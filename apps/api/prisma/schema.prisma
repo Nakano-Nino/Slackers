@@ -37,6 +37,27 @@ enum TaskPriority {
   URGENT
 }
 
+enum BugSeverity {
+  CRITICAL
+  MAJOR
+  MINOR
+  COSMETIC
+}
+
+enum BugStatus {
+  OPEN
+  TRIAGED
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum BugEnvironment {
+  PRODUCTION
+  STAGING
+  DEVELOPMENT
+}
+
 model User {
   id            String          @id @default(cuid())
   email         String          @unique
@@ -51,6 +72,8 @@ model User {
   messages      Message[]
   assignedTasks Task[]          @relation("AssignedTasks")
   createdTasks  Task[]          @relation("CreatedTasks")
+  reportedBugs  Bug[]           @relation("ReportedBugs")
+  assignedBugs  Bug[]           @relation("AssignedBugs")
   ownedProjects Project[]       @relation("ProjectOwner")
   projectMembers ProjectMember[]
   memberships   ChannelMember[]
@@ -71,6 +94,7 @@ model Project {
 
   members     ProjectMember[]
   tasks       Task[]
+  bugs        Bug[]
 
   @@map("projects")
 }
@@ -123,6 +147,7 @@ model Message {
   userId    String
   content   String   @db.Text
   taskId    String?
+  bugId     String?
   createdAt DateTime @default(now())
 
   channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
@@ -150,6 +175,8 @@ model Task {
   creatorId   String?
   creator     User?        @relation("CreatedTasks", fields: [creatorId], references: [id], onDelete: SetNull)
 
+  bugs        Bug[]
+
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
@@ -157,4 +184,35 @@ model Task {
   @@index([status])
   @@index([assigneeId])
   @@map("tasks")
+}
+
+model Bug {
+  id                 String         @id @default(cuid())
+  projectId          String
+  project            Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title              String
+  description        String         @db.Text
+  severity           BugSeverity    @default(MAJOR)
+  status             BugStatus      @default(OPEN)
+  environment        BugEnvironment @default(PRODUCTION)
+  reproductionSteps  String?        @db.Text
+  expectedBehavior   String?        @db.Text
+  actualBehavior     String?        @db.Text
+
+  reportedById       String
+  reportedBy         User           @relation("ReportedBugs", fields: [reportedById], references: [id], onDelete: Cascade)
+
+  assignedToId       String?
+  assignedTo         User?          @relation("AssignedBugs", fields: [assignedToId], references: [id], onDelete: SetNull)
+
+  taskId             String?
+  task               Task?          @relation(fields: [taskId], references: [id], onDelete: SetNull)
+
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  @@index([projectId])
+  @@index([severity])
+  @@index([status])
+  @@map("bugs")
 }

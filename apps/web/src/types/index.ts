@@ -2,6 +2,10 @@ export type UserRole = 'admin' | 'manager' | 'member' | 'viewer';
 export type TaskStatus = 'backlog' | 'todo' | 'in_progress' | 'in_review' | 'done';
 export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent';
 
+export type BugSeverity = 'critical' | 'major' | 'minor' | 'cosmetic';
+export type BugStatus = 'open' | 'triaged' | 'in_progress' | 'resolved' | 'closed';
+export type BugEnvironment = 'production' | 'staging' | 'development';
+
 export interface User {
   id: string;
   email: string;
@@ -24,6 +28,8 @@ export interface Project {
   totalPoints?: number;
   completedPoints?: number;
   progressPercentage?: number;
+  totalBugs?: number;
+  criticalBugs?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -46,6 +52,37 @@ export interface Task {
   updatedAt: string;
 }
 
+export interface Bug {
+  id: string;
+  projectId: string;
+  projectName?: string;
+  title: string;
+  description: string;
+  severity: BugSeverity;
+  status: BugStatus;
+  environment: BugEnvironment;
+  reproductionSteps?: string;
+  expectedBehavior?: string;
+  actualBehavior?: string;
+  reportedById: string;
+  reportedBy?: User;
+  assignedToId?: string;
+  assignedTo?: User;
+  taskId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BugStats {
+  totalBugs: number;
+  openBugs: number;
+  criticalBugs: number;
+  resolvedBugs: number;
+  resolutionRate: number;
+  bySeverity: Record<BugSeverity, number>;
+  byStatus: Record<BugStatus, number>;
+}
+
 export interface ProjectStats {
   projectId: string;
   projectName: string;
@@ -64,6 +101,7 @@ export interface Message {
   userAvatar: string;
   content: string;
   taskId?: string;
+  bugId?: string;
   createdAt: string;
 }
 

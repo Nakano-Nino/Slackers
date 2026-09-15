@@ -2,6 +2,8 @@ import {
   ActivityLog,
   ApiResponse,
   AuthResponse,
+  Bug,
+  BugStats,
   Channel,
   HealthStatus,
   Message,
@@ -161,7 +163,13 @@ export const api = {
     return res.data || [];
   },
 
-  sendMessage: async (data: { channelId: string; content: string; userId?: string; taskId?: string }): Promise<Message> => {
+  sendMessage: async (data: {
+    channelId: string;
+    content: string;
+    userId?: string;
+    taskId?: string;
+    bugId?: string;
+  }): Promise<Message> => {
     const res = await fetchJson<ApiResponse<Message>>('/api/messages', {
       method: 'POST',
       body: JSON.stringify(data),
@@ -219,6 +227,78 @@ export const api = {
     await fetchJson<ApiResponse<{ id: string }>>(`/api/tasks/${id}`, {
       method: 'DELETE',
     });
+  },
+
+  // Bugs & Defect Tracking
+  getBugs: async (filter?: {
+    projectId?: string;
+    severity?: string;
+    status?: string;
+    assignedToId?: string;
+  }): Promise<Bug[]> => {
+    const params = new URLSearchParams();
+    if (filter?.projectId) params.set('projectId', filter.projectId);
+    if (filter?.severity) params.set('severity', filter.severity);
+    if (filter?.status) params.set('status', filter.status);
+    if (filter?.assignedToId) params.set('assignedToId', filter.assignedToId);
+    const query = params.toString() ? `?${params.toString()}` : '';
+    const res = await fetchJson<ApiResponse<Bug[]>>(`/api/bugs${query}`);
+    return res.data || [];
+  },
+
+  getBug: async (id: string): Promise<Bug> => {
+    const res = await fetchJson<ApiResponse<Bug>>(`/api/bugs/${id}`);
+    if (!res.data) throw new Error('Bug not found');
+    return res.data;
+  },
+
+  createBug: async (data: {
+    projectId: string;
+    title: string;
+    description: string;
+    severity: string;
+    environment: string;
+    reproductionSteps?: string;
+    expectedBehavior?: string;
+    actualBehavior?: string;
+    assignedToId?: string;
+  }): Promise<Bug> => {
+    const res = await fetchJson<ApiResponse<Bug>>('/api/bugs', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (!res.data) throw new Error('Failed to report bug');
+    return res.data;
+  },
+
+  updateBug: async (id: string, updates: Partial<Bug>): Promise<Bug> => {
+    const res = await fetchJson<ApiResponse<Bug>>(`/api/bugs/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(updates),
+    });
+    if (!res.data) throw new Error('Failed to update bug');
+    return res.data;
+  },
+
+  deleteBug: async (id: string): Promise<void> => {
+    await fetchJson<ApiResponse<{ id: string }>>(`/api/bugs/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  convertBugToTask: async (bugId: string): Promise<{ bug: Bug; task: Task }> => {
+    const res = await fetchJson<ApiResponse<{ bug: Bug; task: Task }>>(`/api/bugs/${bugId}/convert-to-task`, {
+      method: 'POST',
+    });
+    if (!res.data) throw new Error('Failed to convert bug to task');
+    return res.data;
+  },
+
+  getBugStats: async (projectId?: string): Promise<BugStats> => {
+    const query = projectId ? `?projectId=${encodeURIComponent(projectId)}` : '';
+    const res = await fetchJson<ApiResponse<BugStats>>(`/api/bugs/stats${query}`);
+    if (!res.data) throw new Error('Failed to fetch bug stats');
+    return res.data;
   },
 
   // Logs

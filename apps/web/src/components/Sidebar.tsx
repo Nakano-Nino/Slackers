@@ -11,9 +11,11 @@ import {
   ChevronDown,
   FolderKanban,
   LogOut,
-  Shield,
+  Bug,
+  Flame,
 } from 'lucide-react';
 import { Channel, Project, User } from '../types';
+import { ThemeToggle } from './ThemeToggle';
 
 interface Props {
   channels: Channel[];
@@ -25,9 +27,11 @@ interface Props {
   onSelectProject: (id: string) => void;
   users: User[];
   currentUser: User | null;
-  activeView: 'chat' | 'kanban';
-  onSelectView: (view: 'chat' | 'kanban') => void;
+  activeView: 'chat' | 'kanban' | 'bugs';
+  onSelectView: (view: 'chat' | 'kanban' | 'bugs') => void;
   taskCount: number;
+  bugCount: number;
+  criticalBugCount: number;
   onLogout: () => void;
 }
 
@@ -51,33 +55,38 @@ export function Sidebar({
   activeView,
   onSelectView,
   taskCount,
+  bugCount,
+  criticalBugCount,
   onLogout,
 }: Props) {
   const roleInfo = currentUser?.role ? ROLE_BADGES[currentUser.role] : ROLE_BADGES.member;
 
   return (
-    <aside className="w-64 bg-neutral-950 border-r border-neutral-800 flex flex-col h-full select-none">
-      {/* Workspace Header */}
-      <div className="h-14 px-4 border-b border-neutral-800 flex items-center justify-between hover:bg-neutral-900/50 cursor-pointer transition">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center font-bold text-white shadow-sm text-sm">
+    <aside className="w-64 bg-neutral-950 border-r border-neutral-800 flex flex-col h-full select-none shrink-0">
+      {/* Workspace Header with Theme Toggle */}
+      <div className="h-14 px-4 border-b border-neutral-800 flex items-center justify-between">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center font-bold text-white shadow-sm text-sm shrink-0">
             S
           </div>
-          <div>
-            <h1 className="font-semibold text-sm text-neutral-100 flex items-center gap-1">
+          <div className="min-w-0">
+            <h1 className="font-semibold text-sm text-neutral-100 flex items-center gap-1 truncate">
               Slackers HQ
-              <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
             </h1>
-            <p className="text-[11px] text-neutral-500 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            <p className="text-[11px] text-neutral-500 flex items-center gap-1 truncate">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
               {projects.length} Active Projects
             </p>
           </div>
         </div>
+
+        {/* Theme Toggle in Header */}
+        <ThemeToggle />
       </div>
 
-      {/* Primary Navigation Switcher (Chat vs Project Kanban) */}
+      {/* Primary Navigation Switcher (Chat vs Project Kanban vs Bug Tracker) */}
       <div className="p-3 border-b border-neutral-800/80 space-y-1">
+        {/* Chat Button */}
         <button
           onClick={() => onSelectView('chat')}
           className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition ${
@@ -99,6 +108,7 @@ export function Sidebar({
           </span>
         </button>
 
+        {/* Kanban Button */}
         <button
           onClick={() => onSelectView('kanban')}
           className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition ${
@@ -118,6 +128,35 @@ export function Sidebar({
           >
             {taskCount}
           </span>
+        </button>
+
+        {/* Bug Tracker Button */}
+        <button
+          onClick={() => onSelectView('bugs')}
+          className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition ${
+            activeView === 'bugs'
+              ? 'bg-rose-600 text-white shadow-md shadow-rose-600/20'
+              : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900'
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            <Bug className="w-4 h-4" />
+            <span>Bug Tracker</span>
+          </div>
+          <div className="flex items-center gap-1">
+            {criticalBugCount > 0 && (
+              <span className="text-[9px] bg-rose-950 text-rose-300 font-bold px-1.5 py-0.2 rounded-full border border-rose-500/40 animate-pulse">
+                {criticalBugCount} critical
+              </span>
+            )}
+            <span
+              className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                activeView === 'bugs' ? 'bg-rose-700/80 text-white' : 'bg-neutral-800 text-neutral-400'
+              }`}
+            >
+              {bugCount}
+            </span>
+          </div>
         </button>
       </div>
 
@@ -143,7 +182,9 @@ export function Sidebar({
                   key={project.id}
                   onClick={() => {
                     onSelectProject(project.id);
-                    onSelectView('kanban');
+                    if (activeView === 'chat') {
+                      onSelectView('kanban');
+                    }
                   }}
                   className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition group ${
                     isActive
@@ -216,7 +257,7 @@ export function Sidebar({
           </div>
         </div>
 
-        {/* Teammates */}
+        {/* Teammates Section */}
         <div>
           <div className="flex items-center justify-between px-2 mb-2">
             <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
@@ -266,7 +307,7 @@ export function Sidebar({
         </div>
       </div>
 
-      {/* User Profile & Logout Bar */}
+      {/* User Profile Footer */}
       {currentUser && (
         <div className="p-3 border-t border-neutral-800 bg-neutral-900/60 flex items-center justify-between">
           <div className="flex items-center gap-2.5 min-w-0">

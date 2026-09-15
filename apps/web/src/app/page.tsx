@@ -3,6 +3,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { api, authStorage } from '../lib/api';
 import {
+  Bug,
+  BugEnvironment,
+  BugSeverity,
+  BugStatus,
   Channel,
   Message,
   Project,
@@ -15,10 +19,12 @@ import {
 import { Sidebar } from '../components/Sidebar';
 import { ChatArea } from '../components/ChatArea';
 import { KanbanBoard } from '../components/KanbanBoard';
+import { BugTracker } from '../components/BugTracker';
 import { ProjectProgressBar } from '../components/ProjectProgressBar';
 import { CreateChannelModal } from '../components/CreateChannelModal';
 import { CreateProjectModal } from '../components/CreateProjectModal';
 import { CreateTaskModal } from '../components/CreateTaskModal';
+import { ReportBugModal } from '../components/ReportBugModal';
 import { AuthModal } from '../components/AuthModal';
 import { BackendStatus } from '../components/BackendStatus';
 import { Database, Server } from 'lucide-react';
@@ -28,7 +34,7 @@ export default function Home() {
   const [isAuthChecking, setIsAuthChecking] = useState(true);
 
   // App navigation & state
-  const [activeView, setActiveView] = useState<'chat' | 'kanban'>('chat');
+  const [activeView, setActiveView] = useState<'chat' | 'kanban' | 'bugs'>('chat');
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProjectId, setSelectedProjectId] = useState<string>('proj-core');
   const [channels, setChannels] = useState<Channel[]>([]);
@@ -40,10 +46,14 @@ export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [projectStats, setProjectStats] = useState<ProjectStats | null>(null);
 
+  // Bug tracking state
+  const [bugs, setBugs] = useState<Bug[]>([]);
+
   // Modals
   const [isChannelModalOpen, setIsChannelModalOpen] = useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [isReportBugModalOpen, setIsReportBugModalOpen] = useState(false);
 
   const [loadingMessages, setLoadingMessages] = useState(false);
 
@@ -71,20 +81,22 @@ export default function Home() {
     checkSession();
   }, []);
 
-  // Load app data when user is authenticated
+  // Load workspace data when authenticated
   const loadWorkspaceData = useCallback(async () => {
     if (!currentUser) return;
 
     try {
-      const [fetchedProjects, fetchedChannels, fetchedUsers] = await Promise.all([
+      const [fetchedProjects, fetchedChannels, fetchedUsers, fetchedBugs] = await Promise.all([
         api.getProjects(),
         api.getChannels(),
         api.getUsers(),
+        api.getBugs(),
       ]);
 
       setProjects(fetchedProjects);
       setChannels(fetchedChannels);
       setUsers(fetchedUsers);
+      setBugs(fetchedBugs);
 
       const initialProjectId = fetchedProjects.length > 0 ? fetchedProjects[0].id : 'proj-core';
       setSelectedProjectId(initialProjectId);
@@ -107,14 +119,16 @@ export default function Home() {
   const loadProjectTasksAndStats = useCallback(async (projectId: string) => {
     if (!projectId || !currentUser) return;
     try {
-      const [fetchedTasks, fetchedStats] = await Promise.all([
+      const [fetchedTasks, fetchedStats, fetchedBugs] = await Promise.all([
         api.getTasks({ projectId }),
         api.getProjectStats(projectId),
+        api.getBugs({ projectId }),
       ]);
       setTasks(fetchedTasks);
       setProjectStats(fetchedStats);
+      setBugs(fetchedBugs);
     } catch (err) {
-      console.error(`Failed to load tasks for project ${projectId}:`, err);
+      console.error(`Failed to load project details for ${projectId}:`, err);
     }
   }, [currentUser]);
 
@@ -155,6 +169,7 @@ export default function Home() {
     setCurrentUser(null);
     setProjects([]);
     setTasks([]);
+    setBugs([]);
     setMessages([]);
   };
 
@@ -207,7 +222,6 @@ export default function Home() {
   };
 
   const handleUpdateTaskStatus = async (taskId: string, newStatus: TaskStatus) => {
-    // Optimistic UI update
     setTasks((prev) =>
       prev.map((t) => (t.id === taskId ? { ...t, status: newStatus } : t))
     );
@@ -229,6 +243,63 @@ export default function Home() {
     } catch (err) {
       console.error('Failed to delete task:', err);
       await refreshCurrentProject();
+    }
+  };
+
+  // Bug Handlers
+  const handleCreateBug = async (bugData: {
+    projectId: string;
+    title: string;
+    description: string;
+    severity: BugSeverity;
+    environment: BugEnvironment;
+    reproductionSteps?: string;
+    expectedBehavior?: string;
+    actualBehavior?: string;
+    assignedToId?: string;
+  }) => {
+    const newBug = await api.createBug(bugData);
+    setBugs((prev) => [newBug, ...prev]);
+    await refreshCurrentProject();
+  };
+
+  const handleUpdateBugStatus = async (bugId: string, newStatus: BugStatus) => {
+    setBugs((prev) =>
+      prev.map((b) => (b.id === bugId ? { ...b, status: newStatus } : b))
+    );
+
+    try {
+      await api.updateBug(bugId, { status: newStatus });
+    } catch (err) {
+      console.error('Failed to update bug status:', err);
+      await refreshCurrentProject();
+    }
+  };
+
+  const handleDeleteBug = async (bugId: string) => {
+    setBugs((prev) => prev.filter((b) => b.id !== bugId));
+    try {
+      await api.deleteBug(bugId);
+    } catch (err) {
+      console.error('Failed to delete bug:', err);
+      await refreshCurrentProject();
+    }
+  };
+
+  const handleConvertBugToTask = async (bugId: string) => {
+    try {
+      const result = await api.convertBugToTask(bugId);
+      // Update bug state with linked task and in_progress status
+      setBugs((prev) =>
+        prev.map((b) => (b.id === bugId ? result.bug : b))
+      );
+      // Add created task into tasks state
+      if (result.task.projectId === selectedProjectId) {
+        setTasks((prev) => [...prev, result.task]);
+      }
+      await refreshCurrentProject();
+    } catch (err) {
+      console.error('Failed to convert bug to task:', err);
     }
   };
 
@@ -254,6 +325,28 @@ export default function Home() {
     }
   };
 
+  const handleDiscussBugInChat = async (bug: Bug) => {
+    const targetChannel = channels.find((c) => c.name === 'engineering') || channels[0];
+    const channelId = targetChannel ? targetChannel.id : selectedChannelId;
+
+    setSelectedChannelId(channelId);
+    setActiveView('chat');
+
+    const bugMessage = `🚨 **Bug Ticket Alert**: [${bug.severity.toUpperCase()} / ${bug.environment.toUpperCase()}] ${bug.title}\n> ${bug.description}\n* **Status**: \`${bug.status.toUpperCase()}\`\n* **Reported By**: ${bug.reportedBy?.name || 'Anonymous'}\n* **Assignee**: ${bug.assignedTo?.name || 'Unassigned'}\n* **Reproduction**: \`${bug.reproductionSteps || 'See defect card'}\``;
+
+    try {
+      const newMsg = await api.sendMessage({
+        channelId,
+        content: bugMessage,
+        userId: currentUser?.id,
+        bugId: bug.id,
+      });
+      setMessages((prev) => [...prev, newMsg]);
+    } catch (err) {
+      console.error('Failed to send bug discussion to chat:', err);
+    }
+  };
+
   if (isAuthChecking) {
     return (
       <div className="flex h-screen w-screen items-center justify-center bg-neutral-950 text-neutral-200">
@@ -267,13 +360,14 @@ export default function Home() {
     );
   }
 
-  // If user is not logged in, enforce authentication!
+  // Authentication Guard
   if (!currentUser) {
     return <AuthModal onSuccess={(user) => setCurrentUser(user)} />;
   }
 
   const activeProject = projects.find((p) => p.id === selectedProjectId) || projects[0] || null;
   const selectedChannel = channels.find((c) => c.id === selectedChannelId) || null;
+  const criticalBugCount = bugs.filter((b) => b.severity === 'critical' && b.status !== 'closed' && b.status !== 'resolved').length;
 
   return (
     <main className="flex h-screen w-screen overflow-hidden bg-neutral-950 font-sans text-neutral-100">
@@ -290,6 +384,8 @@ export default function Home() {
         activeView={activeView}
         onSelectView={setActiveView}
         taskCount={tasks.length}
+        bugCount={bugs.length}
+        criticalBugCount={criticalBugCount}
         onLogout={handleLogout}
       />
 
@@ -303,7 +399,7 @@ export default function Home() {
             onSendMessage={handleSendMessage}
             loadingMessages={loadingMessages}
           />
-        ) : (
+        ) : activeView === 'kanban' ? (
           <div className="flex-1 flex flex-col h-full p-6 overflow-hidden">
             {/* Header with Title & Backend Status */}
             <div className="flex items-center justify-between mb-4 shrink-0">
@@ -328,7 +424,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Project Progress Bar with Multi-Project Switcher */}
+            {/* Project Progress Bar */}
             <ProjectProgressBar
               projects={projects}
               activeProject={activeProject}
@@ -339,7 +435,7 @@ export default function Home() {
               onOpenCreateProject={() => setIsProjectModalOpen(true)}
             />
 
-            {/* Project-Scoped Kanban Board */}
+            {/* Kanban Board */}
             <KanbanBoard
               tasks={tasks}
               users={users}
@@ -347,6 +443,39 @@ export default function Home() {
               onUpdateTaskStatus={handleUpdateTaskStatus}
               onDeleteTask={handleDeleteTask}
               onDiscussInChat={handleDiscussInChat}
+            />
+          </div>
+        ) : (
+          <div className="flex-1 flex flex-col h-full p-6 overflow-hidden">
+            {/* Bug Tracker View Header */}
+            <div className="flex items-center justify-between mb-4 shrink-0">
+              <div>
+                <h2 className="text-xl font-bold text-neutral-100 flex items-center gap-2">
+                  Bug & Defect Tracker
+                </h2>
+                <p className="text-xs text-neutral-400">
+                  Log, triage, and resolve software defects with cross-team chat alerts and Kanban conversion.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <BackendStatus />
+              </div>
+            </div>
+
+            {/* Bug Tracker Component */}
+            <BugTracker
+              bugs={bugs}
+              projects={projects}
+              users={users}
+              currentUserRole={currentUser.role}
+              selectedProjectId={selectedProjectId}
+              onSelectProject={setSelectedProjectId}
+              onOpenReportBug={() => setIsReportBugModalOpen(true)}
+              onUpdateBugStatus={handleUpdateBugStatus}
+              onDeleteBug={handleDeleteBug}
+              onConvertToTask={handleConvertBugToTask}
+              onDiscussInChat={handleDiscussBugInChat}
             />
           </div>
         )}
@@ -368,6 +497,15 @@ export default function Home() {
         isOpen={isTaskModalOpen}
         onClose={() => setIsTaskModalOpen(false)}
         onCreate={handleCreateTask}
+        projects={projects}
+        defaultProjectId={selectedProjectId}
+        users={users}
+      />
+
+      <ReportBugModal
+        isOpen={isReportBugModalOpen}
+        onClose={() => setIsReportBugModalOpen(false)}
+        onCreate={handleCreateBug}
         projects={projects}
         defaultProjectId={selectedProjectId}
         users={users}

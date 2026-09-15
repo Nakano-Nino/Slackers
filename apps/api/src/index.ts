@@ -8,6 +8,7 @@ import projectRoutes from './routes/projectRoutes.js';
 import channelRoutes from './routes/channelRoutes.js';
 import messageRoutes from './routes/messageRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
+import bugRoutes from './routes/bugRoutes.js';
 import logRoutes from './routes/logRoutes.js';
 import { dataStore } from './services/dataStore.js';
 import { errorHandler } from './middleware/errorHandler.js';
@@ -35,6 +36,7 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/channels', channelRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/bugs', bugRoutes);
 app.use('/api/logs', logRoutes);
 
 // Users route
@@ -71,6 +73,7 @@ app.listen(PORT, () => {
   console.log(`👉 Auth endpoints: http://localhost:${PORT}/api/auth`);
   console.log(`👉 Projects: http://localhost:${PORT}/api/projects`);
   console.log(`👉 Tasks & Kanban: http://localhost:${PORT}/api/tasks`);
+  console.log(`👉 Bug Tracker: http://localhost:${PORT}/api/bugs`);
   console.log(`👉 Channels & Chat: http://localhost:${PORT}/api/channels`);
   console.log(`👉 MongoDB Audit Logs: http://localhost:${PORT}/api/logs`);
 });

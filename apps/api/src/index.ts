@@ -5,6 +5,8 @@ import dotenv from 'dotenv';
 import healthRoutes from './routes/healthRoutes.js';
 import channelRoutes from './routes/channelRoutes.js';
 import messageRoutes from './routes/messageRoutes.js';
+import taskRoutes from './routes/taskRoutes.js';
+import logRoutes from './routes/logRoutes.js';
 import { dataStore } from './services/dataStore.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
@@ -28,6 +30,8 @@ app.use(morgan('dev'));
 app.use('/api/health', healthRoutes);
 app.use('/api/channels', channelRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/tasks', taskRoutes);
+app.use('/api/logs', logRoutes);
 
 // Users route
 app.get('/api/users', (req: Request, res: Response) => {
@@ -62,6 +66,9 @@ app.listen(PORT, () => {
   console.log(`🚀 Slackers API Server running on http://localhost:${PORT}`);
   console.log(`👉 Health check: http://localhost:${PORT}/api/health`);
   console.log(`👉 Channels: http://localhost:${PORT}/api/channels`);
+  console.log(`👉 Tasks & Kanban: http://localhost:${PORT}/api/tasks`);
+  console.log(`👉 Sprint Stats: http://localhost:${PORT}/api/tasks/sprint/stats`);
+  console.log(`👉 MongoDB Audit Logs: http://localhost:${PORT}/api/logs`);
 });
 
 export default app;

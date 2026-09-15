@@ -1,9 +1,13 @@
+export type TaskStatus = 'backlog' | 'todo' | 'in_progress' | 'in_review' | 'done';
+export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent';
+
 export interface User {
   id: string;
   name: string;
   avatar: string;
   status: 'online' | 'offline' | 'away';
   role: string;
+  email?: string;
 }
 
 export interface Message {
@@ -13,6 +17,7 @@ export interface Message {
   userName: string;
   userAvatar: string;
   content: string;
+  taskId?: string;
   createdAt: string;
 }
 
@@ -23,6 +28,58 @@ export interface Channel {
   isPrivate: boolean;
   memberCount: number;
   createdAt: string;
+}
+
+export interface Task {
+  id: string;
+  title: string;
+  description: string;
+  status: TaskStatus;
+  priority: TaskPriority;
+  storyPoints: number;
+  tags: string[];
+  dueDate?: string;
+  assigneeId?: string;
+  assignee?: User;
+  sprintId?: string;
+  sprintName?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Sprint {
+  id: string;
+  name: string;
+  goal: string;
+  status: 'planning' | 'active' | 'completed';
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface SprintStats {
+  sprintName: string;
+  totalPoints: number;
+  completedPoints: number;
+  progressPercentage: number;
+  tasksByStatus: Record<TaskStatus, number>;
+  totalTasks: number;
+}
+
+export interface ActivityLog {
+  timestamp: string;
+  level: 'info' | 'warn' | 'error';
+  action:
+    | 'TASK_CREATED'
+    | 'TASK_STATUS_CHANGED'
+    | 'TASK_UPDATED'
+    | 'TASK_DELETED'
+    | 'MESSAGE_SENT'
+    | 'CHANNEL_CREATED'
+    | 'USER_LOGIN'
+    | 'SYSTEM';
+  userId?: string;
+  userName?: string;
+  details: Record<string, unknown>;
 }
 
 export interface ApiResponse<T> {

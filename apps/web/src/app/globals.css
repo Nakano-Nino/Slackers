@@ -3,57 +3,82 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --surface: #ffffff;
-  --surface-muted: #f1f5f9;
-  --border-color: #cbd5e1;
+  --background: #f8fafc; /* modern clean slate-50 */
+  --foreground: #0f172a; /* slate-900 */
+  --card-bg: #ffffff;
+  --muted-bg: #f1f5f9; /* slate-100 */
+  --border-color: #e2e8f0; /* slate-200 */
 }
 
 .dark {
   --background: #0a0a0a;
   --foreground: #ededed;
-  --surface: #171717;
-  --surface-muted: #1f1f1f;
+  --card-bg: #171717;
+  --muted-bg: #1f1f1f;
   --border-color: #262626;
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-/* Light mode utility adaptations */
-html:not(.dark) .bg-neutral-950 {
-  background-color: #f8fafc !important; /* slate-50 */
-  color: #0f172a !important; /* slate-900 */
+/* =========================================================
+   CLEAN MODERN SLATE LIGHT MODE THEME OVERRIDES
+   Ensures ALL neutral backgrounds, text, and borders 
+   automatically adapt with perfect contrast in light mode.
+   ========================================================= */
+
+html:not(.dark) {
+  color-scheme: light;
 }
 
-html:not(.dark) .bg-neutral-900 {
+/* 1. Page & Workspace Containers */
+html:not(.dark) main,
+html:not(.dark) aside,
+html:not(.dark) body {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/* 2. Neutral Backgrounds & Cards */
+html:not(.dark) [class*="bg-neutral-950"] {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+html:not(.dark) [class*="bg-neutral-900"] {
   background-color: #ffffff !important;
   color: #0f172a !important;
 }
 
-html:not(.dark) .bg-neutral-900\/60,
-html:not(.dark) .bg-neutral-900\/80,
-html:not(.dark) .bg-neutral-900\/90 {
+html:not(.dark) [class*="bg-neutral-900/"],
+html:not(.dark) [class*="bg-neutral-950/"],
+html:not(.dark) [class*="bg-neutral-800"] {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+html:not(.dark) [class*="bg-neutral-800/"] {
+  background-color: #e2e8f0 !important;
+}
+
+/* Modal Content Card override (ensures modal window is solid white) */
+html:not(.dark) .fixed .bg-neutral-900 {
   background-color: #ffffff !important;
+  color: #0f172a !important;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1) !important;
 }
 
-html:not(.dark) .bg-neutral-950\/60,
-html:not(.dark) .bg-neutral-950\/70,
-html:not(.dark) .bg-neutral-950\/80 {
-  background-color: #f1f5f9 !important; /* slate-100 */
-}
-
-html:not(.dark) .border-neutral-800,
-html:not(.dark) .border-neutral-800\/80,
-html:not(.dark) .border-neutral-800\/90,
-html:not(.dark) .border-neutral-700 {
+/* 3. Borders */
+html:not(.dark) [class*="border-neutral-800"],
+html:not(.dark) [class*="border-neutral-700"],
+html:not(.dark) [class*="border-neutral-900"] {
   border-color: #e2e8f0 !important; /* slate-200 */
 }
 
+/* 4. Text & Typography */
 html:not(.dark) .text-neutral-100,
 html:not(.dark) .text-neutral-200 {
   color: #0f172a !important; /* slate-900 */
@@ -69,6 +94,7 @@ html:not(.dark) .text-neutral-600 {
   color: #64748b !important; /* slate-500 */
 }
 
+/* 5. Inputs, Selects, and Textareas */
 html:not(.dark) input,
 html:not(.dark) textarea,
 html:not(.dark) select {
@@ -77,7 +103,66 @@ html:not(.dark) select {
   border-color: #cbd5e1 !important;
 }
 
+html:not(.dark) input::placeholder,
+html:not(.dark) textarea::placeholder {
+  color: #94a3b8 !important; /* slate-400 */
+}
+
+html:not(.dark) input:focus,
+html:not(.dark) textarea:focus,
+html:not(.dark) select:focus {
+  border-color: #6366f1 !important; /* indigo-500 */
+  outline: none !important;
+}
+
+/* 6. Hover States */
 html:not(.dark) .hover\:bg-neutral-900:hover,
-html:not(.dark) .hover\:bg-neutral-800:hover {
-  background-color: #f1f5f9 !important; /* slate-100 */
+html:not(.dark) .hover\:bg-neutral-800:hover,
+html:not(.dark) [class*="hover:bg-neutral-900/"]:hover,
+html:not(.dark) [class*="hover:bg-neutral-800/"]:hover {
+  background-color: #e2e8f0 !important;
+}
+
+/* 7. Status Badges & Pills in Light Mode */
+html:not(.dark) [class*="bg-rose-950"] {
+  background-color: #ffe4e6 !important; /* rose-100 */
+  color: #be123c !important; /* rose-700 */
+  border-color: #fecdd3 !important;
+}
+
+html:not(.dark) [class*="bg-amber-950"] {
+  background-color: #fef3c7 !important; /* amber-100 */
+  color: #b45309 !important; /* amber-700 */
+  border-color: #fde68a !important;
+}
+
+html:not(.dark) [class*="bg-emerald-950"] {
+  background-color: #d1fae5 !important; /* emerald-100 */
+  color: #047857 !important; /* emerald-700 */
+  border-color: #a7f3d0 !important;
+}
+
+html:not(.dark) [class*="bg-purple-950"] {
+  background-color: #f3e8ff !important; /* purple-100 */
+  color: #7e22ce !important; /* purple-700 */
+  border-color: #e9d5ff !important;
+}
+
+html:not(.dark) [class*="bg-sky-950"] {
+  background-color: #e0f2fe !important; /* sky-100 */
+  color: #0369a1 !important; /* sky-700 */
+  border-color: #bae6fd !important;
+}
+
+html:not(.dark) [class*="bg-blue-950"] {
+  background-color: #dbeafe !important; /* blue-100 */
+  color: #1d4ed8 !important; /* blue-700 */
+  border-color: #bfdbfe !important;
+}
+
+/* Tags in Light Mode */
+html:not(.dark) [class*="bg-neutral-800/70"] {
+  background-color: #f1f5f9 !important;
+  color: #475569 !important;
+  border: 1px solid #e2e8f0 !important;
 }

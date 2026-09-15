@@ -6,23 +6,22 @@ import {
   TaskPriority,
   TaskStatus,
   User as UserType,
+  UserRole,
 } from '../types';
 import {
   ChevronLeft,
   ChevronRight,
   MessageSquareShare,
   Trash2,
-  AlertCircle,
-  Clock,
   Search,
   Filter,
-  Layers,
-  ArrowRight,
+  ShieldAlert,
 } from 'lucide-react';
 
 interface Props {
   tasks: Task[];
   users: UserType[];
+  currentUserRole?: UserRole;
   onUpdateTaskStatus: (taskId: string, newStatus: TaskStatus) => Promise<void>;
   onDeleteTask: (taskId: string) => Promise<void>;
   onDiscussInChat: (task: Task) => void;
@@ -46,6 +45,7 @@ const PRIORITY_STYLES: Record<TaskPriority, { label: string; badge: string }> = 
 export function KanbanBoard({
   tasks,
   users,
+  currentUserRole,
   onUpdateTaskStatus,
   onDeleteTask,
   onDiscussInChat,
@@ -55,8 +55,16 @@ export function KanbanBoard({
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
 
+  // RBAC permissions
+  const canMoveTasks = currentUserRole !== 'viewer';
+  const canDeleteTasks = currentUserRole === 'admin' || currentUserRole === 'manager';
+
   const filteredTasks = tasks.filter((task) => {
-    if (searchQuery && !task.title.toLowerCase().includes(searchQuery.toLowerCase()) && !task.description.toLowerCase().includes(searchQuery.toLowerCase())) {
+    if (
+      searchQuery &&
+      !task.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      !task.description.toLowerCase().includes(searchQuery.toLowerCase())
+    ) {
       return false;
     }
     if (assigneeFilter !== 'all' && task.assigneeId !== assigneeFilter) {
@@ -82,15 +90,18 @@ export function KanbanBoard({
 
   // Drag and Drop handlers
   const handleDragStart = (e: React.DragEvent, taskId: string) => {
+    if (!canMoveTasks) return;
     e.dataTransfer.setData('text/plain', taskId);
     setDraggedTaskId(taskId);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
+    if (!canMoveTasks) return;
     e.preventDefault();
   };
 
   const handleDrop = async (e: React.DragEvent, targetStatus: TaskStatus) => {
+    if (!canMoveTasks) return;
     e.preventDefault();
     const taskId = e.dataTransfer.getData('text/plain') || draggedTaskId;
     if (!taskId) return;
@@ -112,7 +123,7 @@ export function KanbanBoard({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search tasks, descriptions..."
+            placeholder="Search tasks, acceptance criteria..."
             className="w-full bg-transparent text-xs text-neutral-200 placeholder-neutral-500 focus:outline-none"
           />
         </div>
@@ -152,7 +163,7 @@ export function KanbanBoard({
         </div>
       </div>
 
-      {/* Kanban Board Columns Container */}
+      {/* Kanban Board Columns */}
       <div className="flex-1 overflow-x-auto pb-4">
         <div className="grid grid-flow-col auto-cols-[300px] gap-4 h-full min-h-[500px]">
           {COLUMNS.map((col) => {
@@ -181,11 +192,11 @@ export function KanbanBoard({
                   </span>
                 </div>
 
-                {/* Task Cards Feed */}
+                {/* Task Cards */}
                 <div className="flex-1 overflow-y-auto p-2.5 space-y-2.5">
                   {columnTasks.length === 0 ? (
                     <div className="h-28 border border-dashed border-neutral-800 rounded-lg flex items-center justify-center text-[11px] text-neutral-600">
-                      Drop tasks here
+                      {canMoveTasks ? 'Drop tasks here' : 'No tasks'}
                     </div>
                   ) : (
                     columnTasks.map((task) => {
@@ -196,11 +207,13 @@ export function KanbanBoard({
                       return (
                         <div
                           key={task.id}
-                          draggable
+                          draggable={canMoveTasks}
                           onDragStart={(e) => handleDragStart(e, task.id)}
-                          className="bg-neutral-900 border border-neutral-800 hover:border-indigo-500/50 rounded-xl p-3.5 shadow-sm transition group cursor-grab active:cursor-grabbing hover:shadow-md"
+                          className={`bg-neutral-900 border border-neutral-800 hover:border-indigo-500/50 rounded-xl p-3.5 shadow-sm transition group hover:shadow-md ${
+                            canMoveTasks ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'
+                          }`}
                         >
-                          {/* Card Top: Priority & Story points */}
+                          {/* Card Top: Priority & Points */}
                           <div className="flex items-center justify-between gap-2 mb-2">
                             <div className="flex items-center gap-1.5">
                               <span
@@ -213,10 +226,10 @@ export function KanbanBoard({
                               </span>
                             </div>
 
-                            {/* Discuss in Chat button */}
+                            {/* Discuss in Chat */}
                             <button
                               onClick={() => onDiscussInChat(task)}
-                              title="Discuss in Chat channel"
+                              title="Discuss in Chat"
                               className="text-neutral-500 hover:text-indigo-400 p-1 rounded hover:bg-neutral-800 transition"
                             >
                               <MessageSquareShare className="w-3.5 h-3.5" />
@@ -251,7 +264,6 @@ export function KanbanBoard({
 
                           {/* Footer: Assignee & Action Controls */}
                           <div className="pt-2 border-t border-neutral-800/70 flex items-center justify-between">
-                            {/* Assignee */}
                             <div className="flex items-center gap-1.5">
                               {task.assignee ? (
                                 <>
@@ -269,9 +281,9 @@ export function KanbanBoard({
                               )}
                             </div>
 
-                            {/* Dual-Mode Controls: 1-Click Move Buttons */}
+                            {/* Dual-Move Controls (1-Click Move + Delete) */}
                             <div className="flex items-center gap-1">
-                              {prevStatus && (
+                              {canMoveTasks && prevStatus && (
                                 <button
                                   onClick={() => onUpdateTaskStatus(task.id, prevStatus)}
                                   title={`Move back to ${prevStatus.replace('_', ' ')}`}
@@ -280,7 +292,7 @@ export function KanbanBoard({
                                   <ChevronLeft className="w-3.5 h-3.5" />
                                 </button>
                               )}
-                              {nextStatus && (
+                              {canMoveTasks && nextStatus && (
                                 <button
                                   onClick={() => onUpdateTaskStatus(task.id, nextStatus)}
                                   title={`Advance to ${nextStatus.replace('_', ' ')}`}
@@ -289,13 +301,15 @@ export function KanbanBoard({
                                   <ChevronRight className="w-3.5 h-3.5" />
                                 </button>
                               )}
-                              <button
-                                onClick={() => onDeleteTask(task.id)}
-                                title="Delete task"
-                                className="p-1 text-neutral-600 hover:text-rose-400 hover:bg-neutral-800 rounded transition ml-1"
-                              >
-                                <Trash2 className="w-3 h-3" />
-                              </button>
+                              {canDeleteTasks && (
+                                <button
+                                  onClick={() => onDeleteTask(task.id)}
+                                  title="Delete task (Admin/Manager)"
+                                  className="p-1 text-neutral-600 hover:text-rose-400 hover:bg-neutral-800 rounded transition ml-1"
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                </button>
+                              )}
                             </div>
                           </div>
                         </div>

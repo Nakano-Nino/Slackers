@@ -1,16 +1,54 @@
-import { ActivityLog, ApiResponse, Channel, HealthStatus, Message, SprintStats, Task, User } from '../types';
+import {
+  ActivityLog,
+  ApiResponse,
+  AuthResponse,
+  Channel,
+  HealthStatus,
+  Message,
+  Project,
+  ProjectStats,
+  Task,
+  User,
+} from '../types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
 
+const TOKEN_KEY = 'slackers_auth_token';
+
+export const authStorage = {
+  getToken: (): string | null => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem(TOKEN_KEY);
+  },
+  setToken: (token: string) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(TOKEN_KEY, token);
+    }
+  },
+  clearToken: () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(TOKEN_KEY);
+    }
+  },
+};
+
 async function fetchJson<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
+  const token = authStorage.getToken();
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options?.headers as Record<string, string>),
+  };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   try {
     const res = await fetch(url, {
       ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers,
-      },
+      headers,
       cache: 'no-store',
     });
 
@@ -32,16 +70,80 @@ export const api = {
     return fetchJson<HealthStatus>('/api/health');
   },
 
+  // Authentication
+  login: async (credentials: { email: string; password: string }): Promise<AuthResponse> => {
+    const res = await fetchJson<ApiResponse<AuthResponse>>('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials),
+    });
+    if (!res.data) throw new Error('Login failed');
+    authStorage.setToken(res.data.token);
+    return res.data;
+  },
+
+  register: async (data: { name: string; email: string; password: string }): Promise<AuthResponse> => {
+    const res = await fetchJson<ApiResponse<AuthResponse>>('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (!res.data) throw new Error('Registration failed');
+    authStorage.setToken(res.data.token);
+    return res.data;
+  },
+
+  getMe: async (): Promise<User> => {
+    const res = await fetchJson<ApiResponse<User>>('/api/auth/me');
+    if (!res.data) throw new Error('Failed to fetch profile');
+    return res.data;
+  },
+
+  logout: () => {
+    authStorage.clearToken();
+  },
+
+  // Projects
+  getProjects: async (): Promise<Project[]> => {
+    const res = await fetchJson<ApiResponse<Project[]>>('/api/projects');
+    return res.data || [];
+  },
+
+  getProject: async (id: string): Promise<Project> => {
+    const res = await fetchJson<ApiResponse<Project>>(`/api/projects/${id}`);
+    if (!res.data) throw new Error('Project not found');
+    return res.data;
+  },
+
+  createProject: async (data: {
+    name: string;
+    key: string;
+    description?: string;
+    isPrivate?: boolean;
+  }): Promise<Project> => {
+    const res = await fetchJson<ApiResponse<Project>>('/api/projects', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (!res.data) throw new Error('Failed to create project');
+    return res.data;
+  },
+
+  deleteProject: async (id: string): Promise<void> => {
+    await fetchJson<ApiResponse<{ id: string }>>(`/api/projects/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  getProjectStats: async (projectId?: string): Promise<ProjectStats> => {
+    const query = projectId ? `?projectId=${encodeURIComponent(projectId)}` : '';
+    const res = await fetchJson<ApiResponse<ProjectStats>>(`/api/tasks/stats${query}`);
+    if (!res.data) throw new Error('Failed to fetch project stats');
+    return res.data;
+  },
+
   // Channels
   getChannels: async (): Promise<Channel[]> => {
     const res = await fetchJson<ApiResponse<Channel[]>>('/api/channels');
     return res.data || [];
-  },
-
-  getChannel: async (id: string): Promise<Channel> => {
-    const res = await fetchJson<ApiResponse<Channel>>(`/api/channels/${id}`);
-    if (!res.data) throw new Error('Channel not found');
-    return res.data;
   },
 
   createChannel: async (data: { name: string; description?: string; isPrivate?: boolean }): Promise<Channel> => {
@@ -74,15 +176,10 @@ export const api = {
     return res.data || [];
   },
 
-  getCurrentUser: async (): Promise<User> => {
-    const res = await fetchJson<ApiResponse<User>>('/api/users/me');
-    if (!res.data) throw new Error('Failed to fetch current user');
-    return res.data;
-  },
-
   // Tasks & Kanban
-  getTasks: async (filter?: { status?: string; assigneeId?: string }): Promise<Task[]> => {
+  getTasks: async (filter?: { projectId?: string; status?: string; assigneeId?: string }): Promise<Task[]> => {
     const params = new URLSearchParams();
+    if (filter?.projectId) params.set('projectId', filter.projectId);
     if (filter?.status) params.set('status', filter.status);
     if (filter?.assigneeId) params.set('assigneeId', filter.assigneeId);
     const query = params.toString() ? `?${params.toString()}` : '';
@@ -90,13 +187,8 @@ export const api = {
     return res.data || [];
   },
 
-  getTask: async (id: string): Promise<Task> => {
-    const res = await fetchJson<ApiResponse<Task>>(`/api/tasks/${id}`);
-    if (!res.data) throw new Error('Task not found');
-    return res.data;
-  },
-
   createTask: async (data: {
+    projectId: string;
     title: string;
     description?: string;
     status?: string;
@@ -127,12 +219,6 @@ export const api = {
     await fetchJson<ApiResponse<{ id: string }>>(`/api/tasks/${id}`, {
       method: 'DELETE',
     });
-  },
-
-  getSprintStats: async (): Promise<SprintStats> => {
-    const res = await fetchJson<ApiResponse<SprintStats>>('/api/tasks/sprint/stats');
-    if (!res.data) throw new Error('Failed to fetch sprint stats');
-    return res.data;
   },
 
   // Logs

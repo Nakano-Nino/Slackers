@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useState } from 'react';
-import { X, CheckSquare, User, Flag, Hash } from 'lucide-react';
-import { Task, TaskPriority, TaskStatus, User as UserType } from '../types';
+import React, { useState, useEffect } from 'react';
+import { X, CheckSquare, User, Flag, Hash, Folder } from 'lucide-react';
+import { Project, TaskPriority, TaskStatus, User as UserType } from '../types';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   onCreate: (task: {
+    projectId: string;
     title: string;
     description: string;
     status: TaskStatus;
@@ -16,19 +17,35 @@ interface Props {
     tags: string[];
     assigneeId?: string;
   }) => Promise<void>;
+  projects: Project[];
+  defaultProjectId: string;
   users: UserType[];
 }
 
-export function CreateTaskModal({ isOpen, onClose, onCreate, users }: Props) {
+export function CreateTaskModal({
+  isOpen,
+  onClose,
+  onCreate,
+  projects,
+  defaultProjectId,
+  users,
+}: Props) {
+  const [projectId, setProjectId] = useState(defaultProjectId);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState<TaskStatus>('todo');
   const [priority, setPriority] = useState<TaskPriority>('medium');
   const [storyPoints, setStoryPoints] = useState<number>(3);
   const [tagsInput, setTagsInput] = useState('Frontend, Feature');
-  const [assigneeId, setAssigneeId] = useState<string>(users[0]?.id || '');
+  const [assigneeId, setAssigneeId] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (defaultProjectId) {
+      setProjectId(defaultProjectId);
+    }
+  }, [defaultProjectId]);
 
   if (!isOpen) return null;
 
@@ -45,6 +62,7 @@ export function CreateTaskModal({ isOpen, onClose, onCreate, users }: Props) {
         .filter(Boolean);
 
       await onCreate({
+        projectId: projectId || projects[0]?.id || 'proj-core',
         title: title.trim(),
         description: description.trim(),
         status,
@@ -70,7 +88,7 @@ export function CreateTaskModal({ isOpen, onClose, onCreate, users }: Props) {
         <div className="flex items-center justify-between pb-4 border-b border-neutral-800">
           <h2 className="text-lg font-semibold text-neutral-100 flex items-center gap-2">
             <CheckSquare className="w-5 h-5 text-indigo-400" />
-            Create Sprint Task
+            Create Project Task
           </h2>
           <button
             onClick={onClose}
@@ -89,15 +107,32 @@ export function CreateTaskModal({ isOpen, onClose, onCreate, users }: Props) {
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">
+              Target Project
+            </label>
+            <select
+              value={projectId}
+              onChange={(e) => setProjectId(e.target.value)}
+              className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-200 focus:outline-none focus:border-indigo-500"
+            >
+              {projects.map((p) => (
+                <option key={p.id} value={p.id}>
+                  [{p.key}] {p.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">
               Task Title
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Implement WebSocket gateway"
+              placeholder="e.g. Build authentication gateway"
               required
-              className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
+              className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-indigo-500"
             />
           </div>
 
@@ -108,9 +143,9 @@ export function CreateTaskModal({ isOpen, onClose, onCreate, users }: Props) {
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Provide context, acceptance criteria, or technical notes..."
+              placeholder="Acceptance criteria, architecture notes, or details..."
               rows={3}
-              className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
+              className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-indigo-500"
             />
           </div>
 
@@ -211,7 +246,7 @@ export function CreateTaskModal({ isOpen, onClose, onCreate, users }: Props) {
             <button
               type="submit"
               disabled={loading || !title.trim()}
-              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:hover:bg-indigo-600 rounded-lg transition shadow-sm"
+              className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 rounded-lg transition shadow-sm"
             >
               {loading ? 'Creating...' : 'Create Task'}
             </button>

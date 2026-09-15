@@ -1,27 +1,46 @@
-import { Channel, Message, User } from '../types/index.js';
+import bcrypt from 'bcryptjs';
+import { Channel, Message, User, UserRole } from '../types/index.js';
+
+// Pre-hashed 'password123'
+const DEFAULT_PASSWORD_HASH = bcrypt.hashSync('password123', 10);
 
 class DataStore {
   private users: User[] = [
     {
       id: 'u-1',
       name: 'Sarah Connor',
+      email: 'sarah@slackers.dev',
+      passwordHash: DEFAULT_PASSWORD_HASH,
       avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
       status: 'online',
-      role: 'Lead Architect',
+      role: 'admin',
     },
     {
       id: 'u-2',
       name: 'Alex Rivera',
+      email: 'alex@slackers.dev',
+      passwordHash: DEFAULT_PASSWORD_HASH,
       avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
       status: 'online',
-      role: 'Frontend Engineer',
+      role: 'manager',
     },
     {
       id: 'u-3',
       name: 'Jordan Lee',
+      email: 'jordan@slackers.dev',
+      passwordHash: DEFAULT_PASSWORD_HASH,
       avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&auto=format&fit=crop&q=80',
       status: 'away',
-      role: 'Backend Engineer',
+      role: 'member',
+    },
+    {
+      id: 'u-4',
+      name: 'Taylor Guest',
+      email: 'guest@slackers.dev',
+      passwordHash: DEFAULT_PASSWORD_HASH,
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+      status: 'online',
+      role: 'viewer',
     },
   ];
 
@@ -37,17 +56,17 @@ class DataStore {
     {
       id: 'engineering',
       name: 'engineering',
-      description: 'Tech stack, code reviews, and architecture discussions',
+      description: 'Tech stack, code reviews, and project discussions',
       isPrivate: false,
       memberCount: 18,
       createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(),
     },
     {
-      id: 'random',
-      name: 'random',
-      description: 'Watercooler chat, memes, and non-work banter',
+      id: 'product',
+      name: 'product',
+      description: 'Product roadmap, features, and release planning',
       isPrivate: false,
-      memberCount: 35,
+      memberCount: 24,
       createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 6).toISOString(),
     },
   ];
@@ -59,7 +78,7 @@ class DataStore {
       userId: 'u-1',
       userName: 'Sarah Connor',
       userAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
-      content: 'Welcome everyone to the new Slackers fullstack app! Next.js frontend + Node.js backend are up and connected.',
+      content: 'Welcome to Slackers! We now support Multi-Projects, Role-Based Access Control, and full Email/Password Authentication.',
       createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
     },
     {
@@ -68,7 +87,7 @@ class DataStore {
       userId: 'u-2',
       userName: 'Alex Rivera',
       userAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
-      content: 'Awesome setup! The UI is looking super crisp with Tailwind CSS.',
+      content: 'The new Project Kanban system is live. Switch between projects in the header and assign tasks directly!',
       createdAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
     },
     {
@@ -77,13 +96,30 @@ class DataStore {
       userId: 'u-3',
       userName: 'Jordan Lee',
       userAvatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&auto=format&fit=crop&q=80',
-      content: 'Backend Express REST endpoints are ready. Type-safe responses and CORS configured.',
+      content: 'RBAC verification middleware active: Admin and Manager roles can manage project settings and assign tasks.',
       createdAt: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
     },
   ];
 
   getUsers(): User[] {
+    return this.users.map(({ passwordHash: _, ...safeUser }) => safeUser as User);
+  }
+
+  getUsersInternal(): User[] {
     return this.users;
+  }
+
+  getUserById(id: string): User | undefined {
+    return this.users.find((u) => u.id === id);
+  }
+
+  getUserByEmail(email: string): User | undefined {
+    return this.users.find((u) => u.email.toLowerCase() === email.toLowerCase().trim());
+  }
+
+  addUser(user: User): User {
+    this.users.push(user);
+    return user;
   }
 
   getCurrentUser(): User {
@@ -115,7 +151,7 @@ class DataStore {
     return this.messages.filter((m) => m.channelId === channelId);
   }
 
-  addMessage(data: { channelId: string; content: string; userId?: string }): Message {
+  addMessage(data: { channelId: string; content: string; userId?: string; taskId?: string }): Message {
     const user = this.users.find((u) => u.id === data.userId) || this.users[0];
     const newMessage: Message = {
       id: `m-${Date.now()}`,
@@ -124,6 +160,7 @@ class DataStore {
       userName: user.name,
       userAvatar: user.avatar,
       content: data.content,
+      taskId: data.taskId,
       createdAt: new Date().toISOString(),
     };
     this.messages.push(newMessage);

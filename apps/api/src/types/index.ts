@@ -1,13 +1,60 @@
+export type UserRole = 'admin' | 'manager' | 'member' | 'viewer';
 export type TaskStatus = 'backlog' | 'todo' | 'in_progress' | 'in_review' | 'done';
 export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent';
 
 export interface User {
   id: string;
+  email: string;
+  passwordHash?: string;
   name: string;
   avatar: string;
   status: 'online' | 'offline' | 'away';
-  role: string;
-  email?: string;
+  role: UserRole;
+}
+
+export interface Project {
+  id: string;
+  name: string;
+  key: string;
+  description: string;
+  isPrivate: boolean;
+  ownerId: string;
+  ownerName?: string;
+  memberCount?: number;
+  totalTasks?: number;
+  totalPoints?: number;
+  completedPoints?: number;
+  progressPercentage?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Task {
+  id: string;
+  projectId: string;
+  projectName?: string;
+  title: string;
+  description: string;
+  status: TaskStatus;
+  priority: TaskPriority;
+  storyPoints: number;
+  tags: string[];
+  dueDate?: string;
+  assigneeId?: string;
+  assignee?: User;
+  creatorId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProjectStats {
+  projectId: string;
+  projectName: string;
+  totalPoints: number;
+  completedPoints: number;
+  progressPercentage: number;
+  tasksByStatus: Record<TaskStatus, number>;
+  totalTasks: number;
 }
 
 export interface Message {
@@ -30,56 +77,30 @@ export interface Channel {
   createdAt: string;
 }
 
-export interface Task {
-  id: string;
-  title: string;
-  description: string;
-  status: TaskStatus;
-  priority: TaskPriority;
-  storyPoints: number;
-  tags: string[];
-  dueDate?: string;
-  assigneeId?: string;
-  assignee?: User;
-  sprintId?: string;
-  sprintName?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Sprint {
-  id: string;
-  name: string;
-  goal: string;
-  status: 'planning' | 'active' | 'completed';
-  startDate?: string;
-  endDate?: string;
-}
-
-export interface SprintStats {
-  sprintName: string;
-  totalPoints: number;
-  completedPoints: number;
-  progressPercentage: number;
-  tasksByStatus: Record<TaskStatus, number>;
-  totalTasks: number;
-}
-
 export interface ActivityLog {
   timestamp: string;
   level: 'info' | 'warn' | 'error';
   action:
+    | 'USER_LOGIN'
+    | 'USER_REGISTERED'
+    | 'PROJECT_CREATED'
+    | 'PROJECT_UPDATED'
+    | 'PROJECT_DELETED'
     | 'TASK_CREATED'
     | 'TASK_STATUS_CHANGED'
     | 'TASK_UPDATED'
     | 'TASK_DELETED'
     | 'MESSAGE_SENT'
     | 'CHANNEL_CREATED'
-    | 'USER_LOGIN'
     | 'SYSTEM';
   userId?: string;
   userName?: string;
   details: Record<string, unknown>;
+}
+
+export interface AuthResponse {
+  user: User;
+  token: string;
 }
 
 export interface ApiResponse<T> {

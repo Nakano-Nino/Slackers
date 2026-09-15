@@ -3,6 +3,8 @@ import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import healthRoutes from './routes/healthRoutes.js';
+import authRoutes from './routes/authRoutes.js';
+import projectRoutes from './routes/projectRoutes.js';
 import channelRoutes from './routes/channelRoutes.js';
 import messageRoutes from './routes/messageRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
@@ -28,6 +30,8 @@ app.use(morgan('dev'));
 
 // Routes
 app.use('/api/health', healthRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/projects', projectRoutes);
 app.use('/api/channels', channelRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/tasks', taskRoutes);
@@ -64,10 +68,10 @@ app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`🚀 Slackers API Server running on http://localhost:${PORT}`);
-  console.log(`👉 Health check: http://localhost:${PORT}/api/health`);
-  console.log(`👉 Channels: http://localhost:${PORT}/api/channels`);
+  console.log(`👉 Auth endpoints: http://localhost:${PORT}/api/auth`);
+  console.log(`👉 Projects: http://localhost:${PORT}/api/projects`);
   console.log(`👉 Tasks & Kanban: http://localhost:${PORT}/api/tasks`);
-  console.log(`👉 Sprint Stats: http://localhost:${PORT}/api/tasks/sprint/stats`);
+  console.log(`👉 Channels & Chat: http://localhost:${PORT}/api/channels`);
   console.log(`👉 MongoDB Audit Logs: http://localhost:${PORT}/api/logs`);
 });
 

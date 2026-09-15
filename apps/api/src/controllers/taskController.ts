@@ -1,9 +1,11 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { z } from 'zod';
 import { taskService } from '../services/taskService.js';
-import { ApiResponse, SprintStats, Task, TaskPriority, TaskStatus } from '../types/index.js';
+import { ApiResponse, ProjectStats, Task, TaskPriority, TaskStatus } from '../types/index.js';
+import { AuthenticatedRequest } from '../middleware/authMiddleware.js';
 
 const CreateTaskSchema = z.object({
+  projectId: z.string().min(1).default('proj-core'),
   title: z.string().min(2).max(100),
   description: z.string().max(2000).optional().default(''),
   status: z.enum(['backlog', 'todo', 'in_progress', 'in_review', 'done'] as const).optional().default('todo'),
@@ -15,6 +17,7 @@ const CreateTaskSchema = z.object({
 });
 
 const UpdateTaskSchema = z.object({
+  projectId: z.string().optional(),
   title: z.string().min(2).max(100).optional(),
   description: z.string().max(2000).optional(),
   status: z.enum(['backlog', 'todo', 'in_progress', 'in_review', 'done'] as const).optional(),
@@ -25,11 +28,12 @@ const UpdateTaskSchema = z.object({
   assigneeId: z.string().optional(),
 });
 
-export const getTasks = (req: Request, res: Response<ApiResponse<Task[]>>) => {
+export const getTasks = (req: AuthenticatedRequest, res: Response<ApiResponse<Task[]>>) => {
+  const projectId = req.query.projectId as string | undefined;
   const status = req.query.status as TaskStatus | undefined;
   const assigneeId = req.query.assigneeId as string | undefined;
 
-  const tasks = taskService.getTasks({ status, assigneeId });
+  const tasks = taskService.getTasks({ projectId, status, assigneeId });
   res.json({
     success: true,
     data: tasks,
@@ -37,7 +41,7 @@ export const getTasks = (req: Request, res: Response<ApiResponse<Task[]>>) => {
   });
 };
 
-export const getTaskById = (req: Request, res: Response<ApiResponse<Task>>) => {
+export const getTaskById = (req: AuthenticatedRequest, res: Response<ApiResponse<Task>>) => {
   const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const task = taskService.getTaskById(id);
   if (!task) {
@@ -55,7 +59,15 @@ export const getTaskById = (req: Request, res: Response<ApiResponse<Task>>) => {
   });
 };
 
-export const createTask = async (req: Request, res: Response<ApiResponse<Task>>) => {
+export const createTask = async (req: AuthenticatedRequest, res: Response<ApiResponse<Task>>) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: 'Authentication required to create tasks',
+      timestamp: new Date().toISOString(),
+    });
+  }
+
   const parseResult = CreateTaskSchema.safeParse(req.body);
   if (!parseResult.success) {
     return res.status(400).json({
@@ -65,15 +77,31 @@ export const createTask = async (req: Request, res: Response<ApiResponse<Task>>)
     });
   }
 
-  const task = await taskService.createTask(parseResult.data);
-  res.status(201).json({
-    success: true,
-    data: task,
-    timestamp: new Date().toISOString(),
-  });
+  try {
+    const task = await taskService.createTask(parseResult.data, req.user);
+    res.status(201).json({
+      success: true,
+      data: task,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err: unknown) {
+    res.status(403).json({
+      success: false,
+      error: err instanceof Error ? err.message : 'Permission denied',
+      timestamp: new Date().toISOString(),
+    });
+  }
 };
 
-export const updateTask = async (req: Request, res: Response<ApiResponse<Task>>) => {
+export const updateTask = async (req: AuthenticatedRequest, res: Response<ApiResponse<Task>>) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: 'Authentication required to modify tasks',
+      timestamp: new Date().toISOString(),
+    });
+  }
+
   const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const parseResult = UpdateTaskSchema.safeParse(req.body);
   if (!parseResult.success) {
@@ -84,42 +112,68 @@ export const updateTask = async (req: Request, res: Response<ApiResponse<Task>>)
     });
   }
 
-  const updated = await taskService.updateTask(id, parseResult.data);
-  if (!updated) {
-    return res.status(404).json({
+  try {
+    const updated = await taskService.updateTask(id, parseResult.data, req.user);
+    if (!updated) {
+      return res.status(404).json({
+        success: false,
+        error: `Task "${id}" not found`,
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    res.json({
+      success: true,
+      data: updated,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err: unknown) {
+    res.status(403).json({
       success: false,
-      error: `Task "${id}" not found`,
+      error: err instanceof Error ? err.message : 'Permission denied',
+      timestamp: new Date().toISOString(),
+    });
+  }
+};
+
+export const deleteTask = async (req: AuthenticatedRequest, res: Response<ApiResponse<{ id: string }>>) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: 'Authentication required to delete tasks',
       timestamp: new Date().toISOString(),
     });
   }
 
-  res.json({
-    success: true,
-    data: updated,
-    timestamp: new Date().toISOString(),
-  });
-};
-
-export const deleteTask = async (req: Request, res: Response<ApiResponse<{ id: string }>>) => {
   const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-  const deleted = await taskService.deleteTask(id);
-  if (!deleted) {
-    return res.status(404).json({
+
+  try {
+    const deleted = await taskService.deleteTask(id, req.user);
+    if (!deleted) {
+      return res.status(404).json({
+        success: false,
+        error: `Task "${id}" not found`,
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    res.json({
+      success: true,
+      data: { id },
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err: unknown) {
+    res.status(403).json({
       success: false,
-      error: `Task "${id}" not found`,
+      error: err instanceof Error ? err.message : 'Permission denied',
       timestamp: new Date().toISOString(),
     });
   }
-
-  res.json({
-    success: true,
-    data: { id },
-    timestamp: new Date().toISOString(),
-  });
 };
 
-export const getSprintStats = (req: Request, res: Response<ApiResponse<SprintStats>>) => {
-  const stats = taskService.getSprintStats();
+export const getProjectStats = (req: AuthenticatedRequest, res: Response<ApiResponse<ProjectStats>>) => {
+  const projectId = req.query.projectId as string | undefined;
+  const stats = taskService.getProjectStats(projectId);
   res.json({
     success: true,
     data: stats,

@@ -9,6 +9,13 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum UserRole {
+  ADMIN
+  MANAGER
+  MEMBER
+  VIEWER
+}
+
 enum UserStatus {
   ONLINE
   OFFLINE
@@ -30,28 +37,56 @@ enum TaskPriority {
   URGENT
 }
 
-enum SprintStatus {
-  PLANNING
-  ACTIVE
-  COMPLETED
-}
-
 model User {
   id            String          @id @default(cuid())
-  email         String?         @unique
+  email         String          @unique
+  passwordHash  String
   name          String
   avatar        String
+  role          UserRole        @default(MEMBER)
   status        UserStatus      @default(ONLINE)
-  role          String          @default("Member")
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
 
   messages      Message[]
   assignedTasks Task[]          @relation("AssignedTasks")
   createdTasks  Task[]          @relation("CreatedTasks")
+  ownedProjects Project[]       @relation("ProjectOwner")
+  projectMembers ProjectMember[]
   memberships   ChannelMember[]
 
   @@map("users")
+}
+
+model Project {
+  id          String          @id @default(cuid())
+  name        String
+  key         String          @unique
+  description String?         @db.Text
+  isPrivate   Boolean         @default(false)
+  ownerId     String
+  owner       User            @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  members     ProjectMember[]
+  tasks       Task[]
+
+  @@map("projects")
+}
+
+model ProjectMember {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String
+  role      String   @default("member")
+  joinedAt  DateTime @default(now())
+
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@map("project_members")
 }
 
 model Channel {
@@ -87,7 +122,7 @@ model Message {
   channelId String
   userId    String
   content   String   @db.Text
-  taskId    String?  // Optional reference to a task discussed in chat
+  taskId    String?
   createdAt DateTime @default(now())
 
   channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
@@ -97,23 +132,10 @@ model Message {
   @@map("messages")
 }
 
-model Sprint {
-  id          String       @id @default(cuid())
-  name        String
-  goal        String?
-  startDate   DateTime?
-  endDate     DateTime?
-  status      SprintStatus @default(ACTIVE)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-
-  tasks       Task[]
-
-  @@map("sprints")
-}
-
 model Task {
   id          String       @id @default(cuid())
+  projectId   String
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
   title       String
   description String?      @db.Text
   status      TaskStatus   @default(BACKLOG)
@@ -128,14 +150,11 @@ model Task {
   creatorId   String?
   creator     User?        @relation("CreatedTasks", fields: [creatorId], references: [id], onDelete: SetNull)
 
-  sprintId    String?
-  sprint      Sprint?      @relation(fields: [sprintId], references: [id], onDelete: SetNull)
-
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
+  @@index([projectId])
   @@index([status])
   @@index([assigneeId])
-  @@index([sprintId])
   @@map("tasks")
 }

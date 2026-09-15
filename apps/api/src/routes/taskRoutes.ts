@@ -2,19 +2,20 @@ import { Router } from 'express';
 import {
   createTask,
   deleteTask,
-  getSprintStats,
+  getProjectStats,
   getTaskById,
   getTasks,
   updateTask,
 } from '../controllers/taskController.js';
+import { authenticate, optionalAuth, requireRole } from '../middleware/authMiddleware.js';
 
 const router = Router();
 
-router.get('/', getTasks);
-router.get('/sprint/stats', getSprintStats);
-router.get('/:id', getTaskById);
-router.post('/', createTask);
-router.patch('/:id', updateTask);
-router.delete('/:id', deleteTask);
+router.get('/', optionalAuth, getTasks);
+router.get('/stats', optionalAuth, getProjectStats);
+router.get('/:id', optionalAuth, getTaskById);
+router.post('/', authenticate, requireRole(['admin', 'manager', 'member']), createTask);
+router.patch('/:id', authenticate, requireRole(['admin', 'manager', 'member']), updateTask);
+router.delete('/:id', authenticate, requireRole(['admin', 'manager']), deleteTask);
 
 export default router;

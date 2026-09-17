@@ -34,7 +34,7 @@ export const getBugs = (req: AuthenticatedRequest, res: Response<ApiResponse<Bug
   const status = req.query.status as BugStatus | undefined;
   const assignedToId = req.query.assignedToId as string | undefined;
 
-  const bugs = bugService.getBugs({ projectId, severity, status, assignedToId });
+  const bugs = bugService.getBugs({ projectId, severity, status, assignedToId }, req.user);
   res.json({
     success: true,
     data: bugs,
@@ -44,11 +44,11 @@ export const getBugs = (req: AuthenticatedRequest, res: Response<ApiResponse<Bug
 
 export const getBugById = (req: AuthenticatedRequest, res: Response<ApiResponse<Bug>>) => {
   const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-  const bug = bugService.getBugById(id);
+  const bug = bugService.getBugById(id, req.user);
   if (!bug) {
     return res.status(404).json({
       success: false,
-      error: `Bug ticket "${id}" not found`,
+      error: `Bug ticket "${id}" not found or permission denied`,
       timestamp: new Date().toISOString(),
     });
   }
@@ -188,7 +188,7 @@ export const convertBugToTask = async (
 
 export const getBugStats = (req: AuthenticatedRequest, res: Response<ApiResponse<BugStats>>) => {
   const projectId = req.query.projectId as string | undefined;
-  const stats = bugService.getBugStats(projectId);
+  const stats = bugService.getBugStats(projectId, req.user);
   res.json({
     success: true,
     data: stats,

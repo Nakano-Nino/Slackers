@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Hash,
   Lock,
@@ -13,8 +13,13 @@ import {
   LogOut,
   Bug,
   Flame,
+  Shield,
+  Search,
+  Settings,
+  BellOff,
+  UserPlus,
 } from 'lucide-react';
-import { Channel, Project, User } from '../types';
+import { Channel, MuteTarget, Project, User } from '../types';
 import { ThemeToggle } from './ThemeToggle';
 
 interface Props {
@@ -33,14 +38,16 @@ interface Props {
   bugCount: number;
   criticalBugCount: number;
   onLogout: () => void;
+  onOpenSettings?: () => void;
+  selectedDmUserId?: string | null;
+  onSelectDmUser?: (user: User) => void;
+  unreadDms?: Record<string, number>;
+  mutedTargets?: MuteTarget[];
+  onOpenCommandPalette?: () => void;
+  onOpenInviteMember?: () => void;
 }
 
-const ROLE_BADGES: Record<string, { label: string; class: string }> = {
-  admin: { label: 'Admin', class: 'bg-rose-500/20 text-rose-300 border-rose-500/30' },
-  manager: { label: 'Manager', class: 'bg-amber-500/20 text-amber-300 border-amber-500/30' },
-  member: { label: 'Member', class: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30' },
-  viewer: { label: 'Viewer', class: 'bg-neutral-800 text-neutral-400 border-neutral-700' },
-};
+import { getUserRoleBadge } from '../lib/roles';
 
 export function Sidebar({
   channels,
@@ -58,8 +65,30 @@ export function Sidebar({
   bugCount,
   criticalBugCount,
   onLogout,
+  onOpenSettings,
+  selectedDmUserId,
+  onSelectDmUser,
+  unreadDms,
+  mutedTargets = [],
+  onOpenCommandPalette,
+  onOpenInviteMember,
 }: Props) {
-  const roleInfo = currentUser?.role ? ROLE_BADGES[currentUser.role] : ROLE_BADGES.member;
+  const [searchQuery, setSearchQuery] = useState('');
+  const roleInfo = getUserRoleBadge(currentUser);
+  const canCreateChannel = currentUser?.role === 'admin' || currentUser?.role === 'manager';
+  const canManageMembers = currentUser?.role === 'admin' || currentUser?.role === 'manager';
+  const totalDmUnread = Object.values(unreadDms || {}).reduce((sum, count) => sum + count, 0);
+
+  const query = searchQuery.toLowerCase().trim();
+  const filteredProjects = projects.filter(
+    (p) => !query || p.name.toLowerCase().includes(query) || p.key.toLowerCase().includes(query)
+  );
+  const filteredChannels = channels.filter(
+    (c) => !query || c.name.toLowerCase().includes(query)
+  );
+  const filteredUsers = users
+    .filter((u) => u.id !== currentUser?.id)
+    .filter((u) => !query || u.name.toLowerCase().includes(query) || u.email.toLowerCase().includes(query));
 
   return (
     <aside className="w-64 bg-neutral-950 border-r border-neutral-800 flex flex-col h-full select-none shrink-0">
@@ -160,6 +189,29 @@ export function Sidebar({
         </button>
       </div>
 
+      {/* Quick Search Filter across channels, projects, and users */}
+      <div className="px-3 pt-2 pb-1 shrink-0">
+        <div className="relative flex items-center">
+          <Search className="w-3.5 h-3.5 text-neutral-500 absolute left-2.5 pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={onOpenCommandPalette ? 'Search or press ⌘K...' : 'Search project, channel, user...'}
+            className="w-full bg-neutral-900 border border-neutral-800 rounded-lg pl-8 pr-11 py-1 text-xs text-neutral-200 placeholder-neutral-500 focus:outline-none focus:border-indigo-500/70 transition"
+          />
+          {onOpenCommandPalette && (
+            <button
+              onClick={onOpenCommandPalette}
+              className="absolute right-1.5 px-1.5 py-0.5 text-[10px] font-mono font-medium text-neutral-400 bg-neutral-800 hover:text-neutral-200 hover:bg-neutral-700 rounded border border-neutral-700 transition"
+              title="Global Command Palette (Cmd+K / Ctrl+K)"
+            >
+              ⌘K
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Scrollable Section: Projects & Channels */}
       <div className="flex-1 overflow-y-auto px-3 py-3 space-y-5">
         {/* Projects Quick Jump */}
@@ -170,12 +222,12 @@ export function Sidebar({
               Projects
             </span>
             <span className="text-[10px] text-neutral-500 font-mono">
-              {projects.length}
+              {filteredProjects.length}
             </span>
           </div>
 
           <div className="space-y-0.5">
-            {projects.map((project) => {
+            {filteredProjects.map((project) => {
               const isActive = project.id === selectedProjectId;
               return (
                 <button
@@ -213,18 +265,27 @@ export function Sidebar({
             <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
               Channels
             </span>
-            <button
-              onClick={onOpenCreateChannel}
-              title="Add Channel"
-              className="p-1 hover:bg-neutral-800 rounded text-neutral-400 hover:text-white transition"
-            >
-              <Plus className="w-3.5 h-3.5" />
-            </button>
+            {canCreateChannel && (
+              <button
+                onClick={onOpenCreateChannel}
+                title="Add Channel (Admin/Manager)"
+                className="p-1 hover:bg-neutral-800 rounded text-neutral-400 hover:text-white transition"
+              >
+                <Plus className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
           <div className="space-y-0.5">
-            {channels.map((channel) => {
-              const isActive = activeView === 'chat' && channel.id === selectedChannelId;
+            {filteredChannels.map((channel) => {
+              const isActive = activeView === 'chat' && !selectedDmUserId && channel.id === selectedChannelId;
+              const isChannelMuted = mutedTargets.some(
+                (m) =>
+                  m.targetType === 'channel' &&
+                  m.targetId === channel.id &&
+                  (m.mutedUntil === null || new Date(m.mutedUntil).getTime() > Date.now())
+              );
+
               return (
                 <button
                   key={channel.id}
@@ -245,6 +306,9 @@ export function Sidebar({
                       <Hash className="w-4 h-4 text-neutral-500 group-hover:text-neutral-400 shrink-0" />
                     )}
                     <span className="truncate">{channel.name}</span>
+                    {isChannelMuted && (
+                      <BellOff className="w-3 h-3 text-amber-400/80 shrink-0" title="Notifications muted" />
+                    )}
                   </div>
                   {channel.memberCount > 0 && (
                     <span className="text-[11px] text-neutral-600 group-hover:text-neutral-500 px-1.5 py-0.5 rounded bg-neutral-900">
@@ -257,52 +321,109 @@ export function Sidebar({
           </div>
         </div>
 
-        {/* Teammates Section */}
+        {/* Direct Messages (End-to-End Encrypted) Section */}
         <div>
           <div className="flex items-center justify-between px-2 mb-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
-              Teammates
+            <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400 flex items-center gap-1.5">
+              <Shield className="w-3.5 h-3.5 text-emerald-400" />
+              Direct Messages
             </span>
-            <span className="text-[11px] text-neutral-500 flex items-center gap-1">
-              <Users className="w-3 h-3" />
-              {users.length}
-            </span>
+            <div className="flex items-center gap-1.5">
+              {totalDmUnread > 0 && (
+                <span className="text-[10px] px-1.5 py-0.2 rounded-full font-bold bg-rose-500 text-white shadow-sm animate-pulse">
+                  {totalDmUnread}
+                </span>
+              )}
+              {canManageMembers && onOpenInviteMember && (
+                <button
+                  onClick={onOpenInviteMember}
+                  title="Invite or add teammate"
+                  className="p-1 hover:bg-neutral-800 rounded text-neutral-400 hover:text-neutral-200 transition"
+                >
+                  <UserPlus className="w-3.5 h-3.5 text-indigo-400" />
+                </button>
+              )}
+              <span className="text-[10px] text-emerald-400 font-mono font-semibold bg-emerald-500/10 px-1.5 py-0.2 rounded border border-emerald-500/20">
+                E2EE
+              </span>
+            </div>
           </div>
 
           <div className="space-y-1">
-            {users.map((user) => (
-              <div
-                key={user.id}
-                className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-sm text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900 cursor-pointer transition"
-              >
-                <div className="relative">
-                  <img
-                    src={user.avatar}
-                    alt={user.name}
-                    className="w-6 h-6 rounded-full object-cover"
-                  />
-                  <span
-                    className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-neutral-950 ${
-                      user.status === 'online'
-                        ? 'bg-emerald-500'
-                        : user.status === 'away'
-                        ? 'bg-amber-500'
-                        : 'bg-neutral-500'
-                    }`}
-                  />
-                </div>
-                <div className="truncate flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <span className="truncate block leading-tight text-xs font-medium">
-                      {user.name}
-                    </span>
-                    <span className="text-[9px] uppercase font-bold text-neutral-500">
-                      {user.role}
-                    </span>
+            {filteredUsers.map((user) => {
+              const isActive = activeView === 'chat' && selectedDmUserId === user.id;
+              const unreadCount = unreadDms?.[user.id] || 0;
+              const userRoleBadge = getUserRoleBadge(user);
+              const isUserMuted = mutedTargets.some(
+                (m) =>
+                  m.targetType === 'dm' &&
+                  m.targetId === user.id &&
+                  (m.mutedUntil === null || new Date(m.mutedUntil).getTime() > Date.now())
+              );
+
+              return (
+                <button
+                  key={user.id}
+                  onClick={() => {
+                    if (onSelectDmUser) {
+                      onSelectDmUser(user);
+                      onSelectView('chat');
+                    }
+                  }}
+                  className={`w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg text-left transition group ${
+                    isActive
+                      ? 'bg-neutral-800 text-neutral-100 font-medium'
+                      : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/50'
+                  }`}
+                >
+                  <div className="relative shrink-0">
+                    <img
+                      src={user.avatar}
+                      alt={user.name}
+                      className="w-6 h-6 rounded-full object-cover"
+                    />
+                    <span
+                      className={`absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-neutral-950 ${
+                        user.status === 'online'
+                          ? 'bg-emerald-500'
+                          : user.status === 'away'
+                          ? 'bg-amber-500'
+                          : 'bg-neutral-500'
+                      }`}
+                    />
                   </div>
-                </div>
-              </div>
-            ))}
+                  <div className="truncate flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className={`truncate flex items-center gap-1.5 leading-tight text-xs ${unreadCount > 0 ? 'font-bold text-neutral-100' : 'font-medium'}`}>
+                        <span className="truncate">{user.name}</span>
+                        {isUserMuted && (
+                          <BellOff className="w-3 h-3 text-amber-400/80 shrink-0" title="Notifications muted" />
+                        )}
+                      </span>
+                      {unreadCount > 0 ? (
+                        <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-rose-500 text-white shrink-0 shadow-sm animate-pulse">
+                          {unreadCount}
+                        </span>
+                      ) : (
+                        <span className={`text-[8px] font-bold uppercase px-1 py-0.2 rounded border shrink-0 ${userRoleBadge.class}`}>
+                          {userRoleBadge.shortLabel}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+
+            {canManageMembers && onOpenInviteMember && (
+              <button
+                onClick={onOpenInviteMember}
+                className="w-full mt-2 flex items-center justify-center gap-2 px-2.5 py-1.5 rounded-lg border border-dashed border-neutral-800 hover:border-indigo-500/50 text-neutral-400 hover:text-indigo-400 hover:bg-indigo-500/5 transition text-xs font-medium group"
+              >
+                <UserPlus className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                <span>Invite or Add Teammates</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -332,13 +453,22 @@ export function Sidebar({
             </div>
           </div>
 
-          <button
-            onClick={onLogout}
-            title="Sign Out"
-            className="p-1.5 text-neutral-500 hover:text-rose-400 hover:bg-neutral-800 rounded-lg transition shrink-0"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-1 shrink-0">
+            <button
+              onClick={onOpenSettings}
+              title="User & Account Settings"
+              className="p-1.5 text-neutral-500 hover:text-indigo-400 hover:bg-neutral-800 rounded-lg transition"
+            >
+              <Settings className="w-4 h-4" />
+            </button>
+            <button
+              onClick={onLogout}
+              title="Sign Out"
+              className="p-1.5 text-neutral-500 hover:text-rose-400 hover:bg-neutral-800 rounded-lg transition"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       )}
     </aside>

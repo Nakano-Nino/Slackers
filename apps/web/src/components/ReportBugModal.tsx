@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Bug as BugIcon, AlertTriangle, ShieldAlert, CheckCircle2 } from 'lucide-react';
 import { BugEnvironment, BugSeverity, Project, User } from '../types';
+import { formatUserRole } from '../lib/roles';
 
 interface Props {
   isOpen: boolean;
@@ -236,7 +237,7 @@ export function ReportBugModal({
               <option value="">Unassigned</option>
               {users.map((u) => (
                 <option key={u.id} value={u.id}>
-                  {u.name} ({u.role})
+                  {u.name} — {formatUserRole(u)}
                 </option>
               ))}
             </select>

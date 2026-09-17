@@ -64,19 +64,27 @@ model User {
   passwordHash  String
   name          String
   avatar        String
-  role          UserRole        @default(MEMBER)
-  status        UserStatus      @default(ONLINE)
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  publicKey           String?         @db.Text
+  encryptedPrivateKey String?         @db.Text
+  keyVaultSalt        String?         @db.Text
+  keyVaultIv          String?         @db.Text
+  role                UserRole        @default(MEMBER)
+  status              UserStatus      @default(ONLINE)
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
 
   messages      Message[]
+  sentDMs       DirectMessage[] @relation("SentDMs")
+  receivedDMs   DirectMessage[] @relation("ReceivedDMs")
   assignedTasks Task[]          @relation("AssignedTasks")
   createdTasks  Task[]          @relation("CreatedTasks")
+  taskComments  TaskComment[]
   reportedBugs  Bug[]           @relation("ReportedBugs")
   assignedBugs  Bug[]           @relation("AssignedBugs")
   ownedProjects Project[]       @relation("ProjectOwner")
   projectMembers ProjectMember[]
   memberships   ChannelMember[]
+  channelKeys   ChannelKey[]
 
   @@map("users")
 }
@@ -123,6 +131,7 @@ model Channel {
 
   messages    Message[]
   members     ChannelMember[]
+  keys        ChannelKey[]
 
   @@map("channels")
 }
@@ -141,14 +150,31 @@ model ChannelMember {
   @@map("channel_members")
 }
 
+model ChannelKey {
+  id           String   @id @default(cuid())
+  channelId    String
+  userId       String
+  encryptedKey String   @db.Text
+  iv           String   @db.Text
+  createdAt    DateTime @default(now())
+
+  channel      Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([channelId, userId])
+  @@map("channel_keys")
+}
+
 model Message {
-  id        String   @id @default(cuid())
-  channelId String
-  userId    String
-  content   String   @db.Text
-  taskId    String?
-  bugId     String?
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  channelId  String
+  userId     String
+  ciphertext String   @db.Text
+  iv         String   @db.Text
+  content    String?  @db.Text
+  taskId     String?
+  bugId      String?
+  createdAt  DateTime @default(now())
 
   channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -175,6 +201,7 @@ model Task {
   creatorId   String?
   creator     User?        @relation("CreatedTasks", fields: [creatorId], references: [id], onDelete: SetNull)
 
+  comments    TaskComment[]
   bugs        Bug[]
 
   createdAt   DateTime     @default(now())
@@ -215,4 +242,37 @@ model Bug {
   @@index([severity])
   @@index([status])
   @@map("bugs")
+}
+
+model DirectMessage {
+  id         String    @id @default(cuid())
+  senderId   String
+  receiverId String
+  ciphertext String    @db.Text
+  iv         String
+  senderCopy String?   @db.Text
+  isRead     Boolean   @default(false)
+  readAt     DateTime?
+  createdAt  DateTime  @default(now())
+
+  sender     User      @relation("SentDMs", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver   User      @relation("ReceivedDMs", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@index([senderId, receiverId])
+  @@map("direct_messages")
+}
+
+model TaskComment {
+  id        String   @id @default(cuid())
+  taskId    String
+  userId    String
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@map("task_comments")
 }

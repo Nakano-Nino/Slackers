@@ -1,13 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
 import { authService } from '../services/authService.js';
 import { dataStore } from '../services/dataStore.js';
+import { sessionService } from '../services/sessionService.js';
 import { User, UserRole } from '../types/index.js';
 
 export interface AuthenticatedRequest extends Request {
   user?: User;
+  sessionId?: string;
 }
 
-export const authenticate = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export type AuthRequest = AuthenticatedRequest;
+
+export const authenticate = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({
@@ -26,6 +30,21 @@ export const authenticate = (req: AuthenticatedRequest, res: Response, next: Nex
       error: 'Invalid or expired token. Please log in again.',
       timestamp: new Date().toISOString(),
     });
+  }
+
+  // Check if session has been explicitly revoked
+  if (payload.sessionId) {
+    const isValid = await sessionService.isSessionValid(payload.id, payload.sessionId);
+    if (!isValid) {
+      return res.status(401).json({
+        success: false,
+        error: 'Session has been revoked or expired. Please log in again.',
+        timestamp: new Date().toISOString(),
+      });
+    }
+    // Touch session last active time
+    sessionService.touchSession(payload.sessionId).catch(() => {});
+    req.sessionId = payload.sessionId;
   }
 
   const user = dataStore.getUserById(payload.id);

@@ -1,52 +1,130 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Lock, Mail, User as UserIcon, Shield, Sparkles, ArrowRight, Eye, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Lock, Mail, User as UserIcon, Shield, Sparkles, ArrowRight, Eye, CheckCircle2, UserCheck, X } from 'lucide-react';
 import { api } from '../lib/api';
-import { User, UserRole } from '../types';
+import { User, UserRole, Invitation } from '../types';
+
+import { DEVELOPER_ROLES, getUserRoleBadge } from '../lib/roles';
 
 interface Props {
-  onSuccess: (user: User) => void;
+  onSuccess: (user: User, password?: string) => void;
+  inviteToken?: string | null;
+  onClearInviteToken?: () => void;
 }
 
-const DEMO_USERS: { name: string; email: string; role: UserRole; badge: string; desc: string }[] = [
+const DEMO_USERS: { name: string; email: string; role: UserRole; developerRole: string; badge: string; desc: string }[] = [
   {
     name: 'Sarah Connor',
     email: 'sarah@slackers.dev',
     role: 'admin',
+    developerRole: 'lead_architect',
     badge: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
-    desc: 'Admin: Full access to create/delete projects, manage tasks & assignees',
+    desc: 'Admin / Lead Architect: Full access to manage projects, channels & tasks',
   },
   {
     name: 'Alex Rivera',
     email: 'alex@slackers.dev',
     role: 'manager',
+    developerRole: 'engineering_manager',
     badge: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
-    desc: 'Manager: Manage tasks, change assignees, adjust project scope',
+    desc: 'Manager / Eng Lead: Manage tasks, change assignees, adjust project scope',
   },
   {
     name: 'Jordan Lee',
     email: 'jordan@slackers.dev',
     role: 'member',
-    badge: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
-    desc: 'Member: Update task status, create tasks, chat & collaborate',
+    developerRole: 'backend_developer',
+    badge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+    desc: 'Backend Developer: APIs, database schemas, encrypted DMs',
+  },
+  {
+    name: 'Marcus Chen',
+    email: 'marcus@slackers.dev',
+    role: 'member',
+    developerRole: 'frontend_developer',
+    badge: 'bg-sky-500/20 text-sky-300 border-sky-500/30',
+    desc: 'Frontend Developer: React, UI design, client-side state',
+  },
+  {
+    name: 'Liam O’Connor',
+    email: 'liam@slackers.dev',
+    role: 'member',
+    developerRole: 'qa_engineer',
+    badge: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+    desc: 'QA Engineer: Bug verification, test reports, quality gates',
+  },
+  {
+    name: 'Priya Patel',
+    email: 'priya@slackers.dev',
+    role: 'manager',
+    developerRole: 'devops_engineer',
+    badge: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+    desc: 'DevOps / Cloud Engineer: CI/CD pipelines, Docker, Kubernetes',
+  },
+  {
+    name: 'Morgan Vance',
+    email: 'morgan@slackers.dev',
+    role: 'member',
+    developerRole: 'security_engineer',
+    badge: 'bg-red-500/20 text-red-300 border-red-500/30',
+    desc: 'Security Engineer: E2EE key vaults, cryptography audit',
   },
   {
     name: 'Taylor Guest',
     email: 'guest@slackers.dev',
     role: 'viewer',
+    developerRole: 'qa_engineer',
     badge: 'bg-neutral-800 text-neutral-400 border-neutral-700',
     desc: 'Viewer: Read-only access to channels and boards',
   },
 ];
 
-export function AuthModal({ onSuccess }: Props) {
+export function AuthModal({ onSuccess, inviteToken, onClearInviteToken }: Props) {
   const [isRegister, setIsRegister] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [developerRole, setDeveloperRole] = useState('backend_developer');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [invitationData, setInvitationData] = useState<Partial<Invitation> | null>(null);
+  const [verifyingInvite, setVerifyingInvite] = useState(false);
+
+  useEffect(() => {
+    if (!inviteToken) {
+      setInvitationData(null);
+      return;
+    }
+
+    let isMounted = true;
+    setVerifyingInvite(true);
+    setError(null);
+
+    api.verifyInvitation(inviteToken)
+      .then((res) => {
+        if (!isMounted) return;
+        if (res.valid && res.invitation) {
+          setInvitationData(res.invitation);
+          setIsRegister(true);
+          if (res.invitation.email) setEmail(res.invitation.email);
+          if (res.invitation.developerRole) setDeveloperRole(res.invitation.developerRole);
+        } else {
+          setError('This invitation link is invalid or has expired.');
+        }
+      })
+      .catch((err) => {
+        if (!isMounted) return;
+        setError(err instanceof Error ? err.message : 'Failed to verify invitation link.');
+      })
+      .finally(() => {
+        if (isMounted) setVerifyingInvite(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [inviteToken]);
 
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,19 +135,29 @@ export function AuthModal({ onSuccess }: Props) {
     setError(null);
 
     try {
-      if (isRegister) {
+      if (inviteToken && invitationData) {
+        const res = await api.acceptInvitation({
+          token: inviteToken,
+          name: name.trim(),
+          email: email.trim(),
+          password,
+          developerRole,
+        });
+        onSuccess(res.user, password);
+      } else if (isRegister) {
         const res = await api.register({
           name: name.trim(),
           email: email.trim(),
           password,
+          developerRole,
         });
-        onSuccess(res.user);
+        onSuccess(res.user, password);
       } else {
         const res = await api.login({
           email: email.trim(),
           password,
         });
-        onSuccess(res.user);
+        onSuccess(res.user, password);
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Authentication failed');
@@ -86,7 +174,7 @@ export function AuthModal({ onSuccess }: Props) {
         email: demoEmail,
         password: 'password123',
       });
-      onSuccess(res.user);
+      onSuccess(res.user, 'password123');
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Demo login failed');
     } finally {
@@ -118,40 +206,77 @@ export function AuthModal({ onSuccess }: Props) {
           </div>
         </div>
 
-        {/* 1-Click Quick Demo Switcher */}
-        <div className="mt-5 p-3.5 bg-neutral-950/80 border border-neutral-800/90 rounded-xl">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-              Quick Demo Accounts (1-Click Login)
-            </span>
-            <span className="text-[10px] text-neutral-500">pass: password123</span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2">
-            {DEMO_USERS.map((user) => (
-              <button
-                key={user.email}
-                type="button"
-                disabled={loading}
-                onClick={() => handleQuickDemoLogin(user.email)}
-                className="flex flex-col items-start p-2 rounded-lg bg-neutral-900 hover:bg-neutral-800/80 border border-neutral-800/70 hover:border-indigo-500/50 transition text-left group"
-              >
-                <div className="flex items-center justify-between w-full">
-                  <span className="font-semibold text-xs text-neutral-200 group-hover:text-indigo-300">
-                    {user.name}
-                  </span>
-                  <span className={`text-[9px] font-bold uppercase px-1.5 py-0.2 rounded border ${user.badge}`}>
-                    {user.role}
-                  </span>
+        {/* Invitation Banner */}
+        {invitationData && (
+          <div className="mt-5 p-3.5 bg-indigo-950/40 border border-indigo-500/30 rounded-xl">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-lg bg-indigo-600/20 text-indigo-400 border border-indigo-500/30">
+                  <UserCheck className="w-5 h-5" />
                 </div>
-                <span className="text-[10px] text-neutral-500 truncate w-full mt-0.5">
-                  {user.email}
-                </span>
-              </button>
-            ))}
+                <div>
+                  <h3 className="text-xs font-bold text-neutral-100">Workspace Invitation</h3>
+                  <p className="text-[11px] text-neutral-300">
+                    You’ve been invited to join as{' '}
+                    <span className="font-semibold text-indigo-300 uppercase">{invitationData.role}</span>
+                    {invitationData.developerRole && (
+                      <span className="text-neutral-400"> ({invitationData.developerRole.replace('_', ' ')})</span>
+                    )}
+                  </p>
+                </div>
+              </div>
+              {onClearInviteToken && (
+                <button
+                  type="button"
+                  onClick={onClearInviteToken}
+                  className="text-[11px] text-neutral-400 hover:text-neutral-200 underline shrink-0 pt-0.5"
+                >
+                  Sign in instead
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* 1-Click Quick Demo Switcher (hidden during invite flow) */}
+        {!invitationData && (
+          <div className="mt-5 p-3.5 bg-neutral-950/80 border border-neutral-800/90 rounded-xl">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+                Quick Demo Accounts (1-Click Login)
+              </span>
+              <span className="text-[10px] text-neutral-500">pass: password123</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1">
+              {DEMO_USERS.map((user) => {
+                const badge = getUserRoleBadge(user);
+                return (
+                  <button
+                    key={user.email}
+                    type="button"
+                    disabled={loading}
+                    onClick={() => handleQuickDemoLogin(user.email)}
+                    className="flex flex-col items-start p-2 rounded-lg bg-neutral-900 hover:bg-neutral-800/80 border border-neutral-800/70 hover:border-indigo-500/50 transition text-left group"
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <span className="font-semibold text-xs text-neutral-200 group-hover:text-indigo-300 truncate">
+                        {user.name}
+                      </span>
+                      <span className={`text-[8px] font-bold uppercase px-1 py-0.2 rounded border shrink-0 ${badge.class}`}>
+                        {badge.shortLabel}
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-neutral-500 truncate w-full mt-0.5">
+                      {user.desc}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Error Notification */}
         {error && (
@@ -164,37 +289,65 @@ export function AuthModal({ onSuccess }: Props) {
         <form onSubmit={handleAuthSubmit} className="mt-5 space-y-3.5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-neutral-400">
-              Or sign in with email & password:
+              {invitationData
+                ? 'Create your account to accept the invitation:'
+                : 'Or sign in with email & password:'}
             </span>
-            <button
-              type="button"
-              onClick={() => {
-                setIsRegister(!isRegister);
-                setError(null);
-              }}
-              className="text-xs text-indigo-400 hover:text-indigo-300 font-medium underline"
-            >
-              {isRegister ? 'Already have an account? Sign In' : 'Create new account'}
-            </button>
+            {!invitationData && (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsRegister(!isRegister);
+                  setError(null);
+                }}
+                className="text-xs text-indigo-400 hover:text-indigo-300 font-medium underline"
+              >
+                {isRegister ? 'Already have an account? Sign In' : 'Create new account'}
+              </button>
+            )}
           </div>
 
           {isRegister && (
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">
-                Full Name
-              </label>
-              <div className="relative flex items-center">
-                <UserIcon className="absolute left-3 w-4 h-4 text-neutral-500" />
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. John Doe"
-                  required={isRegister}
-                  className="w-full bg-neutral-950 border border-neutral-800 rounded-lg pl-9 pr-3 py-2 text-sm text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-indigo-500 transition"
-                />
+            <>
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">
+                  Full Name
+                </label>
+                <div className="relative flex items-center">
+                  <UserIcon className="absolute left-3 w-4 h-4 text-neutral-500" />
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="e.g. John Doe"
+                    required={isRegister}
+                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg pl-9 pr-3 py-2 text-sm text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-indigo-500 transition"
+                  />
+                </div>
               </div>
-            </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">
+                  Developer Role
+                </label>
+                <select
+                  value={developerRole}
+                  onChange={(e) => setDeveloperRole(e.target.value)}
+                  disabled={!!invitationData?.developerRole}
+                  className={`w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-100 focus:outline-none transition ${
+                    invitationData?.developerRole
+                      ? 'opacity-70 cursor-not-allowed bg-neutral-900/60'
+                      : 'focus:border-indigo-500'
+                  }`}
+                >
+                  {DEVELOPER_ROLES.map((r) => (
+                    <option key={r.id} value={r.id} className="bg-neutral-900 text-neutral-200">
+                      {r.label} — {r.description}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </>
           )}
 
           <div>
@@ -207,9 +360,12 @@ export function AuthModal({ onSuccess }: Props) {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                readOnly={!!invitationData?.email}
                 placeholder="you@company.com"
                 required
-                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg pl-9 pr-3 py-2 text-sm text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-indigo-500 transition"
+                className={`w-full bg-neutral-950 border border-neutral-800 rounded-lg pl-9 pr-3 py-2 text-sm text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-indigo-500 transition ${
+                  invitationData?.email ? 'opacity-70 cursor-not-allowed bg-neutral-900/60' : ''
+                }`}
               />
             </div>
           </div>
@@ -240,7 +396,13 @@ export function AuthModal({ onSuccess }: Props) {
               <span>Authenticating...</span>
             ) : (
               <>
-                <span>{isRegister ? 'Register & Join' : 'Sign In'}</span>
+                <span>
+                  {invitationData
+                    ? 'Accept Invitation & Join'
+                    : isRegister
+                    ? 'Register & Join'
+                    : 'Sign In'}
+                </span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}

@@ -90,7 +90,7 @@ class BugService {
   private enrichBug(bug: Bug): Bug {
     const reporter = dataStore.getUserById(bug.reportedById);
     const assignee = bug.assignedToId ? dataStore.getUserById(bug.assignedToId) : undefined;
-    const project = projectService.getProjects().find((p) => p.id === bug.projectId);
+    const project = projectService.getProjectRaw(bug.projectId);
 
     return {
       ...bug,
@@ -100,16 +100,25 @@ class BugService {
     };
   }
 
-  getBugs(filter?: {
-    projectId?: string;
-    severity?: BugSeverity;
-    status?: BugStatus;
-    assignedToId?: string;
-  }): Bug[] {
+  getBugs(
+    filter?: {
+      projectId?: string;
+      severity?: BugSeverity;
+      status?: BugStatus;
+      assignedToId?: string;
+    },
+    user?: User
+  ): Bug[] {
     let result = this.bugs;
+
     if (filter?.projectId) {
+      const proj = projectService.getProjectById(filter.projectId, user);
+      if (!proj) return [];
       result = result.filter((b) => b.projectId === filter.projectId);
+    } else {
+      result = result.filter((b) => !!projectService.getProjectById(b.projectId, user));
     }
+
     if (filter?.severity) {
       result = result.filter((b) => b.severity === filter.severity);
     }
@@ -122,9 +131,13 @@ class BugService {
     return result.map((b) => this.enrichBug(b));
   }
 
-  getBugById(id: string): Bug | undefined {
+  getBugById(id: string, user?: User): Bug | undefined {
     const bug = this.bugs.find((b) => b.id === id);
-    return bug ? this.enrichBug(bug) : undefined;
+    if (!bug) return undefined;
+    if (user && !projectService.getProjectById(bug.projectId, user)) {
+      return undefined;
+    }
+    return this.enrichBug(bug);
   }
 
   async createBug(
@@ -141,9 +154,15 @@ class BugService {
     },
     reporter: User
   ): Promise<Bug> {
+    const projectId = data.projectId || 'proj-core';
+    const project = projectService.getProjectById(projectId, reporter);
+    if (!project) {
+      throw new Error(`Project "${projectId}" not found or permission denied.`);
+    }
+
     const newBug: Bug = {
       id: `bug-${Date.now()}`,
-      projectId: data.projectId || 'proj-core',
+      projectId,
       title: data.title.trim(),
       description: data.description.trim(),
       severity: data.severity || 'major',
@@ -184,6 +203,11 @@ class BugService {
     if (index === -1) return undefined;
 
     const oldBug = this.bugs[index];
+    const project = projectService.getProjectById(oldBug.projectId, actor);
+    if (!project) {
+      throw new Error(`Project "${oldBug.projectId}" not found or permission denied.`);
+    }
+
     const isStatusChange = updates.status && updates.status !== oldBug.status;
 
     this.bugs[index] = {
@@ -228,6 +252,12 @@ class BugService {
     const index = this.bugs.findIndex((b) => b.id === id);
     if (index === -1) return false;
 
+    const bugToDelete = this.bugs[index];
+    const project = projectService.getProjectById(bugToDelete.projectId, actor);
+    if (!project) {
+      throw new Error(`Project "${bugToDelete.projectId}" not found or permission denied.`);
+    }
+
     const deleted = this.bugs.splice(index, 1)[0];
     await mongoLogger.log('BUG_DELETED', { bugId: id, title: deleted.title }, actor);
 
@@ -238,6 +268,11 @@ class BugService {
     const bug = this.bugs.find((b) => b.id === bugId);
     if (!bug) {
       throw new Error(`Bug ticket "${bugId}" not found`);
+    }
+
+    const project = projectService.getProjectById(bug.projectId, actor);
+    if (!project) {
+      throw new Error(`Project "${bug.projectId}" not found or permission denied.`);
     }
 
     // Map severity to priority and points
@@ -282,10 +317,25 @@ class BugService {
     };
   }
 
-  getBugStats(projectId?: string): BugStats {
+  getBugStats(projectId?: string, user?: User): BugStats {
+    if (projectId && user) {
+      const hasAccess = projectService.getProjectById(projectId, user);
+      if (!hasAccess) {
+        return {
+          totalBugs: 0,
+          openBugs: 0,
+          criticalBugs: 0,
+          resolvedBugs: 0,
+          resolutionRate: 0,
+          bySeverity: { critical: 0, major: 0, minor: 0, cosmetic: 0 },
+          byStatus: { open: 0, triaged: 0, in_progress: 0, resolved: 0, closed: 0 },
+        };
+      }
+    }
+
     const targetBugs = projectId
       ? this.bugs.filter((b) => b.projectId === projectId)
-      : this.bugs;
+      : this.bugs.filter((b) => !!projectService.getProjectById(b.projectId, user));
 
     const totalBugs = targetBugs.length;
     let openBugs = 0;

@@ -10,12 +10,14 @@ const CreateProjectSchema = z.object({
   key: z.string().min(2).max(10),
   description: z.string().max(1000).optional().default(''),
   isPrivate: z.boolean().optional().default(false),
+  memberIds: z.array(z.string()).optional(),
 });
 
 const UpdateProjectSchema = z.object({
   name: z.string().min(2).max(100).optional(),
   description: z.string().max(1000).optional(),
   isPrivate: z.boolean().optional(),
+  memberIds: z.array(z.string()).optional(),
 });
 
 export const getProjects = (req: AuthenticatedRequest, res: Response<ApiResponse<Project[]>>) => {
@@ -23,7 +25,7 @@ export const getProjects = (req: AuthenticatedRequest, res: Response<ApiResponse
 
   // Augment with live task/progress stats
   const augmented = projects.map((p) => {
-    const stats = taskService.getProjectStats(p.id);
+    const stats = taskService.getProjectStats(p.id, req.user);
     return {
       ...p,
       totalTasks: stats.totalTasks,
@@ -52,7 +54,7 @@ export const getProjectById = (req: AuthenticatedRequest, res: Response<ApiRespo
     });
   }
 
-  const stats = taskService.getProjectStats(project.id);
+  const stats = taskService.getProjectStats(project.id, req.user);
   const augmented: Project = {
     ...project,
     totalTasks: stats.totalTasks,
@@ -112,6 +114,25 @@ export const updateProject = async (req: AuthenticatedRequest, res: Response<Api
   }
 
   const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const project = projectService.getProjectById(id, req.user);
+  if (!project) {
+    return res.status(404).json({
+      success: false,
+      error: `Project "${id}" not found or permission denied`,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  const isAdminOrManager = req.user.role === 'admin' || req.user.role === 'manager';
+  const isOwner = project.ownerId === req.user.id;
+  if (!isAdminOrManager && !isOwner) {
+    return res.status(403).json({
+      success: false,
+      error: 'Only the project owner, workspace administrators, or managers can update project settings or members',
+      timestamp: new Date().toISOString(),
+    });
+  }
+
   const parseResult = UpdateProjectSchema.safeParse(req.body);
   if (!parseResult.success) {
     return res.status(400).json({
@@ -165,7 +186,7 @@ export const deleteProject = async (req: AuthenticatedRequest, res: Response<Api
 
 export const getProjectStats = (req: AuthenticatedRequest, res: Response<ApiResponse<ProjectStats>>) => {
   const projectId = req.params.id ? (Array.isArray(req.params.id) ? req.params.id[0] : req.params.id) : undefined;
-  const stats = taskService.getProjectStats(projectId);
+  const stats = taskService.getProjectStats(projectId, req.user);
   res.json({
     success: true,
     data: stats,

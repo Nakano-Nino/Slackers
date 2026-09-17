@@ -15,7 +15,7 @@ router.get('/', optionalAuth, getProjects);
 router.get('/:id', optionalAuth, getProjectById);
 router.get('/:id/stats', optionalAuth, getProjectStats);
 router.post('/', authenticate, requireRole(['admin', 'manager']), createProject);
-router.patch('/:id', authenticate, requireRole(['admin', 'manager']), updateProject);
+router.patch('/:id', authenticate, updateProject);
 router.delete('/:id', authenticate, requireRole(['admin']), deleteProject);
 
 export default router;

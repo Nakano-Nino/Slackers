@@ -31,23 +31,77 @@ class ProjectService {
       description: 'Private intelligence service for summarizing channel conversations and generating automated task tickets.',
       isPrivate: true,
       ownerId: 'u-1',
+      memberIds: ['u-1', 'u-2'],
       createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      id: 'proj-cloud',
+      name: 'Cloud Infrastructure & Kubernetes',
+      key: 'CLOUD',
+      description: 'Multi-region Kubernetes clusters, Terraform infrastructure-as-code, and automated scaling.',
+      isPrivate: true,
+      ownerId: 'u-8',
+      memberIds: ['u-8', 'u-1', 'u-3'],
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 10).toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      id: 'proj-sec',
+      name: 'Security & Zero-Trust Audit',
+      key: 'SEC',
+      description: 'Zero-knowledge end-to-end cryptographic vaults, intrusion detection, and automated pen-testing.',
+      isPrivate: true,
+      ownerId: 'u-5',
+      memberIds: ['u-5', 'u-1'],
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      id: 'proj-ds',
+      name: 'Design System & Clean Slate UI',
+      key: 'DS',
+      description: 'Unified theme tokens, accessible component library, high-contrast light & dark modes.',
+      isPrivate: false,
+      ownerId: 'u-6',
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 8).toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      id: 'proj-api',
+      name: 'Developer GraphQL & Webhook Hub',
+      key: 'API',
+      description: 'Public third-party developer ecosystem, real-time WebSocket subscriptions, and OAuth2 apps.',
+      isPrivate: false,
+      ownerId: 'u-7',
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 6).toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      id: 'proj-data',
+      name: 'BigData & Analytics Pipeline',
+      key: 'DATA',
+      description: 'Real-time telemetry aggregation, user retention metrics, and velocity trend analysis.',
+      isPrivate: false,
+      ownerId: 'u-2',
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 4).toISOString(),
       updatedAt: new Date().toISOString(),
     },
   ];
 
-  getProjects(user?: User): Project[] {
-    // If user is admin or manager, they can view all projects including private ones.
-    // If member/viewer, only show public projects or projects they own.
-    const isAdminOrManager = user?.role === 'admin' || user?.role === 'manager';
+  hasProjectAccess(project: Project, user?: User): boolean {
+    if (!project.isPrivate) return true;
+    if (!user) return false;
+    const isAdminOrManager = user.role === 'admin' || user.role === 'manager';
+    if (isAdminOrManager) return true;
+    if (project.ownerId === user.id) return true;
+    if (project.memberIds && project.memberIds.includes(user.id)) return true;
+    return false;
+  }
 
+  getProjects(user?: User): Project[] {
     return this.projects
-      .filter((p) => {
-        if (!p.isPrivate || isAdminOrManager || p.ownerId === user?.id) {
-          return true;
-        }
-        return false;
-      })
+      .filter((p) => this.hasProjectAccess(p, user))
       .map((p) => this.enrichProject(p));
   }
 
@@ -55,20 +109,27 @@ class ProjectService {
     const project = this.projects.find((p) => p.id === id);
     if (!project) return undefined;
 
-    const isAdminOrManager = user?.role === 'admin' || user?.role === 'manager';
-    if (project.isPrivate && !isAdminOrManager && project.ownerId !== user?.id) {
+    if (!this.hasProjectAccess(project, user)) {
       return undefined;
     }
 
     return this.enrichProject(project);
   }
 
+  getProjectRaw(id: string): Project | undefined {
+    return this.projects.find((p) => p.id === id);
+  }
+
   private enrichProject(project: Project): Project {
     const owner = dataStore.getUserById(project.ownerId);
+    const memberCount = project.isPrivate
+      ? (project.memberIds && project.memberIds.length > 0 ? project.memberIds.length : 1)
+      : dataStore.getUsers().length;
+
     return {
       ...project,
       ownerName: owner ? owner.name : 'Unknown Owner',
-      memberCount: project.isPrivate ? 3 : dataStore.getUsers().length,
+      memberCount,
     };
   }
 
@@ -78,6 +139,7 @@ class ProjectService {
       key: string;
       description?: string;
       isPrivate?: boolean;
+      memberIds?: string[];
     },
     creator: User
   ): Promise<Project> {
@@ -87,6 +149,11 @@ class ProjectService {
       throw new Error(`Project key "${key}" already exists. Please choose a unique key.`);
     }
 
+    const memberIds = data.memberIds ? [...data.memberIds] : [];
+    if (data.isPrivate && !memberIds.includes(creator.id)) {
+      memberIds.push(creator.id);
+    }
+
     const newProject: Project = {
       id: `proj-${Date.now()}`,
       name: data.name.trim(),
@@ -94,6 +161,7 @@ class ProjectService {
       description: data.description || '',
       isPrivate: data.isPrivate || false,
       ownerId: creator.id,
+      memberIds: data.isPrivate ? memberIds : undefined,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -102,7 +170,13 @@ class ProjectService {
 
     await mongoLogger.log(
       'PROJECT_CREATED',
-      { projectId: newProject.id, name: newProject.name, key: newProject.key, isPrivate: newProject.isPrivate },
+      {
+        projectId: newProject.id,
+        name: newProject.name,
+        key: newProject.key,
+        isPrivate: newProject.isPrivate,
+        memberIds: newProject.memberIds,
+      },
       creator
     );
 
@@ -118,9 +192,17 @@ class ProjectService {
     if (index === -1) return undefined;
 
     const oldProject = this.projects[index];
+    let memberIds = updates.memberIds !== undefined ? updates.memberIds : oldProject.memberIds;
+    const isPrivate = updates.isPrivate !== undefined ? updates.isPrivate : oldProject.isPrivate;
+    if (isPrivate && memberIds && !memberIds.includes(oldProject.ownerId)) {
+      memberIds = [...memberIds, oldProject.ownerId];
+    }
+
     this.projects[index] = {
       ...oldProject,
       ...updates,
+      isPrivate,
+      memberIds,
       updatedAt: new Date().toISOString(),
     };
 

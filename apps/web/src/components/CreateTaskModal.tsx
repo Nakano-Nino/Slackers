@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, CheckSquare, User, Flag, Hash, Folder } from 'lucide-react';
+import { X, CheckSquare, User, Flag, Hash, Folder, Calendar, ShieldCheck } from 'lucide-react';
 import { Project, TaskPriority, TaskStatus, User as UserType } from '../types';
+import { formatUserRole } from '../lib/roles';
 
 interface Props {
   isOpen: boolean;
@@ -15,11 +16,14 @@ interface Props {
     priority: TaskPriority;
     storyPoints: number;
     tags: string[];
+    dueDate?: string;
     assigneeId?: string;
+    qaSteps?: Array<{ title: string; description?: string }>;
   }) => Promise<void>;
   projects: Project[];
   defaultProjectId: string;
   users: UserType[];
+  currentUser?: UserType | null;
 }
 
 export function CreateTaskModal({
@@ -29,15 +33,22 @@ export function CreateTaskModal({
   projects,
   defaultProjectId,
   users,
+  currentUser,
 }: Props) {
+  const isQAEngineer = currentUser?.developerRole === 'qa_engineer';
   const [projectId, setProjectId] = useState(defaultProjectId);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [qaStepsInput, setQaStepsInput] = useState('');
   const [status, setStatus] = useState<TaskStatus>('todo');
   const [priority, setPriority] = useState<TaskPriority>('medium');
   const [storyPoints, setStoryPoints] = useState<number>(3);
   const [tagsInput, setTagsInput] = useState('Frontend, Feature');
   const [assigneeId, setAssigneeId] = useState<string>('');
+  const [dueDate, setDueDate] = useState<string>(() => {
+    const d = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    return d.toISOString().split('T')[0];
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -61,6 +72,14 @@ export function CreateTaskModal({
         .map((t) => t.trim())
         .filter(Boolean);
 
+      const qaSteps = isQAEngineer
+        ? qaStepsInput
+            .split('\n')
+            .map((line) => line.trim())
+            .filter(Boolean)
+            .map((title) => ({ title }))
+        : [];
+
       await onCreate({
         projectId: projectId || projects[0]?.id || 'proj-core',
         title: title.trim(),
@@ -69,11 +88,14 @@ export function CreateTaskModal({
         priority,
         storyPoints: Number(storyPoints) || 1,
         tags: tags.length ? tags : ['Task'],
+        dueDate: dueDate || undefined,
         assigneeId: assigneeId || undefined,
+        qaSteps: qaSteps.length > 0 ? qaSteps : undefined,
       });
 
       setTitle('');
       setDescription('');
+      setQaStepsInput('');
       onClose();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to create task');
@@ -144,10 +166,29 @@ export function CreateTaskModal({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Acceptance criteria, architecture notes, or details..."
-              rows={3}
+              rows={2}
               className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-indigo-500"
             />
           </div>
+
+          {isQAEngineer && (
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1 flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
+                  QA Review Steps (Optional)
+                </span>
+                <span className="text-[10px] text-neutral-500 font-normal lowercase">1 test step per line</span>
+              </label>
+              <textarea
+                value={qaStepsInput}
+                onChange={(e) => setQaStepsInput(e.target.value)}
+                placeholder="e.g. Verify happy path with valid inputs&#10;Verify validation error when required field is empty&#10;Verify responsive rendering on mobile"
+                rows={2}
+                className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-xs text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-indigo-500 font-mono"
+              />
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -197,7 +238,7 @@ export function CreateTaskModal({
                 <option value="">Unassigned</option>
                 {users.map((u) => (
                   <option key={u.id} value={u.id}>
-                    {u.name} ({u.role})
+                    {u.name} — {formatUserRole(u)}
                   </option>
                 ))}
               </select>
@@ -220,6 +261,52 @@ export function CreateTaskModal({
                 <option value="13">13 pts (complex)</option>
               </select>
             </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs font-semibold uppercase tracking-wider text-neutral-400 flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-indigo-400" />
+                Due Date
+              </label>
+              <div className="flex items-center gap-1.5 text-[11px]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const d = new Date(Date.now() + 7 * 86400000);
+                    setDueDate(d.toISOString().split('T')[0]);
+                  }}
+                  className="text-indigo-400 hover:text-indigo-300 font-medium transition"
+                >
+                  +1 Week
+                </button>
+                <span className="text-neutral-600">·</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const d = new Date(Date.now() + 14 * 86400000);
+                    setDueDate(d.toISOString().split('T')[0]);
+                  }}
+                  className="text-neutral-400 hover:text-neutral-200 transition"
+                >
+                  +2 Weeks
+                </button>
+                <span className="text-neutral-600">·</span>
+                <button
+                  type="button"
+                  onClick={() => setDueDate('')}
+                  className="text-neutral-500 hover:text-neutral-300 transition"
+                >
+                  Clear
+                </button>
+              </div>
+            </div>
+            <input
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-200 focus:outline-none focus:border-indigo-500"
+            />
           </div>
 
           <div>

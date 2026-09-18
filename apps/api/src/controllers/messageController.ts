@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
+import { AuthenticatedRequest } from '../middleware/authMiddleware.js';
 import { dataStore } from '../services/dataStore.js';
 import { mongoLogger } from '../services/mongoLogger.js';
 import { notificationService } from '../services/notificationService.js';
@@ -17,7 +18,15 @@ const CreateMessageSchema = z.object({
   parentId: z.string().optional(),
 });
 
-export const getMessagesByChannel = (req: Request, res: Response<ApiResponse<Message[]>>) => {
+export const getMessagesByChannel = (req: AuthenticatedRequest, res: Response<ApiResponse<Message[]>>) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: 'Authentication required to view messages',
+      timestamp: new Date().toISOString(),
+    });
+  }
+
   const channelId = Array.isArray(req.params.channelId) ? req.params.channelId[0] : req.params.channelId;
   const channel = dataStore.getChannelById(channelId);
   if (!channel) {
@@ -36,7 +45,15 @@ export const getMessagesByChannel = (req: Request, res: Response<ApiResponse<Mes
   });
 };
 
-export const getThreadReplies = (req: Request, res: Response<ApiResponse<Message[]>>) => {
+export const getThreadReplies = (req: AuthenticatedRequest, res: Response<ApiResponse<Message[]>>) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: 'Authentication required to view thread replies',
+      timestamp: new Date().toISOString(),
+    });
+  }
+
   const parentId = Array.isArray(req.params.parentId) ? req.params.parentId[0] : req.params.parentId;
   const replies = dataStore.getThreadReplies(parentId);
   res.json({
@@ -46,7 +63,15 @@ export const getThreadReplies = (req: Request, res: Response<ApiResponse<Message
   });
 };
 
-export const createMessage = async (req: Request, res: Response<ApiResponse<Message>>) => {
+export const createMessage = async (req: AuthenticatedRequest, res: Response<ApiResponse<Message>>) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: 'Authentication required to post messages',
+      timestamp: new Date().toISOString(),
+    });
+  }
+
   const parseResult = CreateMessageSchema.safeParse(req.body);
   if (!parseResult.success) {
     return res.status(400).json({
@@ -65,8 +90,14 @@ export const createMessage = async (req: Request, res: Response<ApiResponse<Mess
     });
   }
 
-  const message = dataStore.addMessage(parseResult.data);
-  const sender = dataStore.getUserById(message.userId);
+  // Security: strictly enforce sender identity from authenticated session
+  const messageData = {
+    ...parseResult.data,
+    userId: req.user.id,
+  };
+
+  const message = dataStore.addMessage(messageData);
+  const sender = req.user;
 
   if (sender) {
     await mongoLogger.log(

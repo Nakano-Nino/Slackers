@@ -1,8 +1,30 @@
 import { TaskComment, User } from '../types/index.js';
 import { dataStore } from './dataStore.js';
 import { mongoLogger } from './mongoLogger.js';
+import { prisma } from './db.js';
 
 class TaskCommentService {
+  async initFromDb(): Promise<void> {
+    try {
+      const dbComments = await prisma.taskComment.findMany({
+        orderBy: { createdAt: 'asc' },
+      });
+      if (dbComments.length > 0) {
+        this.comments = dbComments.map((c) => ({
+          id: c.id,
+          taskId: c.taskId,
+          userId: c.userId,
+          content: c.content,
+          createdAt: c.createdAt.toISOString(),
+          updatedAt: c.updatedAt.toISOString(),
+        }));
+      }
+      console.log(`📦 TaskCommentService synchronized with PostgreSQL: ${this.comments.length} comments.`);
+    } catch (err: unknown) {
+      console.warn('⚠️  TaskCommentService could not load from PostgreSQL:', err instanceof Error ? err.message : err);
+    }
+  }
+
   private comments: TaskComment[] = [
     {
       id: 'tc-1',
@@ -70,6 +92,19 @@ class TaskCommentService {
 
     this.comments.push(newComment);
 
+    await prisma.taskComment
+      .create({
+        data: {
+          id: newComment.id,
+          taskId: newComment.taskId,
+          userId: newComment.userId,
+          content: newComment.content,
+          createdAt: new Date(newComment.createdAt),
+          updatedAt: new Date(newComment.updatedAt),
+        },
+      })
+      .catch((err) => console.warn('Failed to persist task comment to PostgreSQL:', err));
+
     await mongoLogger.log(
       'TASK_COMMENT_ADDED',
       {
@@ -95,6 +130,10 @@ class TaskCommentService {
     }
 
     this.comments.splice(index, 1);
+
+    await prisma.taskComment
+      .delete({ where: { id: commentId } })
+      .catch((err) => console.warn('Failed to delete task comment in PostgreSQL:', err));
 
     await mongoLogger.log(
       'TASK_COMMENT_DELETED',

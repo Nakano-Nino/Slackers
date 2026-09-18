@@ -38,6 +38,7 @@ import {
   formatFileSize,
   FileAttachmentMetadata,
 } from '../lib/fileCrypto';
+import { formatChatDate, isDifferentDay } from '../lib/dateUtils';
 
 interface Props {
   channel: Channel | null;
@@ -225,6 +226,20 @@ function EncryptedAttachmentCard({ attachment }: { attachment: FileAttachmentMet
         <Download className="w-3.5 h-3.5" />
         <span>{downloading ? 'Decrypting...' : 'Download'}</span>
       </button>
+    </div>
+  );
+}
+
+function ChatDateDivider({ date }: { date: string }) {
+  const label = formatChatDate(date);
+  if (!label) return null;
+
+  return (
+    <div className="sticky top-0 z-10 flex items-center justify-center my-4 py-1 select-none pointer-events-none">
+      <div className="inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-semibold tracking-wide rounded-full bg-slate-200/90 dark:bg-neutral-800/90 text-slate-700 dark:text-neutral-300 shadow-xs border border-slate-300/60 dark:border-neutral-700/60 backdrop-blur-md pointer-events-auto">
+        <Calendar className="w-3 h-3 text-slate-500 dark:text-neutral-400" />
+        <span>{label}</span>
+      </div>
     </div>
   );
 }
@@ -916,7 +931,7 @@ export function ChatArea({
               <p className="text-xs text-slate-400 dark:text-neutral-600 mt-1">Send a message to establish an end-to-end encrypted conversation!</p>
             </div>
           ) : (
-            uniqueDirectMessages.map((dm) => {
+            uniqueDirectMessages.map((dm, idx) => {
               const isMe = currentUser?.id === dm.senderId;
               const sender = dm.sender || (isMe ? currentUser : selectedDmUser);
               const timeFormatted = new Date(dm.createdAt).toLocaleTimeString([], {
@@ -924,12 +939,15 @@ export function ChatArea({
                 minute: '2-digit',
               });
               const decryptedText = decryptedDmMessages[dm.id] || '[Decrypting message...]';
+              const prevDm = idx > 0 ? uniqueDirectMessages[idx - 1] : null;
+              const showDateHeader = !prevDm || isDifferentDay(prevDm.createdAt, dm.createdAt);
 
               return (
-                <div
-                  key={dm.id}
-                  className="flex items-start gap-3.5 group hover:bg-slate-100 dark:hover:bg-neutral-800/20 -mx-3 px-3 py-2 rounded-lg transition relative"
-                >
+                <React.Fragment key={dm.id}>
+                  {showDateHeader && <ChatDateDivider date={dm.createdAt} />}
+                  <div
+                    className="flex items-start gap-3.5 group hover:bg-slate-100 dark:hover:bg-neutral-800/20 -mx-3 px-3 py-2 rounded-lg transition relative"
+                  >
                   {/* Floating Action Bar */}
                   {!dm.isDeleted && (
                     <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute right-3 -top-2.5 z-10 flex items-center gap-0.5 bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 rounded-lg shadow-md px-1 py-0.5">
@@ -1102,7 +1120,8 @@ export function ChatArea({
                     )}
                   </div>
                 </div>
-              );
+              </React.Fragment>
+            );
             })
           )
         ) : (
@@ -1112,19 +1131,22 @@ export function ChatArea({
               <p className="text-sm">No messages yet. Be the first to start the conversation!</p>
             </div>
           ) : (
-            uniqueMessages.map((msg) => {
+            uniqueMessages.map((msg, idx) => {
               const isMe = currentUser?.id === msg.userId;
               const timeFormatted = new Date(msg.createdAt).toLocaleTimeString([], {
                 hour: '2-digit',
                 minute: '2-digit',
               });
               const displayContent = msg.decryptedContent || msg.content || '[Decrypting message...]';
+              const prevMsg = idx > 0 ? uniqueMessages[idx - 1] : null;
+              const showDateHeader = !prevMsg || isDifferentDay(prevMsg.createdAt, msg.createdAt);
 
               return (
-                <div
-                  key={msg.id}
-                  className="flex items-start gap-3.5 group hover:bg-slate-100 dark:hover:bg-neutral-800/20 -mx-3 px-3 py-1.5 rounded-lg transition relative"
-                >
+                <React.Fragment key={msg.id}>
+                  {showDateHeader && <ChatDateDivider date={msg.createdAt} />}
+                  <div
+                    className="flex items-start gap-3.5 group hover:bg-slate-100 dark:hover:bg-neutral-800/20 -mx-3 px-3 py-1.5 rounded-lg transition relative"
+                  >
                   {/* Floating Action Bar */}
                   {!msg.isDeleted && (
                     <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute right-3 -top-2.5 z-10 flex items-center gap-0.5 bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 rounded-lg shadow-md px-1 py-0.5">
@@ -1272,7 +1294,8 @@ export function ChatArea({
                     )}
                   </div>
                 </div>
-              );
+              </React.Fragment>
+            );
             })
           )
         )}

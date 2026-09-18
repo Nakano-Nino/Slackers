@@ -1,4 +1,6 @@
 import http from 'http';
+import path from 'path';
+import fs from 'fs';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -18,7 +20,17 @@ import fileRoutes from './routes/fileRoutes.js';
 import memberRoutes from './routes/memberRoutes.js';
 import { dataStore } from './services/dataStore.js';
 import { socketService } from './services/socketService.js';
+import { connectPostgres } from './services/db.js';
+import { seedPostgres } from './services/dbSeed.js';
+import { projectService } from './services/projectService.js';
+import { taskService } from './services/taskService.js';
+import { bugService } from './services/bugService.js';
+import { dmService } from './services/dmService.js';
+import { taskCommentService } from './services/taskCommentService.js';
+import { notificationService } from './services/notificationService.js';
+import { memberService } from './services/memberService.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { authenticate } from './middleware/authMiddleware.js';
 
 dotenv.config();
 
@@ -26,6 +38,18 @@ const app = express();
 const httpServer = http.createServer(app);
 const PORT = process.env.PORT || 5001;
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:3000';
+
+// Defense-in-depth HTTP security headers
+app.use((_req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('X-XSS-Protection', '0');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  if (process.env.NODE_ENV === 'production') {
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  }
+  next();
+});
 
 // Middleware
 app.use(
@@ -38,6 +62,22 @@ app.use(
 app.use(express.raw({ type: 'application/octet-stream', limit: '50mb' }));
 app.use(express.json({ limit: '10mb' }));
 app.use(morgan('dev'));
+
+// Static files for uploads (avatars, attachments)
+const uploadsDir = path.resolve(process.cwd(), 'uploads');
+const avatarsDir = path.join(uploadsDir, 'avatars');
+if (!fs.existsSync(avatarsDir)) {
+  fs.mkdirSync(avatarsDir, { recursive: true });
+}
+app.use(
+  '/uploads',
+  (_req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; sandbox");
+    next();
+  },
+  express.static(uploadsDir)
+);
 
 // Routes
 app.use('/api/health', healthRoutes);
@@ -54,19 +94,20 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/files', fileRoutes);
 app.use('/api/members', memberRoutes);
 
-// Users route
-app.get('/api/users', (req: Request, res: Response) => {
+// Users route (authenticated, cryptographic secrets stripped)
+app.get('/api/users', authenticate, (_req: Request, res: Response) => {
+  const sanitizedUsers = dataStore.getUsers().map(({ encryptedPrivateKey, keyVaultSalt, keyVaultIv, ...safeUser }) => safeUser);
   res.json({
     success: true,
-    data: dataStore.getUsers(),
+    data: sanitizedUsers,
     timestamp: new Date().toISOString(),
   });
 });
 
-app.get('/api/users/me', (req: Request, res: Response) => {
+app.get('/api/users/me', authenticate, (req: Request, res: Response) => {
   res.json({
     success: true,
-    data: dataStore.getCurrentUser(),
+    data: (req as any).user || dataStore.getCurrentUser(),
     timestamp: new Date().toISOString(),
   });
 });
@@ -86,7 +127,7 @@ app.use(errorHandler);
 // Initialize WebSockets
 socketService.init(httpServer, CLIENT_URL);
 
-httpServer.listen(PORT, () => {
+httpServer.listen(PORT, async () => {
   console.log(`🚀 Slackers API & WebSocket Server running on http://localhost:${PORT}`);
   console.log(`👉 Auth endpoints: http://localhost:${PORT}/api/auth`);
   console.log(`👉 Projects: http://localhost:${PORT}/api/projects`);
@@ -94,6 +135,25 @@ httpServer.listen(PORT, () => {
   console.log(`👉 Bug Tracker: http://localhost:${PORT}/api/bugs`);
   console.log(`👉 Channels & Chat: http://localhost:${PORT}/api/channels`);
   console.log(`👉 MongoDB Audit Logs: http://localhost:${PORT}/api/logs`);
+
+  // Initialize PostgreSQL connection & seed if needed
+  const pgOk = await connectPostgres();
+  if (pgOk) {
+    try {
+      await seedPostgres();
+      await dataStore.initFromDb();
+      await projectService.initFromDb();
+      await taskService.initFromDb();
+      await bugService.initFromDb();
+      await dmService.initFromDb();
+      await taskCommentService.initFromDb();
+      await notificationService.initFromDb();
+      await memberService.initFromDb();
+      console.log('✅ All services initialized and synchronized with PostgreSQL.');
+    } catch (err: unknown) {
+      console.warn('⚠️  PostgreSQL initial synchronization error:', err instanceof Error ? err.message : err);
+    }
+  }
 });
 
 export { app, httpServer };

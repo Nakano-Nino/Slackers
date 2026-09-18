@@ -1,12 +1,18 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { User, UserRole } from '../types/index.js';
+import { User, UserRole, AuthResponse } from '../types/index.js';
 import { dataStore } from './dataStore.js';
 import { mongoLogger } from './mongoLogger.js';
-import { sessionService, UserSession } from './sessionService.js';
+import { sessionService, UserSession, parseDeviceName } from './sessionService.js';
+import { notificationService } from './notificationService.js';
+import { socketService } from './socketService.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'slackers-super-secure-jwt-secret-key-2026';
 const JWT_EXPIRES_IN = '7d';
+
+if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+  console.error('🚨 CRITICAL SECURITY WARNING: JWT_SECRET is unset in production environment! Using fallback key is insecure.');
+}
 
 export class AuthService {
   // Pre-hashed "password123" for instant startup speed
@@ -83,6 +89,21 @@ export class AuthService {
     const isValid = await this.comparePassword(password, user.passwordHash || this.defaultPasswordHash);
     if (!isValid) {
       throw new Error('Invalid email or password');
+    }
+
+    // Clean up any existing stale sessions on the same device for this user
+    if (reqContext?.userAgent) {
+      try {
+        const existingSessions = await sessionService.getUserSessions(user.id);
+        const currentDeviceName = parseDeviceName(reqContext.userAgent);
+        for (const s of existingSessions) {
+          if (s.deviceName === currentDeviceName || (s.userAgent && s.userAgent === reqContext.userAgent)) {
+            await sessionService.revokeSession(user.id, s.id);
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to clean up old device sessions:', err);
+      }
     }
 
     // Create session record for multi-device management
@@ -180,8 +201,9 @@ export class AuthService {
       developerRole?: string;
       currentPassword?: string;
       newPassword?: string;
-    }
-  ): Promise<{ user: User; token: string }> {
+    },
+    currentSessionId?: string
+  ): Promise<AuthResponse> {
     const user = dataStore.getUserById(userId);
     if (!user) {
       throw new Error('User not found');
@@ -230,7 +252,19 @@ export class AuthService {
     // Save update in dataStore
     dataStore.updateUser(userId, user);
 
-    const token = this.generateToken(user);
+    const token = this.generateToken(user, currentSessionId);
+
+    const passwordChanged = Boolean(data.newPassword);
+
+    // If password was updated, immediately invalidate all other active sessions across devices
+    if (passwordChanged && currentSessionId) {
+      try {
+        await sessionService.revokeOtherSessions(user.id, currentSessionId);
+        socketService.emitSessionRevoked(user.id, 'all-others');
+      } catch (err) {
+        console.warn('Failed to revoke other sessions on password change:', err);
+      }
+    }
 
     await mongoLogger.log(
       'USER_PROFILE_UPDATED',
@@ -240,13 +274,24 @@ export class AuthService {
         email: user.email,
         avatar: user.avatar,
         developerRole: user.developerRole,
-        passwordChanged: !!data.newPassword,
+        passwordChanged,
       },
       user
     );
 
+    if (passwordChanged) {
+      notificationService.createNotification({
+        recipientId: user.id,
+        senderId: 'system',
+        senderName: 'Slackers Security',
+        type: 'message',
+        title: 'Password Changed Successfully',
+        content: 'Your account password has been updated and other active sessions have been revoked.',
+      });
+    }
+
     const { passwordHash: _, ...safeUser } = user;
-    return { user: safeUser as User, token };
+    return { user: safeUser as User, token, passwordChanged };
   }
 }
 

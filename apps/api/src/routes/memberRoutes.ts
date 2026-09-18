@@ -9,6 +9,7 @@ import {
   verifyInvitation,
 } from '../controllers/memberController.js';
 import { authenticate, requireRole } from '../middleware/authMiddleware.js';
+import { authRateLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
 
@@ -19,8 +20,8 @@ router.post('/invite', authenticate, requireRole(['admin', 'manager']), createIn
 router.get('/invitations', authenticate, requireRole(['admin', 'manager']), getInvitations);
 router.delete('/invitations/:id', authenticate, requireRole(['admin', 'manager']), revokeInvitation);
 
-// Public invitation onboarding endpoints
-router.get('/invitations/verify/:token', verifyInvitation);
-router.post('/invitations/accept', acceptInvitation);
+// Public invitation onboarding endpoints (rate limited)
+router.get('/invitations/verify/:token', authRateLimiter, verifyInvitation);
+router.post('/invitations/accept', authRateLimiter, acceptInvitation);
 
 export default router;

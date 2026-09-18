@@ -1,8 +1,33 @@
 import { Project, ProjectStats, Task, User } from '../types/index.js';
 import { dataStore } from './dataStore.js';
 import { mongoLogger } from './mongoLogger.js';
+import { prisma } from './db.js';
 
 class ProjectService {
+  async initFromDb(): Promise<void> {
+    try {
+      const dbProjects = await prisma.project.findMany({
+        orderBy: { createdAt: 'asc' },
+      });
+      if (dbProjects.length > 0) {
+        this.projects = dbProjects.map((p) => ({
+          id: p.id,
+          name: p.name,
+          key: p.key,
+          description: p.description || '',
+          isPrivate: p.isPrivate,
+          ownerId: p.ownerId,
+          memberIds: p.memberIds && p.memberIds.length > 0 ? p.memberIds : undefined,
+          createdAt: p.createdAt.toISOString(),
+          updatedAt: p.updatedAt.toISOString(),
+        }));
+      }
+      console.log(`📦 ProjectService synchronized with PostgreSQL: ${this.projects.length} projects.`);
+    } catch (err: unknown) {
+      console.warn('⚠️  ProjectService could not load from PostgreSQL:', err instanceof Error ? err.message : err);
+    }
+  }
+
   private projects: Project[] = [
     {
       id: 'proj-core',
@@ -168,6 +193,22 @@ class ProjectService {
 
     this.projects.push(newProject);
 
+    await prisma.project
+      .create({
+        data: {
+          id: newProject.id,
+          name: newProject.name,
+          key: newProject.key,
+          description: newProject.description,
+          isPrivate: newProject.isPrivate,
+          ownerId: newProject.ownerId,
+          memberIds: newProject.memberIds || [],
+          createdAt: new Date(newProject.createdAt),
+          updatedAt: new Date(newProject.updatedAt),
+        },
+      })
+      .catch((err) => console.warn('Failed to persist project to PostgreSQL:', err));
+
     await mongoLogger.log(
       'PROJECT_CREATED',
       {
@@ -207,6 +248,23 @@ class ProjectService {
     };
 
     const updated = this.projects[index];
+
+    const dataToUpdate: any = {
+      updatedAt: new Date(updated.updatedAt),
+    };
+    if (updates.name !== undefined) dataToUpdate.name = updates.name;
+    if (updates.key !== undefined) dataToUpdate.key = updates.key;
+    if (updates.description !== undefined) dataToUpdate.description = updates.description;
+    if (updates.isPrivate !== undefined) dataToUpdate.isPrivate = updates.isPrivate;
+    if (memberIds !== undefined) dataToUpdate.memberIds = memberIds;
+
+    await prisma.project
+      .update({
+        where: { id },
+        data: dataToUpdate,
+      })
+      .catch((err) => console.warn('Failed to update project in PostgreSQL:', err));
+
     await mongoLogger.log('PROJECT_UPDATED', { projectId: id, changes: updates }, actor);
 
     return this.enrichProject(updated);
@@ -217,6 +275,11 @@ class ProjectService {
     if (index === -1) return false;
 
     const deleted = this.projects.splice(index, 1)[0];
+
+    await prisma.project
+      .delete({ where: { id } })
+      .catch((err) => console.warn('Failed to delete project in PostgreSQL:', err));
+
     await mongoLogger.log('PROJECT_DELETED', { projectId: id, name: deleted.name }, actor);
 
     return true;

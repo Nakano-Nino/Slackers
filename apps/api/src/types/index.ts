@@ -315,6 +315,7 @@ export interface ActivityLog {
     | 'SESSION_CREATED'
     | 'SESSION_REVOKED'
     | 'OTHER_SESSIONS_REVOKED'
+    | 'USER_LOGOUT'
     | 'SYSTEM';
   userId?: string;
   userName?: string;
@@ -324,6 +325,7 @@ export interface ActivityLog {
 export interface AuthResponse {
   user: User;
   token: string;
+  passwordChanged?: boolean;
 }
 
 export interface ApiResponse<T> {

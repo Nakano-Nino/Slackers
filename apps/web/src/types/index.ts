@@ -304,6 +304,7 @@ export interface ActivityLog {
 export interface AuthResponse {
   user: User;
   token: string;
+  passwordChanged?: boolean;
 }
 
 export interface ApiResponse<T> {

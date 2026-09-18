@@ -80,6 +80,41 @@ class MongoLogger {
   isMongoConnected(): boolean {
     return this.isConnected;
   }
+
+  async checkMongoHealth(): Promise<{
+    status: 'connected' | 'disconnected';
+    database?: string;
+    documentsCount?: number;
+    latencyMs?: number;
+    error?: string;
+  }> {
+    if (!this.isConnected || !this.db) {
+      await this.initialize();
+    }
+    if (this.isConnected && this.db) {
+      try {
+        const start = Date.now();
+        await this.db.command({ ping: 1 });
+        const latency = Date.now() - start;
+        const count = this.collection ? await this.collection.countDocuments() : 0;
+        return {
+          status: 'connected',
+          database: 'slackers_logs',
+          documentsCount: count,
+          latencyMs: latency,
+        };
+      } catch (err: unknown) {
+        return {
+          status: 'disconnected',
+          error: err instanceof Error ? err.message : 'Ping failed',
+        };
+      }
+    }
+    return {
+      status: 'disconnected',
+      error: 'MongoDB client not connected',
+    };
+  }
 }
 
 export const mongoLogger = new MongoLogger();

@@ -6,6 +6,7 @@ import { mongoLogger } from './mongoLogger.js';
 import { socketService } from './socketService.js';
 import { authService } from './authService.js';
 import { sessionService, UserSession } from './sessionService.js';
+import { prisma } from './db.js';
 
 const AVATAR_PRESETS = [
   'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
@@ -19,6 +20,35 @@ const AVATAR_PRESETS = [
 ];
 
 class MemberService {
+  async initFromDb(): Promise<void> {
+    try {
+      const dbInvitations = await prisma.invitation.findMany({
+        orderBy: { createdAt: 'desc' },
+      });
+      if (dbInvitations.length > 0) {
+        this.invitations = dbInvitations.map((i) => {
+          const inviter = dataStore.getUserById(i.inviterId);
+          return {
+            id: i.id,
+            token: i.token,
+            email: i.email || undefined,
+            role: i.role.toLowerCase() as UserRole,
+            developerRole: i.developerRole || undefined,
+            invitedById: i.inviterId,
+            invitedByName: inviter?.name,
+            expiresAt: i.expiresAt.toISOString(),
+            isUsed: i.status === 'accepted',
+            usedAt: i.acceptedAt ? i.acceptedAt.toISOString() : undefined,
+            createdAt: i.createdAt.toISOString(),
+          };
+        });
+      }
+      console.log(`📦 MemberService synchronized with PostgreSQL: ${this.invitations.length} invitations.`);
+    } catch (err: unknown) {
+      console.warn('⚠️  MemberService could not load from PostgreSQL:', err instanceof Error ? err.message : err);
+    }
+  }
+
   private invitations: Invitation[] = [];
 
   generateTempPassword(length = 12): string {
@@ -133,6 +163,22 @@ class MemberService {
 
     this.invitations.unshift(invitation);
 
+    await prisma.invitation
+      .create({
+        data: {
+          id: invitation.id,
+          token: invitation.token,
+          email: invitation.email || '',
+          role: invitation.role,
+          developerRole: invitation.developerRole || null,
+          inviterId: invitation.invitedById,
+          status: 'pending',
+          expiresAt: new Date(invitation.expiresAt),
+          createdAt: new Date(invitation.createdAt),
+        },
+      })
+      .catch((err) => console.warn('Failed to persist invitation to PostgreSQL:', err));
+
     await mongoLogger.log(
       'MEMBER_INVITED',
       {
@@ -156,7 +202,7 @@ class MemberService {
     return this.invitations;
   }
 
-  revokeInvitation(id: string, actor: User): boolean {
+  async revokeInvitation(id: string, actor: User): Promise<boolean> {
     if (actor.role !== 'admin' && actor.role !== 'manager') {
       throw new Error('Permission denied: Only Admins and Managers can revoke invitations.');
     }
@@ -165,6 +211,10 @@ class MemberService {
     if (index === -1) return false;
 
     const revoked = this.invitations.splice(index, 1)[0];
+
+    await prisma.invitation
+      .delete({ where: { token: revoked.token } })
+      .catch((err) => console.warn('Failed to delete invitation in PostgreSQL:', err));
 
     mongoLogger.log(
       'INVITATION_REVOKED',
@@ -258,6 +308,16 @@ class MemberService {
     inv.isUsed = true;
     inv.usedById = newUser.id;
     inv.usedAt = new Date().toISOString();
+
+    await prisma.invitation
+      .update({
+        where: { token: inv.token },
+        data: {
+          status: 'accepted',
+          acceptedAt: new Date(inv.usedAt),
+        },
+      })
+      .catch((err) => console.warn('Failed to update accepted invitation in PostgreSQL:', err));
 
     // Create session & JWT token
     const userAgent = reqContext?.userAgent || 'Browser';

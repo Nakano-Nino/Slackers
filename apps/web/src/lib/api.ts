@@ -130,8 +130,32 @@ export const api = {
     return res.data;
   },
 
-  logout: () => {
-    authStorage.clearToken();
+  uploadAvatar: async (imageData: string): Promise<{ avatarUrl: string; user: User }> => {
+    const res = await fetchJson<ApiResponse<{ avatarUrl: string; user: User }>>('/api/auth/avatar', {
+      method: 'POST',
+      body: JSON.stringify({ image: imageData }),
+    });
+    if (!res.data) throw new Error('Failed to upload avatar');
+    return res.data;
+  },
+
+  logout: async (): Promise<void> => {
+    try {
+      const token = authStorage.getToken();
+      if (token) {
+        await fetch(`${API_BASE_URL}/api/auth/logout`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }).catch((err) => {
+          console.warn('Backend logout call notice:', err);
+        });
+      }
+    } finally {
+      authStorage.clearToken();
+    }
   },
 
   // Projects

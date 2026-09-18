@@ -791,6 +791,7 @@ export default function Home() {
     socket.on('task:deleted', handleIncomingTaskDeleted);
     socket.on('presence:update', handleIncomingPresence);
     socket.on('user:created', handleIncomingUserCreated);
+    socket.on('session:revoked', handleLogout);
 
     return () => {
       socket.off('message:new', handleIncomingMessage);
@@ -811,6 +812,7 @@ export default function Home() {
       socket.off('task:deleted', handleIncomingTaskDeleted);
       socket.off('presence:update', handleIncomingPresence);
       socket.off('user:created', handleIncomingUserCreated);
+      socket.off('session:revoked', handleLogout);
     };
   }, [
     currentUser,
@@ -883,9 +885,9 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [toastNotification]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     disconnectSocket();
-    api.logout();
+    await api.logout();
     setCurrentUser(null);
     setMyKeyPair(null);
     setSelectedDmUser(null);
@@ -1628,9 +1630,22 @@ export default function Home() {
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
         currentUser={currentUser}
-        onProfileUpdated={(updatedUser) => {
+        onProfileUpdated={(updatedUser, passwordChanged) => {
           setCurrentUser(updatedUser);
           setUsers((prev) => prev.map((u) => (u.id === updatedUser.id ? { ...u, ...updatedUser } : u)));
+          if (passwordChanged) {
+            setToastNotification({
+              id: `pwd-changed-${Date.now()}`,
+              recipientId: updatedUser.id,
+              senderId: 'system',
+              senderName: 'Slackers Security',
+              type: 'message',
+              title: 'Password Changed Successfully',
+              content: 'Your account password has been updated and your E2EE key vault has been secured.',
+              isRead: false,
+              createdAt: new Date().toISOString(),
+            });
+          }
         }}
         mutedTargets={mutedTargets}
         onUnmuteTarget={handleUnmuteTarget}

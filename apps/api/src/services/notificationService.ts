@@ -1,8 +1,36 @@
 import { Notification, NotificationType, User } from '../types/index.js';
 import { dataStore } from './dataStore.js';
 import { socketService } from './socketService.js';
+import { prisma } from './db.js';
 
 class NotificationService {
+  async initFromDb(): Promise<void> {
+    try {
+      const dbNotifs = await prisma.notification.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 200,
+      });
+      if (dbNotifs.length > 0) {
+        this.notifications = dbNotifs.map((n) => ({
+          id: n.id,
+          recipientId: n.recipientId,
+          senderId: n.senderId,
+          senderName: n.senderName,
+          senderAvatar: n.senderAvatar || undefined,
+          type: n.type as NotificationType,
+          title: n.title,
+          content: n.content,
+          link: (n.link as any) || undefined,
+          isRead: n.isRead,
+          createdAt: n.createdAt.toISOString(),
+        }));
+      }
+      console.log(`📦 NotificationService synchronized with PostgreSQL: ${this.notifications.length} notifications.`);
+    } catch (err: unknown) {
+      console.warn('⚠️  NotificationService could not load from PostgreSQL:', err instanceof Error ? err.message : err);
+    }
+  }
+
   private notifications: Notification[] = [
     {
       id: 'notif-1',
@@ -205,6 +233,24 @@ class NotificationService {
       this.notifications = this.notifications.slice(0, 200);
     }
 
+    prisma.notification
+      .create({
+        data: {
+          id: notification.id,
+          recipientId: notification.recipientId,
+          senderId: notification.senderId || 'system',
+          senderName: notification.senderName || 'System',
+          senderAvatar: notification.senderAvatar || null,
+          type: notification.type,
+          title: notification.title,
+          content: notification.content,
+          link: (notification.link as any) || undefined,
+          isRead: false,
+          createdAt: new Date(notification.createdAt),
+        },
+      })
+      .catch((err) => console.warn('Failed to persist notification to PostgreSQL:', err));
+
     // Emit real-time WebSocket event to recipient
     socketService.emitNewNotification(notification.recipientId, notification);
 
@@ -215,6 +261,12 @@ class NotificationService {
     const notif = this.notifications.find((n) => n.id === notificationId && n.recipientId === userId);
     if (notif) {
       notif.isRead = true;
+      prisma.notification
+        .update({
+          where: { id: notificationId },
+          data: { isRead: true },
+        })
+        .catch((err) => console.warn('Failed to update notification read status in PostgreSQL:', err));
       return true;
     }
     return false;
@@ -228,6 +280,14 @@ class NotificationService {
         count++;
       }
     }
+    if (count > 0) {
+      prisma.notification
+        .updateMany({
+          where: { recipientId: userId, isRead: false },
+          data: { isRead: true },
+        })
+        .catch((err) => console.warn('Failed to update all notifications in PostgreSQL:', err));
+    }
     return count;
   }
 
@@ -236,7 +296,13 @@ class NotificationService {
     this.notifications = this.notifications.filter(
       (n) => !(n.id === notificationId && n.recipientId === userId)
     );
-    return this.notifications.length < initialLen;
+    if (this.notifications.length < initialLen) {
+      prisma.notification
+        .delete({ where: { id: notificationId } })
+        .catch((err) => console.warn('Failed to delete notification in PostgreSQL:', err));
+      return true;
+    }
+    return false;
   }
 }
 

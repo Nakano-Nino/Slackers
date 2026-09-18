@@ -88,7 +88,7 @@ export const createChannel = async (req: AuthRequest, res: Response<ApiResponse<
 };
 
 const SaveChannelKeySchema = z.object({
-  userId: z.string().min(1, 'userId is required'),
+  userId: z.string().min(1).optional(),
   encryptedKey: z.string().min(10, 'encryptedKey is required'),
   iv: z.string().min(8, 'iv is required'),
 });
@@ -112,9 +112,18 @@ export const saveChannelKey = (req: AuthRequest, res: Response<ApiResponse<any>>
     });
   }
 
+  const targetUserId = parseResult.data.userId || req.user.id;
+  if (targetUserId !== req.user.id && req.user.role !== 'admin' && req.user.role !== 'manager') {
+    return res.status(403).json({
+      success: false,
+      error: 'Permission denied: Cannot manage channel keys for another user',
+      timestamp: new Date().toISOString(),
+    });
+  }
+
   const record = dataStore.setChannelKey(
     channelId,
-    parseResult.data.userId,
+    targetUserId,
     parseResult.data.encryptedKey,
     parseResult.data.iv
   );

@@ -1,8 +1,37 @@
 import { DirectMessage, User } from '../types/index.js';
 import { dataStore } from './dataStore.js';
 import { mongoLogger } from './mongoLogger.js';
+import { prisma } from './db.js';
 
 class DmService {
+  async initFromDb(): Promise<void> {
+    try {
+      const dbDMs = await prisma.directMessage.findMany({
+        orderBy: { createdAt: 'asc' },
+      });
+      if (dbDMs.length > 0) {
+        this.messages = dbDMs.map((m) => ({
+          id: m.id,
+          senderId: m.senderId,
+          receiverId: m.receiverId,
+          ciphertext: m.ciphertext,
+          iv: m.iv,
+          senderCopy: m.senderCopy || undefined,
+          isRead: m.isRead,
+          readAt: m.readAt ? m.readAt.toISOString() : null,
+          isEdited: m.isEdited,
+          isDeleted: m.isDeleted,
+          editedAt: m.editedAt ? m.editedAt.toISOString() : undefined,
+          reactions: (m.reactions as any) || undefined,
+          createdAt: m.createdAt.toISOString(),
+        }));
+      }
+      console.log(`📦 DmService synchronized with PostgreSQL: ${this.messages.length} direct messages.`);
+    } catch (err: unknown) {
+      console.warn('⚠️  DmService could not load from PostgreSQL:', err instanceof Error ? err.message : err);
+    }
+  }
+
   private messages: DirectMessage[] = [
     {
       id: 'dm-seed-1',
@@ -135,6 +164,21 @@ class DmService {
 
     this.messages.push(newMsg);
 
+    await prisma.directMessage
+      .create({
+        data: {
+          id: newMsg.id,
+          senderId: newMsg.senderId,
+          receiverId: newMsg.receiverId,
+          ciphertext: newMsg.ciphertext,
+          iv: newMsg.iv,
+          senderCopy: newMsg.senderCopy || null,
+          isRead: false,
+          createdAt: new Date(newMsg.createdAt),
+        },
+      })
+      .catch((err) => console.warn('Failed to persist directMessage to PostgreSQL:', err));
+
     if (sender) {
       await mongoLogger.log(
         'DM_SENT',
@@ -173,6 +217,23 @@ class DmService {
         markedCount++;
       }
     }
+
+    if (markedCount > 0) {
+      prisma.directMessage
+        .updateMany({
+          where: {
+            receiverId: userId,
+            senderId: partnerId,
+            isRead: false,
+          },
+          data: {
+            isRead: true,
+            readAt: new Date(now),
+          },
+        })
+        .catch((err) => console.warn('Failed to update directMessage read status in PostgreSQL:', err));
+    }
+
     return markedCount;
   }
 
@@ -232,6 +293,13 @@ class DmService {
       message.reactions[emoji] = existing;
     }
 
+    prisma.directMessage
+      .update({
+        where: { id: messageId },
+        data: { reactions: message.reactions },
+      })
+      .catch((err) => console.warn('Failed to update directMessage reactions in PostgreSQL:', err));
+
     return this.enrichMessage(message);
   }
 
@@ -254,6 +322,20 @@ class DmService {
     if (senderCopy) message.senderCopy = senderCopy;
     message.isEdited = true;
     message.editedAt = new Date().toISOString();
+
+    prisma.directMessage
+      .update({
+        where: { id: messageId },
+        data: {
+          ciphertext: message.ciphertext,
+          iv: message.iv,
+          senderCopy: message.senderCopy || null,
+          isEdited: true,
+          editedAt: new Date(message.editedAt),
+        },
+      })
+      .catch((err) => console.warn('Failed to persist directMessage edit to PostgreSQL:', err));
+
     return this.enrichMessage(message);
   }
 
@@ -268,6 +350,18 @@ class DmService {
     message.isDeleted = true;
     message.ciphertext = '';
     message.senderCopy = '';
+
+    prisma.directMessage
+      .update({
+        where: { id: messageId },
+        data: {
+          isDeleted: true,
+          ciphertext: '',
+          senderCopy: '',
+        },
+      })
+      .catch((err) => console.warn('Failed to persist directMessage delete to PostgreSQL:', err));
+
     return this.enrichMessage(message);
   }
 }

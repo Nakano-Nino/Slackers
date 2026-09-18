@@ -6,9 +6,9 @@
     "semantic_hash": ""
   },
   "apps/api/src/controllers/authController.ts": {
-    "mtime": 1789691245.7731082,
-    "seen": 1789691544.8150022,
-    "ast_hash": "aca5f2e081210589a4e9824f81e79f94",
+    "mtime": 1789654884.9395924,
+    "seen": 1789655079.273576,
+    "ast_hash": "647814a42edc1742972f11134bb47661",
     "semantic_hash": ""
   },
   "apps/api/src/controllers/bugController.ts": {
@@ -72,9 +72,9 @@
     "semantic_hash": "c15e18fcbf92a8466ccafec0f3f3baae"
   },
   "apps/api/src/routes/authRoutes.ts": {
-    "mtime": 1789691255.0056427,
-    "seen": 1789691544.815019,
-    "ast_hash": "3fa5b67c83c9b8e8428a0ee41486e461",
+    "mtime": 1789654896.2883248,
+    "seen": 1789655079.2735932,
+    "ast_hash": "f5e8c81b9a1b334c3ebf7cb5519f2292",
     "semantic_hash": ""
   },
   "apps/api/src/routes/bugRoutes.ts": {
@@ -126,9 +126,9 @@
     "semantic_hash": ""
   },
   "apps/api/src/services/authService.ts": {
-    "mtime": 1789691268.6154473,
-    "seen": 1789691544.81503,
-    "ast_hash": "7fe5e258474042e6170dbfe08bb90760",
+    "mtime": 1789654592.732064,
+    "seen": 1789654649.7111099,
+    "ast_hash": "d028a36f2599eb5f09a774734dc3f918",
     "semantic_hash": ""
   },
   "apps/api/src/services/bugService.ts": {
@@ -180,9 +180,9 @@
     "semantic_hash": ""
   },
   "apps/api/src/types/index.ts": {
-    "mtime": 1789691286.833315,
-    "seen": 1789691544.8150442,
-    "ast_hash": "75f59636ee97badba0b103f9719d46b4",
+    "mtime": 1789654434.3559322,
+    "seen": 1789654649.711124,
+    "ast_hash": "f4f058cf6cb5ad7f5d4ad95a9d64630b",
     "semantic_hash": ""
   },
   "apps/api/tsconfig.json": {
@@ -222,9 +222,9 @@
     "semantic_hash": "b42e03028136cae78674a96be000cce8"
   },
   "apps/web/src/app/page.tsx": {
-    "mtime": 1789691313.616063,
-    "seen": 1789691544.815049,
-    "ast_hash": "68c619bedff034e111428851a311efef",
+    "mtime": 1789654618.345774,
+    "seen": 1789654649.7111301,
+    "ast_hash": "a96979c85d41dbe5c98646e198c19e7f",
     "semantic_hash": ""
   },
   "apps/web/src/components/AuthModal.tsx": {
@@ -312,9 +312,9 @@
     "semantic_hash": "fc71216a73541b6e019a35ce5fd6fd75"
   },
   "apps/web/src/lib/api.ts": {
-    "mtime": 1789691299.7656822,
-    "seen": 1789691544.8150709,
-    "ast_hash": "742b893eba849e1549bbfeabd1484975",
+    "mtime": 1789654914.7901723,
+    "seen": 1789655079.2736378,
+    "ast_hash": "f2c407c352df5d6cbb3e23d6604e6cf8",
     "semantic_hash": ""
   },
   "apps/web/src/lib/e2ee.ts": {

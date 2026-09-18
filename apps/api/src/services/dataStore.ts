@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { Channel, ChannelKey, KeyVaultData, Message, User, UserRole } from '../types/index.js';
+import { prisma } from './db.js';
 
 // Pre-hashed 'password123'
 const DEFAULT_PASSWORD_HASH = bcrypt.hashSync('password123', 10);
@@ -38,6 +39,82 @@ class DataStore {
         user.keyVaultSalt = vault.keyVaultSalt;
         user.keyVaultIv = vault.keyVaultIv;
       }
+    }
+  }
+
+  async initFromDb(): Promise<void> {
+    try {
+      const dbUsers = await prisma.user.findMany();
+      if (dbUsers.length > 0) {
+        this.users = dbUsers.map((u) => ({
+          id: u.id,
+          email: u.email,
+          passwordHash: u.passwordHash,
+          name: u.name,
+          avatar: u.avatar,
+          publicKey: u.publicKey || undefined,
+          encryptedPrivateKey: u.encryptedPrivateKey || undefined,
+          keyVaultSalt: u.keyVaultSalt || undefined,
+          keyVaultIv: u.keyVaultIv || undefined,
+          role: u.role.toLowerCase() as any,
+          developerRole: u.developerRole || undefined,
+          status: u.status.toLowerCase() as any,
+        }));
+      }
+
+      const dbChannels = await prisma.channel.findMany();
+      if (dbChannels.length > 0) {
+        this.channels = dbChannels.map((c) => ({
+          id: c.id,
+          name: c.name,
+          description: c.description || '',
+          isPrivate: c.isPrivate,
+          memberCount: 0,
+          createdAt: c.createdAt.toISOString(),
+        }));
+      }
+
+      const dbKeys = await prisma.channelKey.findMany();
+      if (dbKeys.length > 0) {
+        this.channelKeys = dbKeys.map((k) => ({
+          id: k.id,
+          channelId: k.channelId,
+          userId: k.userId,
+          encryptedKey: k.encryptedKey,
+          iv: k.iv,
+          createdAt: k.createdAt.toISOString(),
+        }));
+      }
+
+      const dbMessages = await prisma.message.findMany({
+        include: { user: true },
+        orderBy: { createdAt: 'asc' },
+      });
+      if (dbMessages.length > 0) {
+        this.messages = dbMessages.map((m) => ({
+          id: m.id,
+          channelId: m.channelId,
+          userId: m.userId,
+          userName: m.user?.name || 'Unknown',
+          userAvatar: m.user?.avatar || '',
+          ciphertext: m.ciphertext,
+          iv: m.iv,
+          content: m.content || undefined,
+          taskId: m.taskId || undefined,
+          bugId: m.bugId || undefined,
+          createdAt: m.createdAt.toISOString(),
+          isEdited: m.isEdited,
+          isDeleted: m.isDeleted,
+          editedAt: m.editedAt ? m.editedAt.toISOString() : undefined,
+          reactions: (m.reactions as any) || undefined,
+          parentId: m.parentId || undefined,
+          replyCount: m.replyCount,
+          lastReplyAt: m.lastReplyAt ? m.lastReplyAt.toISOString() : undefined,
+        }));
+      }
+      console.log(`📦 DataStore synchronized with PostgreSQL: ${this.users.length} users, ${this.channels.length} channels, ${this.messages.length} messages.`);
+    } catch (err: unknown) {
+      console.warn('⚠️  DataStore could not load from PostgreSQL:', err instanceof Error ? err.message : err);
     }
   }
 
@@ -295,6 +372,38 @@ class DataStore {
 
   addUser(user: User): User {
     this.users.push(user);
+    prisma.user
+      .upsert({
+        where: { id: user.id },
+        update: {
+          email: user.email,
+          name: user.name,
+          avatar: user.avatar,
+          passwordHash: user.passwordHash || '',
+          publicKey: user.publicKey || null,
+          encryptedPrivateKey: user.encryptedPrivateKey || null,
+          keyVaultSalt: user.keyVaultSalt || null,
+          keyVaultIv: user.keyVaultIv || null,
+          role: user.role.toUpperCase() as any,
+          developerRole: user.developerRole || null,
+          status: user.status.toUpperCase() as any,
+        },
+        create: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          avatar: user.avatar,
+          passwordHash: user.passwordHash || '',
+          publicKey: user.publicKey || null,
+          encryptedPrivateKey: user.encryptedPrivateKey || null,
+          keyVaultSalt: user.keyVaultSalt || null,
+          keyVaultIv: user.keyVaultIv || null,
+          role: user.role.toUpperCase() as any,
+          developerRole: user.developerRole || null,
+          status: user.status.toUpperCase() as any,
+        },
+      })
+      .catch((err) => console.warn('Failed to persist user to PostgreSQL:', err));
     return user;
   }
 
@@ -302,6 +411,22 @@ class DataStore {
     const user = this.users.find((u) => u.id === id);
     if (!user) return null;
     Object.assign(user, updates);
+    const dataToUpdate: any = {};
+    if (updates.name !== undefined) dataToUpdate.name = updates.name;
+    if (updates.email !== undefined) dataToUpdate.email = updates.email;
+    if (updates.avatar !== undefined) dataToUpdate.avatar = updates.avatar;
+    if (updates.passwordHash !== undefined) dataToUpdate.passwordHash = updates.passwordHash;
+    if (updates.role !== undefined) dataToUpdate.role = updates.role.toUpperCase();
+    if (updates.developerRole !== undefined) dataToUpdate.developerRole = updates.developerRole;
+    if (updates.status !== undefined) dataToUpdate.status = updates.status.toUpperCase();
+    if (updates.publicKey !== undefined) dataToUpdate.publicKey = updates.publicKey;
+    if (updates.encryptedPrivateKey !== undefined) dataToUpdate.encryptedPrivateKey = updates.encryptedPrivateKey;
+    if (updates.keyVaultSalt !== undefined) dataToUpdate.keyVaultSalt = updates.keyVaultSalt;
+    if (updates.keyVaultIv !== undefined) dataToUpdate.keyVaultIv = updates.keyVaultIv;
+
+    prisma.user
+      .update({ where: { id }, data: dataToUpdate })
+      .catch((err) => console.warn('Failed to update user in PostgreSQL:', err));
     return user;
   }
 
@@ -309,6 +434,9 @@ class DataStore {
     const user = this.users.find((u) => u.id === userId);
     if (!user) return false;
     user.publicKey = publicKey;
+    prisma.user
+      .update({ where: { id: userId }, data: { publicKey } })
+      .catch((err) => console.warn('Failed to update user publicKey in PostgreSQL:', err));
     return true;
   }
 
@@ -324,6 +452,17 @@ class DataStore {
     user.encryptedPrivateKey = vault.encryptedPrivateKey;
     user.keyVaultSalt = vault.keyVaultSalt;
     user.keyVaultIv = vault.keyVaultIv;
+    prisma.user
+      .update({
+        where: { id: userId },
+        data: {
+          publicKey: vault.publicKey,
+          encryptedPrivateKey: vault.encryptedPrivateKey,
+          keyVaultSalt: vault.keyVaultSalt,
+          keyVaultIv: vault.keyVaultIv,
+        },
+      })
+      .catch((err) => console.warn('Failed to update user keyVault in PostgreSQL:', err));
     return true;
   }
 
@@ -359,6 +498,20 @@ class DataStore {
     } else {
       this.channelKeys.push(record);
     }
+
+    prisma.channelKey
+      .upsert({
+        where: { channelId_userId: { channelId, userId } },
+        update: { encryptedKey, iv },
+        create: {
+          id: record.id,
+          channelId,
+          userId,
+          encryptedKey,
+          iv,
+        },
+      })
+      .catch((err) => console.warn('Failed to persist channelKey to PostgreSQL:', err));
     return record;
   }
 
@@ -392,6 +545,17 @@ class DataStore {
       createdAt: new Date().toISOString(),
     };
     this.channels.push(newChannel);
+    prisma.channel
+      .create({
+        data: {
+          id: newChannel.id,
+          name: newChannel.name,
+          description: newChannel.description,
+          isPrivate: newChannel.isPrivate,
+          createdAt: new Date(newChannel.createdAt),
+        },
+      })
+      .catch((err) => console.warn('Failed to persist channel to PostgreSQL:', err));
     return newChannel;
   }
 
@@ -443,6 +607,35 @@ class DataStore {
     }
 
     this.messages.push(newMessage);
+    prisma.message
+      .create({
+        data: {
+          id: newMessage.id,
+          channelId: newMessage.channelId,
+          userId: newMessage.userId,
+          ciphertext: newMessage.ciphertext,
+          iv: newMessage.iv,
+          content: newMessage.content,
+          taskId: newMessage.taskId,
+          bugId: newMessage.bugId,
+          parentId: newMessage.parentId,
+          replyCount: newMessage.replyCount || 0,
+          lastReplyAt: newMessage.lastReplyAt ? new Date(newMessage.lastReplyAt) : null,
+          createdAt: new Date(newMessage.createdAt),
+        },
+      })
+      .then(() => {
+        if (data.parentId) {
+          return prisma.message.update({
+            where: { id: data.parentId },
+            data: {
+              replyCount: { increment: 1 },
+              lastReplyAt: new Date(now),
+            },
+          });
+        }
+      })
+      .catch((err) => console.warn('Failed to persist message to PostgreSQL:', err));
     return newMessage;
   }
 
@@ -466,6 +659,13 @@ class DataStore {
       message.reactions[emoji] = existing;
     }
 
+    prisma.message
+      .update({
+        where: { id: messageId },
+        data: { reactions: message.reactions },
+      })
+      .catch((err) => console.warn('Failed to persist reactions to PostgreSQL:', err));
+
     return message;
   }
 
@@ -481,6 +681,19 @@ class DataStore {
     message.iv = iv;
     message.isEdited = true;
     message.editedAt = new Date().toISOString();
+
+    prisma.message
+      .update({
+        where: { id: messageId },
+        data: {
+          ciphertext: message.ciphertext,
+          iv: message.iv,
+          isEdited: true,
+          editedAt: new Date(message.editedAt),
+        },
+      })
+      .catch((err) => console.warn('Failed to persist editMessage to PostgreSQL:', err));
+
     return message;
   }
 
@@ -495,6 +708,18 @@ class DataStore {
     message.isDeleted = true;
     message.ciphertext = '';
     message.content = 'This message was deleted';
+
+    prisma.message
+      .update({
+        where: { id: messageId },
+        data: {
+          isDeleted: true,
+          ciphertext: '',
+          content: 'This message was deleted',
+        },
+      })
+      .catch((err) => console.warn('Failed to persist deleteMessage to PostgreSQL:', err));
+
     return message;
   }
 }

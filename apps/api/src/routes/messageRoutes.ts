@@ -12,11 +12,13 @@ import { authenticate } from '../middleware/authMiddleware.js';
 
 const router = Router();
 
+router.use(authenticate);
+
 router.get('/channel/:channelId', getMessagesByChannel);
 router.get('/thread/:parentId', getThreadReplies);
 router.post('/', messagingRateLimiter, createMessage);
-router.post('/:id/react', authenticate, toggleReaction);
-router.patch('/:id', authenticate, editMessage);
-router.delete('/:id', authenticate, deleteMessage);
+router.post('/:id/react', toggleReaction);
+router.patch('/:id', editMessage);
+router.delete('/:id', deleteMessage);
 
 export default router;

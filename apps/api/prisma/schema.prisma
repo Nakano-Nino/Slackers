@@ -69,6 +69,7 @@ model User {
   keyVaultSalt        String?         @db.Text
   keyVaultIv          String?         @db.Text
   role                UserRole        @default(MEMBER)
+  developerRole       String?
   status              UserStatus      @default(ONLINE)
   createdAt           DateTime        @default(now())
   updatedAt           DateTime        @updatedAt
@@ -95,6 +96,7 @@ model Project {
   key         String          @unique
   description String?         @db.Text
   isPrivate   Boolean         @default(false)
+  memberIds   String[]        @default([])
   ownerId     String
   owner       User            @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Cascade)
   createdAt   DateTime        @default(now())
@@ -174,12 +176,20 @@ model Message {
   content    String?  @db.Text
   taskId     String?
   bugId      String?
+  parentId   String?
+  replyCount Int      @default(0)
+  lastReplyAt DateTime?
+  isEdited   Boolean  @default(false)
+  isDeleted  Boolean  @default(false)
+  editedAt   DateTime?
+  reactions  Json?
   createdAt  DateTime @default(now())
 
   channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([channelId])
+  @@index([parentId])
   @@map("messages")
 }
 
@@ -200,6 +210,10 @@ model Task {
 
   creatorId   String?
   creator     User?        @relation("CreatedTasks", fields: [creatorId], references: [id], onDelete: SetNull)
+
+  qaSteps     Json?
+  qaVerdict   String?
+  attachments Json?
 
   comments    TaskComment[]
   bugs        Bug[]
@@ -253,6 +267,10 @@ model DirectMessage {
   senderCopy String?   @db.Text
   isRead     Boolean   @default(false)
   readAt     DateTime?
+  isEdited   Boolean   @default(false)
+  isDeleted  Boolean   @default(false)
+  editedAt   DateTime?
+  reactions  Json?
   createdAt  DateTime  @default(now())
 
   sender     User      @relation("SentDMs", fields: [senderId], references: [id], onDelete: Cascade)
@@ -276,3 +294,36 @@ model TaskComment {
   @@index([taskId])
   @@map("task_comments")
 }
+
+model Invitation {
+  id            String    @id @default(cuid())
+  email         String
+  role          String
+  developerRole String?
+  token         String    @unique
+  inviterId     String
+  status        String    @default("pending")
+  expiresAt     DateTime
+  createdAt     DateTime  @default(now())
+  acceptedAt    DateTime?
+
+  @@map("invitations")
+}
+
+model Notification {
+  id           String   @id @default(cuid())
+  recipientId  String
+  senderId     String
+  senderName   String
+  senderAvatar String?
+  type         String
+  title        String
+  content      String   @db.Text
+  link         Json?
+  isRead       Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  @@index([recipientId])
+  @@map("notifications")
+}
+

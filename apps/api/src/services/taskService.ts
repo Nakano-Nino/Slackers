@@ -5,8 +5,40 @@ import { projectService } from './projectService.js';
 import { taskCommentService } from './taskCommentService.js';
 import { notificationService } from './notificationService.js';
 import { socketService } from './socketService.js';
+import { prisma } from './db.js';
 
 class TaskService {
+  async initFromDb(): Promise<void> {
+    try {
+      const dbTasks = await prisma.task.findMany({
+        orderBy: { createdAt: 'asc' },
+      });
+      if (dbTasks.length > 0) {
+        this.tasks = dbTasks.map((t) => ({
+          id: t.id,
+          projectId: t.projectId,
+          title: t.title,
+          description: t.description || '',
+          status: t.status.toLowerCase() as TaskStatus,
+          priority: t.priority.toLowerCase() as TaskPriority,
+          storyPoints: t.storyPoints,
+          tags: t.tags || [],
+          dueDate: t.dueDate ? t.dueDate.toISOString().split('T')[0] : undefined,
+          assigneeId: t.assigneeId || undefined,
+          creatorId: t.creatorId || undefined,
+          qaSteps: (t.qaSteps as any) || undefined,
+          qaVerdict: (t.qaVerdict as any) || undefined,
+          attachments: (t.attachments as any) || undefined,
+          createdAt: t.createdAt.toISOString(),
+          updatedAt: t.updatedAt.toISOString(),
+        }));
+      }
+      console.log(`📦 TaskService synchronized with PostgreSQL: ${this.tasks.length} tasks.`);
+    } catch (err: unknown) {
+      console.warn('⚠️  TaskService could not load from PostgreSQL:', err instanceof Error ? err.message : err);
+    }
+  }
+
   private tasks: Task[] = [
     {
       id: 'task-1',
@@ -404,6 +436,28 @@ class TaskService {
 
     this.tasks.push(newTask);
 
+    await prisma.task
+      .create({
+        data: {
+          id: newTask.id,
+          projectId: newTask.projectId,
+          title: newTask.title,
+          description: newTask.description,
+          status: newTask.status.toUpperCase() as any,
+          priority: newTask.priority.toUpperCase() as any,
+          storyPoints: newTask.storyPoints,
+          tags: newTask.tags,
+          dueDate: newTask.dueDate ? new Date(newTask.dueDate) : null,
+          assigneeId: newTask.assigneeId || null,
+          creatorId: newTask.creatorId || null,
+          qaSteps: (newTask.qaSteps as any) || undefined,
+          qaVerdict: newTask.qaVerdict || null,
+          createdAt: new Date(newTask.createdAt),
+          updatedAt: new Date(newTask.updatedAt),
+        },
+      })
+      .catch((err) => console.warn('Failed to persist task to PostgreSQL:', err));
+
     await mongoLogger.log(
       'TASK_CREATED',
       {
@@ -496,6 +550,28 @@ class TaskService {
 
     const updatedTask = this.tasks[index];
 
+    const dataToUpdate: any = {
+      updatedAt: new Date(updatedTask.updatedAt),
+    };
+    if (updates.title !== undefined) dataToUpdate.title = updates.title;
+    if (updates.description !== undefined) dataToUpdate.description = updates.description;
+    if (updates.status !== undefined) dataToUpdate.status = updates.status.toUpperCase();
+    if (updates.priority !== undefined) dataToUpdate.priority = updates.priority.toUpperCase();
+    if (updates.storyPoints !== undefined) dataToUpdate.storyPoints = updates.storyPoints;
+    if (updates.tags !== undefined) dataToUpdate.tags = updates.tags;
+    if (updates.dueDate !== undefined) dataToUpdate.dueDate = updates.dueDate ? new Date(updates.dueDate) : null;
+    if (updates.assigneeId !== undefined) dataToUpdate.assigneeId = updates.assigneeId || null;
+    if (updates.projectId !== undefined) dataToUpdate.projectId = updates.projectId;
+    if (updates.qaSteps !== undefined) dataToUpdate.qaSteps = updates.qaSteps as any;
+    if (updates.qaVerdict !== undefined) dataToUpdate.qaVerdict = updates.qaVerdict;
+
+    await prisma.task
+      .update({
+        where: { id },
+        data: dataToUpdate,
+      })
+      .catch((err) => console.warn('Failed to update task in PostgreSQL:', err));
+
     // Notify if task was assigned or reassigned
     if (updates.assigneeId && updates.assigneeId !== oldTask.assigneeId && updates.assigneeId !== actor.id) {
       notificationService.createNotification({
@@ -556,6 +632,10 @@ class TaskService {
     }
 
     const deleted = this.tasks.splice(index, 1)[0];
+    await prisma.task
+      .delete({ where: { id } })
+      .catch((err) => console.warn('Failed to delete task in PostgreSQL:', err));
+
     await mongoLogger.log(
       'TASK_DELETED',
       {
@@ -603,6 +683,17 @@ class TaskService {
     task.qaSteps.push(newStep);
     task.qaVerdict = this.computeQAVerdict(task.qaSteps);
     task.updatedAt = new Date().toISOString();
+
+    await prisma.task
+      .update({
+        where: { id: task.id },
+        data: {
+          qaSteps: task.qaSteps as any,
+          qaVerdict: task.qaVerdict || null,
+          updatedAt: new Date(task.updatedAt),
+        },
+      })
+      .catch((err) => console.warn('Failed to persist QA step added in PostgreSQL:', err));
 
     await mongoLogger.log(
       'TASK_QA_STEP_UPDATED',
@@ -690,6 +781,17 @@ class TaskService {
     task.qaVerdict = this.computeQAVerdict(task.qaSteps);
     task.updatedAt = new Date().toISOString();
 
+    await prisma.task
+      .update({
+        where: { id: task.id },
+        data: {
+          qaSteps: task.qaSteps as any,
+          qaVerdict: task.qaVerdict || null,
+          updatedAt: new Date(task.updatedAt),
+        },
+      })
+      .catch((err) => console.warn('Failed to persist QA step updated in PostgreSQL:', err));
+
     await mongoLogger.log(
       'TASK_QA_STEP_UPDATED',
       {
@@ -742,6 +844,17 @@ class TaskService {
     const removed = task.qaSteps.splice(stepIndex, 1)[0];
     task.qaVerdict = this.computeQAVerdict(task.qaSteps);
     task.updatedAt = new Date().toISOString();
+
+    await prisma.task
+      .update({
+        where: { id: task.id },
+        data: {
+          qaSteps: task.qaSteps as any,
+          qaVerdict: task.qaVerdict || null,
+          updatedAt: new Date(task.updatedAt),
+        },
+      })
+      .catch((err) => console.warn('Failed to persist QA step deleted in PostgreSQL:', err));
 
     await mongoLogger.log(
       'TASK_QA_STEP_UPDATED',

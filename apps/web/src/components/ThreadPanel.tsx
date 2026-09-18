@@ -10,6 +10,7 @@ import {
   Smile,
   Check,
   CheckCheck,
+  Calendar,
 } from 'lucide-react';
 import { Channel, DirectMessage, Message, User } from '../types';
 import { api } from '../lib/api';
@@ -19,6 +20,21 @@ import {
   formatFileSize,
   FileAttachmentMetadata,
 } from '../lib/fileCrypto';
+import { formatChatDate, isDifferentDay } from '../lib/dateUtils';
+
+function ThreadDateDivider({ date }: { date: string }) {
+  const label = formatChatDate(date);
+  if (!label) return null;
+
+  return (
+    <div className="sticky top-0 z-10 flex items-center justify-center my-3 py-0.5 select-none pointer-events-none">
+      <div className="inline-flex items-center gap-1.5 px-3 py-0.5 text-[10px] font-semibold tracking-wide rounded-full bg-slate-900/95 text-slate-400 shadow-xs border border-slate-800 backdrop-blur-md pointer-events-auto">
+        <Calendar className="w-2.5 h-2.5 text-slate-500" />
+        <span>{label}</span>
+      </div>
+    </div>
+  );
+}
 
 interface Props {
   isOpen: boolean;
@@ -282,80 +298,84 @@ export function ThreadPanel({
             No replies yet. Start the conversation below!
           </div>
         ) : (
-          replies.map((reply) => {
+          replies.map((reply, idx) => {
             const replyDecrypted = decryptedReplies[reply.id] || reply.content || reply.ciphertext;
+            const prevReply = idx > 0 ? replies[idx - 1] : null;
+            const showDateHeader = !prevReply || isDifferentDay(prevReply.createdAt, reply.createdAt);
 
             return (
-              <div
-                key={reply.id}
-                className={`group flex items-start gap-2.5 p-2 rounded-xl transition hover:bg-slate-950/40 relative`}
-              >
-                <img
-                  src={reply.userAvatar}
-                  alt={reply.userName}
-                  className="w-6 h-6 rounded-full object-cover ring-1 ring-slate-800 shrink-0 mt-0.5"
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 mb-0.5">
-                    <span className="text-xs font-semibold text-slate-200">{reply.userName}</span>
-                    <span className="text-[10px] text-slate-500">
-                      {new Date(reply.createdAt).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </span>
-                    {reply.isEdited && (
-                      <span className="text-[9px] text-slate-500 italic">(edited)</span>
+              <React.Fragment key={reply.id}>
+                {showDateHeader && <ThreadDateDivider date={reply.createdAt} />}
+                <div
+                  className={`group flex items-start gap-2.5 p-2 rounded-xl transition hover:bg-slate-950/40 relative`}
+                >
+                  <img
+                    src={reply.userAvatar}
+                    alt={reply.userName}
+                    className="w-6 h-6 rounded-full object-cover ring-1 ring-slate-800 shrink-0 mt-0.5"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <span className="text-xs font-semibold text-slate-200">{reply.userName}</span>
+                      <span className="text-[10px] text-slate-500">
+                        {new Date(reply.createdAt).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </span>
+                      {reply.isEdited && (
+                        <span className="text-[9px] text-slate-500 italic">(edited)</span>
+                      )}
+                    </div>
+
+                    <p className="text-xs text-slate-300 leading-relaxed break-words whitespace-pre-wrap">
+                      {reply.isDeleted ? (
+                        <span className="italic text-slate-500">This message was deleted</span>
+                      ) : (
+                        replyDecrypted
+                      )}
+                    </p>
+
+                    {/* Reaction Badges */}
+                    {reply.reactions && Object.keys(reply.reactions).length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-1.5">
+                        {Object.entries(reply.reactions).map(([emoji, userIds]) => {
+                          const hasReacted = currentUser && userIds.includes(currentUser.id);
+                          return (
+                            <button
+                              key={emoji}
+                              onClick={() => onToggleReaction(reply.id, emoji)}
+                              className={`flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full border transition ${
+                                hasReacted
+                                  ? 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300'
+                                  : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                              }`}
+                            >
+                              <span>{emoji}</span>
+                              <span className="font-semibold">{userIds.length}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
                     )}
                   </div>
 
-                  <p className="text-xs text-slate-300 leading-relaxed break-words whitespace-pre-wrap">
-                    {reply.isDeleted ? (
-                      <span className="italic text-slate-500">This message was deleted</span>
-                    ) : (
-                      replyDecrypted
-                    )}
-                  </p>
-
-                  {/* Reaction Badges */}
-                  {reply.reactions && Object.keys(reply.reactions).length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-1.5">
-                      {Object.entries(reply.reactions).map(([emoji, userIds]) => {
-                        const hasReacted = currentUser && userIds.includes(currentUser.id);
-                        return (
-                          <button
-                            key={emoji}
-                            onClick={() => onToggleReaction(reply.id, emoji)}
-                            className={`flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full border transition ${
-                              hasReacted
-                                ? 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300'
-                                : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
-                            }`}
-                          >
-                            <span>{emoji}</span>
-                            <span className="font-semibold">{userIds.length}</span>
-                          </button>
-                        );
-                      })}
+                  {/* Quick Reaction Button on Hover */}
+                  {!reply.isDeleted && (
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute right-2 top-2 flex items-center gap-1 bg-slate-900 border border-slate-800 p-1 rounded-lg shadow-lg">
+                      {COMMON_REACTIONS.slice(0, 3).map((emoji) => (
+                        <button
+                          key={emoji}
+                          onClick={() => onToggleReaction(reply.id, emoji)}
+                          className="text-xs hover:scale-125 transition-transform p-0.5"
+                        >
+                          {emoji}
+                        </button>
+                      ))}
                     </div>
                   )}
                 </div>
-
-                {/* Quick Reaction Button on Hover */}
-                {!reply.isDeleted && (
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute right-2 top-2 flex items-center gap-1 bg-slate-900 border border-slate-800 p-1 rounded-lg shadow-lg">
-                    {COMMON_REACTIONS.slice(0, 3).map((emoji) => (
-                      <button
-                        key={emoji}
-                        onClick={() => onToggleReaction(reply.id, emoji)}
-                        className="text-xs hover:scale-125 transition-transform p-0.5"
-                      >
-                        {emoji}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              </React.Fragment>
             );
           })
         )}

@@ -3,8 +3,39 @@ import { dataStore } from './dataStore.js';
 import { mongoLogger } from './mongoLogger.js';
 import { projectService } from './projectService.js';
 import { taskService } from './taskService.js';
+import { prisma } from './db.js';
 
 class BugService {
+  async initFromDb(): Promise<void> {
+    try {
+      const dbBugs = await prisma.bug.findMany({
+        orderBy: { createdAt: 'desc' },
+      });
+      if (dbBugs.length > 0) {
+        this.bugs = dbBugs.map((b) => ({
+          id: b.id,
+          projectId: b.projectId,
+          title: b.title,
+          description: b.description,
+          severity: b.severity.toLowerCase() as BugSeverity,
+          status: b.status.toLowerCase() as BugStatus,
+          environment: b.environment.toLowerCase() as BugEnvironment,
+          reproductionSteps: b.reproductionSteps || '',
+          expectedBehavior: b.expectedBehavior || '',
+          actualBehavior: b.actualBehavior || '',
+          reportedById: b.reportedById,
+          assignedToId: b.assignedToId || undefined,
+          taskId: b.taskId || undefined,
+          createdAt: b.createdAt.toISOString(),
+          updatedAt: b.updatedAt.toISOString(),
+        }));
+      }
+      console.log(`📦 BugService synchronized with PostgreSQL: ${this.bugs.length} bugs.`);
+    } catch (err: unknown) {
+      console.warn('⚠️  BugService could not load from PostgreSQL:', err instanceof Error ? err.message : err);
+    }
+  }
+
   private bugs: Bug[] = [
     {
       id: 'bug-1',
@@ -179,6 +210,27 @@ class BugService {
 
     this.bugs.unshift(newBug);
 
+    await prisma.bug
+      .create({
+        data: {
+          id: newBug.id,
+          projectId: newBug.projectId,
+          title: newBug.title,
+          description: newBug.description,
+          severity: newBug.severity.toUpperCase() as any,
+          status: newBug.status.toUpperCase() as any,
+          environment: newBug.environment.toUpperCase() as any,
+          reproductionSteps: newBug.reproductionSteps,
+          expectedBehavior: newBug.expectedBehavior,
+          actualBehavior: newBug.actualBehavior,
+          reportedById: newBug.reportedById,
+          assignedToId: newBug.assignedToId || null,
+          createdAt: new Date(newBug.createdAt),
+          updatedAt: new Date(newBug.updatedAt),
+        },
+      })
+      .catch((err) => console.warn('Failed to persist bug to PostgreSQL:', err));
+
     await mongoLogger.log(
       'BUG_REPORTED',
       {
@@ -217,6 +269,27 @@ class BugService {
     };
 
     const updatedBug = this.bugs[index];
+
+    const dataToUpdate: any = {
+      updatedAt: new Date(updatedBug.updatedAt),
+    };
+    if (updates.title !== undefined) dataToUpdate.title = updates.title;
+    if (updates.description !== undefined) dataToUpdate.description = updates.description;
+    if (updates.severity !== undefined) dataToUpdate.severity = updates.severity.toUpperCase();
+    if (updates.status !== undefined) dataToUpdate.status = updates.status.toUpperCase();
+    if (updates.environment !== undefined) dataToUpdate.environment = updates.environment.toUpperCase();
+    if (updates.reproductionSteps !== undefined) dataToUpdate.reproductionSteps = updates.reproductionSteps;
+    if (updates.expectedBehavior !== undefined) dataToUpdate.expectedBehavior = updates.expectedBehavior;
+    if (updates.actualBehavior !== undefined) dataToUpdate.actualBehavior = updates.actualBehavior;
+    if (updates.assignedToId !== undefined) dataToUpdate.assignedToId = updates.assignedToId || null;
+    if (updates.taskId !== undefined) dataToUpdate.taskId = updates.taskId || null;
+
+    await prisma.bug
+      .update({
+        where: { id },
+        data: dataToUpdate,
+      })
+      .catch((err) => console.warn('Failed to update bug in PostgreSQL:', err));
 
     if (isStatusChange) {
       await mongoLogger.log(
@@ -259,6 +332,11 @@ class BugService {
     }
 
     const deleted = this.bugs.splice(index, 1)[0];
+
+    await prisma.bug
+      .delete({ where: { id } })
+      .catch((err) => console.warn('Failed to delete bug in PostgreSQL:', err));
+
     await mongoLogger.log('BUG_DELETED', { bugId: id, title: deleted.title }, actor);
 
     return true;
@@ -300,6 +378,17 @@ class BugService {
     bug.status = 'in_progress';
     bug.taskId = task.id;
     bug.updatedAt = new Date().toISOString();
+
+    await prisma.bug
+      .update({
+        where: { id: bug.id },
+        data: {
+          status: 'IN_PROGRESS',
+          taskId: task.id,
+          updatedAt: new Date(bug.updatedAt),
+        },
+      })
+      .catch((err) => console.warn('Failed to update converted bug in PostgreSQL:', err));
 
     await mongoLogger.log(
       'BUG_CONVERTED_TO_TASK',

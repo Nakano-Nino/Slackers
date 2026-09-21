@@ -384,9 +384,9 @@
     "semantic_hash": ""
   },
   "docker-compose.yml": {
-    "mtime": 1789462364.7266731,
-    "seen": 1789527064.980551,
-    "ast_hash": "c4f15ab676665e1dd303153298a333a6",
+    "mtime": 1789969074.9633243,
+    "seen": 1789969288.600477,
+    "ast_hash": "7367572eda7d74c6644e652b01935ac8",
     "semantic_hash": ""
   },
   "apps/web/public/file.svg": {
@@ -672,9 +672,9 @@
     "semantic_hash": ""
   },
   "docker-compose.prod.yml": {
-    "mtime": 1789965928.8327901,
-    "seen": 1789966499.5213492,
-    "ast_hash": "b042d4b0a7d82f48b04f02d30b938307",
+    "mtime": 1789969068.8154638,
+    "seen": 1789969288.6004748,
+    "ast_hash": "c9bbbaa25047b6a35d0b529eca799c83",
     "semantic_hash": ""
   },
   "docs/DEPLOYMENT_UBUNTU.md": {

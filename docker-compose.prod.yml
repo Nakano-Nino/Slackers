@@ -3,7 +3,7 @@ services:
   # 1. Relational Database: PostgreSQL 16
   # ==============================================================================
   postgres:
-    image: postgres:16-alpine
+    image: postgres:latest
     container_name: slackers_postgres_prod
     restart: unless-stopped
     environment:
@@ -21,10 +21,10 @@ services:
       - slackers_network
 
   # ==============================================================================
-  # 2. Audit & Security Log Store: MongoDB 7.0
+  # 2. Audit & Security Log Store: MongoDB
   # ==============================================================================
   mongodb:
-    image: mongo:7.0
+    image: mongo:latest
     container_name: slackers_mongodb_prod
     restart: unless-stopped
     environment:
@@ -40,10 +40,10 @@ services:
       - slackers_network
 
   # ==============================================================================
-  # 3. Cache, Presence & Socket.IO Adapter: Redis 7
+  # 3. Cache, Presence & Socket.IO Adapter: Redis
   # ==============================================================================
   redis:
-    image: redis:7-alpine
+    image: redis:latest
     container_name: slackers_redis_prod
     restart: unless-stopped
     command: redis-server --appendonly yes
@@ -61,7 +61,7 @@ services:
   # 4. S3 Object Storage: MinIO
   # ==============================================================================
   minio:
-    image: minio/minio:latest
+    image: quay.io/minio/minio:latest
     container_name: slackers_minio_prod
     restart: unless-stopped
     command: server /data --console-address ":9001"
@@ -80,7 +80,7 @@ services:
 
   # Helper container: Ensure default encrypted storage bucket exists
   minio-init:
-    image: minio/mc:latest
+    image: quay.io/minio/mc:latest
     container_name: slackers_minio_init
     depends_on:
       - minio
@@ -154,7 +154,7 @@ services:
   # 7. Reverse Proxy & SSL Engine: Nginx
   # ==============================================================================
   nginx:
-    image: nginx:alpine
+    image: nginx:latest
     container_name: slackers_nginx_prod
     restart: unless-stopped
     ports:

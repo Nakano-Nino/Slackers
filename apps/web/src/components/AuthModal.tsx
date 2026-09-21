@@ -1,84 +1,17 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Lock, Mail, User as UserIcon, Shield, Sparkles, ArrowRight, Eye, EyeOff, CheckCircle2, UserCheck, X } from 'lucide-react';
+import { Lock, Mail, User as UserIcon, Shield, ArrowRight, Eye, EyeOff, CheckCircle2, UserCheck, X } from 'lucide-react';
 import { api } from '../lib/api';
 import { User, UserRole, Invitation } from '../types';
 
-import { DEVELOPER_ROLES, getUserRoleBadge } from '../lib/roles';
+import { DEVELOPER_ROLES } from '../lib/roles';
 
 interface Props {
   onSuccess: (user: User, password?: string) => void;
   inviteToken?: string | null;
   onClearInviteToken?: () => void;
 }
-
-const DEMO_USERS: { name: string; email: string; role: UserRole; developerRole: string; badge: string; desc: string }[] = [
-  {
-    name: 'Sarah Connor',
-    email: 'sarah@slackers.dev',
-    role: 'admin',
-    developerRole: 'lead_architect',
-    badge: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
-    desc: 'Admin / Lead Architect: Full access to manage projects, channels & tasks',
-  },
-  {
-    name: 'Alex Rivera',
-    email: 'alex@slackers.dev',
-    role: 'manager',
-    developerRole: 'engineering_manager',
-    badge: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
-    desc: 'Manager / Eng Lead: Manage tasks, change assignees, adjust project scope',
-  },
-  {
-    name: 'Jordan Lee',
-    email: 'jordan@slackers.dev',
-    role: 'member',
-    developerRole: 'backend_developer',
-    badge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
-    desc: 'Backend Developer: APIs, database schemas, encrypted DMs',
-  },
-  {
-    name: 'Marcus Chen',
-    email: 'marcus@slackers.dev',
-    role: 'member',
-    developerRole: 'frontend_developer',
-    badge: 'bg-sky-500/20 text-sky-300 border-sky-500/30',
-    desc: 'Frontend Developer: React, UI design, client-side state',
-  },
-  {
-    name: 'Liam O’Connor',
-    email: 'liam@slackers.dev',
-    role: 'member',
-    developerRole: 'qa_engineer',
-    badge: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
-    desc: 'QA Engineer: Bug verification, test reports, quality gates',
-  },
-  {
-    name: 'Priya Patel',
-    email: 'priya@slackers.dev',
-    role: 'manager',
-    developerRole: 'devops_engineer',
-    badge: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-    desc: 'DevOps / Cloud Engineer: CI/CD pipelines, Docker, Kubernetes',
-  },
-  {
-    name: 'Morgan Vance',
-    email: 'morgan@slackers.dev',
-    role: 'member',
-    developerRole: 'security_engineer',
-    badge: 'bg-red-500/20 text-red-300 border-red-500/30',
-    desc: 'Security Engineer: E2EE key vaults, cryptography audit',
-  },
-  {
-    name: 'Taylor Guest',
-    email: 'guest@slackers.dev',
-    role: 'viewer',
-    developerRole: 'qa_engineer',
-    badge: 'bg-neutral-800 text-neutral-400 border-neutral-700',
-    desc: 'Viewer: Read-only access to channels and boards',
-  },
-];
 
 export function AuthModal({ onSuccess, inviteToken, onClearInviteToken }: Props) {
   const [isRegister, setIsRegister] = useState(false);
@@ -167,21 +100,6 @@ export function AuthModal({ onSuccess, inviteToken, onClearInviteToken }: Props)
     }
   };
 
-  const handleQuickDemoLogin = async (demoEmail: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await api.login({
-        email: demoEmail,
-        password: 'password123',
-      });
-      onSuccess(res.user, 'password123');
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Demo login failed');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950 p-4">
@@ -239,46 +157,6 @@ export function AuthModal({ onSuccess, inviteToken, onClearInviteToken }: Props)
           </div>
         )}
 
-        {/* 1-Click Quick Demo Switcher (hidden during invite flow) */}
-        {!invitationData && (
-          <div className="mt-5 p-3.5 bg-neutral-950/80 border border-neutral-800/90 rounded-xl">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-                Quick Demo Accounts (1-Click Login)
-              </span>
-              <span className="text-[10px] text-neutral-500">pass: password123</span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1">
-              {DEMO_USERS.map((user) => {
-                const badge = getUserRoleBadge(user);
-                return (
-                  <button
-                    key={user.email}
-                    type="button"
-                    disabled={loading}
-                    onClick={() => handleQuickDemoLogin(user.email)}
-                    className="flex flex-col items-start p-2 rounded-lg bg-neutral-900 hover:bg-neutral-800/80 border border-neutral-800/70 hover:border-indigo-500/50 transition text-left group"
-                  >
-                    <div className="flex items-center justify-between w-full">
-                      <span className="font-semibold text-xs text-neutral-200 group-hover:text-indigo-300 truncate">
-                        {user.name}
-                      </span>
-                      <span className={`text-[8px] font-bold uppercase px-1 py-0.2 rounded border shrink-0 ${badge.class}`}>
-                        {badge.shortLabel}
-                      </span>
-                    </div>
-                    <span className="text-[10px] text-neutral-500 truncate w-full mt-0.5">
-                      {user.desc}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
         {/* Error Notification */}
         {error && (
           <div className="mt-4 p-3 bg-rose-950/50 border border-rose-800 rounded-lg text-rose-300 text-xs">
@@ -292,7 +170,7 @@ export function AuthModal({ onSuccess, inviteToken, onClearInviteToken }: Props)
             <span className="text-xs font-medium text-neutral-400">
               {invitationData
                 ? 'Create your account to accept the invitation:'
-                : 'Or sign in with email & password:'}
+                : (isRegister ? 'Enter your details to create an account:' : 'Sign in with your email & password:')}
             </span>
             {!invitationData && (
               <button

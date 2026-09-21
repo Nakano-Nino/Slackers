@@ -14,13 +14,6 @@ const LoginSchema = z.object({
   password: z.string().min(6),
 });
 
-const RegisterSchema = z.object({
-  name: z.string().min(2).max(50),
-  email: z.string().email(),
-  password: z.string().min(6),
-  developerRole: z.string().optional(),
-});
-
 export const login = async (req: Request, res: Response<ApiResponse<AuthResponse>>) => {
   const parseResult = LoginSchema.safeParse(req.body);
   if (!parseResult.success) {
@@ -53,41 +46,12 @@ export const login = async (req: Request, res: Response<ApiResponse<AuthResponse
   }
 };
 
-export const register = async (req: Request, res: Response<ApiResponse<AuthResponse>>) => {
-  const parseResult = RegisterSchema.safeParse(req.body);
-  if (!parseResult.success) {
-    return res.status(400).json({
-      success: false,
-      error: parseResult.error.errors.map((e) => e.message).join(', '),
-      timestamp: new Date().toISOString(),
-    });
-  }
-
-  const userAgent = (req.headers['user-agent'] as string) || 'unknown';
-  const ipAddress = req.ip || req.socket.remoteAddress || '127.0.0.1';
-
-  try {
-    // New registrations default to 'member' role with optional developerRole
-    const result = await authService.register(
-      {
-        ...parseResult.data,
-        role: 'member',
-      },
-      { userAgent, ipAddress }
-    );
-
-    res.status(201).json({
-      success: true,
-      data: result,
-      timestamp: new Date().toISOString(),
-    });
-  } catch (err: unknown) {
-    res.status(400).json({
-      success: false,
-      error: err instanceof Error ? err.message : 'Registration failed',
-      timestamp: new Date().toISOString(),
-    });
-  }
+export const register = async (_req: Request, res: Response<ApiResponse<AuthResponse>>) => {
+  return res.status(403).json({
+    success: false,
+    error: 'Public registration is disabled. You can only join the workspace via an invitation link.',
+    timestamp: new Date().toISOString(),
+  });
 };
 
 export const getMe = (req: AuthenticatedRequest, res: Response<ApiResponse<User>>) => {

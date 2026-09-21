@@ -14,7 +14,6 @@ interface Props {
 }
 
 export function AuthModal({ onSuccess, inviteToken, onClearInviteToken }: Props) {
-  const [isRegister, setIsRegister] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -40,7 +39,6 @@ export function AuthModal({ onSuccess, inviteToken, onClearInviteToken }: Props)
         if (!isMounted) return;
         if (res.valid && res.invitation) {
           setInvitationData(res.invitation);
-          setIsRegister(true);
           if (res.invitation.email) setEmail(res.invitation.email);
           if (res.invitation.developerRole) setDeveloperRole(res.invitation.developerRole);
         } else {
@@ -63,7 +61,7 @@ export function AuthModal({ onSuccess, inviteToken, onClearInviteToken }: Props)
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password.trim()) return;
-    if (isRegister && !name.trim()) return;
+    if (invitationData && !name.trim()) return;
 
     setLoading(true);
     setError(null);
@@ -72,14 +70,6 @@ export function AuthModal({ onSuccess, inviteToken, onClearInviteToken }: Props)
       if (inviteToken && invitationData) {
         const res = await api.acceptInvitation({
           token: inviteToken,
-          name: name.trim(),
-          email: email.trim(),
-          password,
-          developerRole,
-        });
-        onSuccess(res.user, password);
-      } else if (isRegister) {
-        const res = await api.register({
           name: name.trim(),
           email: email.trim(),
           password,
@@ -170,23 +160,11 @@ export function AuthModal({ onSuccess, inviteToken, onClearInviteToken }: Props)
             <span className="text-xs font-medium text-neutral-400">
               {invitationData
                 ? 'Create your account to accept the invitation:'
-                : (isRegister ? 'Enter your details to create an account:' : 'Sign in with your email & password:')}
+                : 'Sign in with your email & password:'}
             </span>
-            {!invitationData && (
-              <button
-                type="button"
-                onClick={() => {
-                  setIsRegister(!isRegister);
-                  setError(null);
-                }}
-                className="text-xs text-indigo-400 hover:text-indigo-300 font-medium underline"
-              >
-                {isRegister ? 'Already have an account? Sign In' : 'Create new account'}
-              </button>
-            )}
           </div>
 
-          {isRegister && (
+          {invitationData && (
             <>
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-1">
@@ -199,7 +177,7 @@ export function AuthModal({ onSuccess, inviteToken, onClearInviteToken }: Props)
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g. John Doe"
-                    required={isRegister}
+                    required={!!invitationData}
                     className="w-full bg-neutral-950 border border-neutral-800 rounded-lg pl-9 pr-3 py-2 text-sm text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-indigo-500 transition"
                   />
                 </div>
@@ -285,16 +263,18 @@ export function AuthModal({ onSuccess, inviteToken, onClearInviteToken }: Props)
             ) : (
               <>
                 <span>
-                  {invitationData
-                    ? 'Accept Invitation & Join'
-                    : isRegister
-                    ? 'Register & Join'
-                    : 'Sign In'}
+                  {invitationData ? 'Accept Invitation & Join' : 'Sign In'}
                 </span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
           </button>
+
+          {!invitationData && (
+            <p className="text-[11px] text-neutral-500 text-center mt-3">
+              Registration is invite-only. Contact your workspace admin for an invitation link.
+            </p>
+          )}
         </form>
       </div>
     </div>

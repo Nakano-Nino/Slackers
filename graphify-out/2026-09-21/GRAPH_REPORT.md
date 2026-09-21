@@ -1,12 +1,12 @@
 # Graph Report - slackers  (2026-09-21)
 
 ## Corpus Check
-- 112 files · ~99,278 words
+- 112 files · ~99,429 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 16 file(s) not represented in the graph (top: (none) 5, .example 4, .conf 3)
 
 ## Summary
-- 948 nodes · 2307 edges · 58 communities (40 shown, 16 thin omitted)
+- 949 nodes · 2307 edges · 66 communities (46 shown, 18 thin omitted)
 - Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 94 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
@@ -40,7 +40,7 @@
 - AGENTS.md
 - dependencies
 - devDependencies
-- test-pentest-remediations.ts
+- channelController.ts
 - scripts
 - User
 - authMiddleware.ts
@@ -49,29 +49,37 @@
 - taskController.ts
 - memberController.ts
 - ChatArea.tsx
-- messageController.ts
+- test-pentest-round2.ts
 - fileService
 - projectController.ts
-- authService.ts
+- api/src/types/index.ts
 - bugController.ts
 - notificationController.ts
 - User
-- api/src/types/index.ts
-- AuthModal.tsx
+- dataStore.ts
+- roles.ts
 - page.tsx
 - s3Service
+- socketService
 - 🚀 Slackers — Ubuntu VPS Docker Deployment Guide
 - api/package.json
 - react
-- mongoLogger
-- sessionController.ts
+- socketService.ts
+- test-pentest-remediations.ts
 - 🛠 Manual Step-by-Step Installation (Alternative)
+- devDependencies
+- ThemeContext.tsx
 - init-ssl.sh
 - entrypoint.sh
 - deploy.sh
 - setup-ssl.sh
+- redisService.ts
+- dependencies
 - setup-vps-native.sh
 - update-native.sh
+- scripts
+- next
+- optionalDependencies
 
 ## God Nodes (most connected - your core abstractions)
 1. `dataStore` - 72 edges
@@ -86,12 +94,12 @@
 10. `Task` - 22 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `runVerification()` --calls--> `authenticate()`  [EXTRACTED]
-  scratch/test-pentest-remediations.ts → apps/api/src/middleware/authMiddleware.ts
 - `runVerification()` --calls--> `getChannels()`  [EXTRACTED]
   scratch/test-pentest-remediations.ts → apps/api/src/controllers/channelController.ts
 - `runVerification()` --calls--> `getChannelById()`  [EXTRACTED]
   scratch/test-pentest-remediations.ts → apps/api/src/controllers/channelController.ts
+- `runVerification()` --calls--> `authenticate()`  [EXTRACTED]
+  scratch/test-pentest-remediations.ts → apps/api/src/middleware/authMiddleware.ts
 - `runVerification()` --calls--> `getMessagesByChannel()`  [EXTRACTED]
   scratch/test-pentest-remediations.ts → apps/api/src/controllers/messageController.ts
 - `runVerification()` --calls--> `createMessage()`  [EXTRACTED]
@@ -100,19 +108,19 @@
 ## Import Cycles
 - None detected.
 
-## Communities (58 total, 16 thin omitted)
+## Communities (66 total, 18 thin omitted)
 
 ### Community 0 - "web/src/types/index.ts"
 Cohesion: 0.12
-Nodes (25): Props, AVATAR_PRESETS, Props, SettingsTab, api, channelKeyCache, sharedKeyCache, ApiResponse (+17 more)
+Nodes (25): Props, AVATAR_PRESETS, Props, SettingsTab, Props, api, channelKeyCache, sharedKeyCache (+17 more)
 
 ### Community 1 - "dataStore"
-Cohesion: 0.08
-Nodes (8): dataStore, generateSeedKeyVault(), AutomationRule, Channel, ChannelKey, KeyVaultData, Message, WebhookLog
+Cohesion: 0.09
+Nodes (7): dataStore, generateSeedKeyVault(), AutomationRule, Channel, ChannelKey, KeyVaultData, Message
 
 ### Community 2 - "src/index.ts"
-Cohesion: 0.15
-Nodes (12): app, avatarsDir, httpServer, uploadsDir, errorHandler(), router, router, router (+4 more)
+Cohesion: 0.14
+Nodes (13): app, avatarsDir, httpServer, uploadsDir, errorHandler(), router, router, router (+5 more)
 
 ### Community 3 - "Hybrid Production Deployment Guide: Docker Databases + PM2 Apps"
 Cohesion: 0.14
@@ -123,20 +131,20 @@ Cohesion: 0.10
 Nodes (13): webhookController, automationService, channelKeyCache, decryptChannelMessageNode(), deriveChannelKeyNode(), encryptChannelMessageNode(), generateWebhookSecret(), generateWebhookToken() (+5 more)
 
 ### Community 5 - "web/package.json"
-Cohesion: 0.04
-Nodes (44): nextConfig, dependencies, lucide-react, next, react, react-dom, socket.io-client, devDependencies (+36 more)
+Cohesion: 0.12
+Nodes (15): @types/node, typescript, name, private, version, eslint, eslint-config-next, react-dom (+7 more)
 
 ### Community 6 - "dmController.ts"
-Cohesion: 0.07
-Nodes (19): deleteDirectMessage(), editDirectMessage(), getConversation(), getKeyVault(), getPublicKey(), getRecentConversations(), getUnreadCounts(), KeyVaultSchema (+11 more)
+Cohesion: 0.12
+Nodes (18): deleteDirectMessage(), editDirectMessage(), getConversation(), getKeyVault(), getPublicKey(), getRecentConversations(), getUnreadCounts(), KeyVaultSchema (+10 more)
 
 ### Community 7 - "compilerOptions"
 Cohesion: 0.11
 Nodes (18): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+10 more)
 
 ### Community 8 - "E2EEService"
-Cohesion: 0.18
-Nodes (6): Home(), ChatArea(), SettingsModal(), arrayBufferToBase64(), base64ToArrayBuffer(), E2EEService
+Cohesion: 0.19
+Nodes (6): Home(), SettingsModal(), arrayBufferToBase64(), base64ToArrayBuffer(), E2EEService, KeyVaultData
 
 ### Community 9 - "compilerOptions"
 Cohesion: 0.13
@@ -166,9 +174,9 @@ Nodes (14): dependencies, @aws-sdk/client-s3, bcryptjs, cors, dotenv, express, i
 Cohesion: 0.20
 Nodes (10): devDependencies, prisma, tsx, @types/bcryptjs, @types/cors, @types/express, @types/jsonwebtoken, @types/morgan (+2 more)
 
-### Community 25 - "test-pentest-remediations.ts"
-Cohesion: 0.31
-Nodes (13): createChannel(), CreateChannelSchema, getChannelById(), getChannelKey(), getChannels(), saveChannelKey(), SaveChannelKeySchema, createMessage() (+5 more)
+### Community 25 - "channelController.ts"
+Cohesion: 0.56
+Nodes (7): createChannel(), CreateChannelSchema, getChannelById(), getChannelKey(), getChannels(), saveChannelKey(), SaveChannelKeySchema
 
 ### Community 26 - "scripts"
 Cohesion: 0.29
@@ -179,16 +187,16 @@ Cohesion: 0.08
 Nodes (12): authService, memberService, projectService, AuthenticatedSocket, taskService, AuthResponse, Invitation, Project (+4 more)
 
 ### Community 28 - "authMiddleware.ts"
-Cohesion: 0.19
-Nodes (13): downloadEncryptedFile(), uploadEncryptedFile(), getThreadReplies(), authenticate(), AuthRequest, requireRole(), authRateLimiter, memoryRateLimits (+5 more)
+Cohesion: 0.22
+Nodes (12): downloadEncryptedFile(), uploadEncryptedFile(), getSessions(), revokeOtherSessions(), UserSessionResponse, authenticate(), AuthRequest, requireRole() (+4 more)
 
 ### Community 29 - "TaskDetailModal.tsx"
-Cohesion: 0.12
-Nodes (21): CreateTaskModal(), Props, ReportBugModal(), Sidebar(), formatActivityAction(), getDueDateStatus(), PRIORITY_LABELS, STATUS_LABELS (+13 more)
+Cohesion: 0.22
+Nodes (10): formatActivityAction(), getDueDateStatus(), PRIORITY_LABELS, STATUS_LABELS, TaskDetailModal(), ActivityLog, QAReviewStep, QAStepStatus (+2 more)
 
 ### Community 30 - "authController.ts"
-Cohesion: 0.28
-Nodes (11): getMe(), login(), LoginSchema, logout(), register(), RegisterSchema, updateProfile(), UpdateProfileSchema (+3 more)
+Cohesion: 0.25
+Nodes (12): getMe(), login(), LoginSchema, logout(), register(), RegisterSchema, updateProfile(), UpdateProfileSchema (+4 more)
 
 ### Community 31 - "taskController.ts"
 Cohesion: 0.11
@@ -200,19 +208,19 @@ Nodes (12): acceptInvitation(), AcceptInviteSchema, addMember(), AddMemberSchema
 
 ### Community 33 - "ChatArea.tsx"
 Cohesion: 0.13
-Nodes (25): ChatDateDivider(), EncryptedAttachmentCard(), extractPlainText(), highlightMatches(), Props, RenderDecryptedContent(), SafetyModalProps, TaskAttachmentCard() (+17 more)
+Nodes (26): ChatArea(), ChatDateDivider(), EncryptedAttachmentCard(), extractPlainText(), highlightMatches(), Props, RenderDecryptedContent(), TaskAttachmentCard() (+18 more)
 
-### Community 34 - "messageController.ts"
-Cohesion: 0.47
-Nodes (8): CreateMessageSchema, deleteMessage(), editMessage(), toggleReaction(), revokeSession(), assert(), mockResponse(), runRound2Verification()
+### Community 34 - "test-pentest-round2.ts"
+Cohesion: 0.22
+Nodes (9): deleteMessage(), editMessage(), toggleReaction(), revokeSession(), parseDeviceName(), sessionService, assert(), mockResponse() (+1 more)
 
 ### Community 36 - "projectController.ts"
-Cohesion: 0.35
-Nodes (11): createProject(), CreateProjectSchema, deleteProject(), getProjectById(), getProjects(), getProjectStats(), updateProject(), UpdateProjectSchema (+3 more)
+Cohesion: 0.53
+Nodes (8): createProject(), CreateProjectSchema, deleteProject(), getProjectById(), getProjects(), getProjectStats(), updateProject(), UpdateProjectSchema
 
-### Community 37 - "authService.ts"
-Cohesion: 0.25
-Nodes (5): AVATAR_PRESETS, parseDeviceName(), sessionService, UserSession, bcryptjs
+### Community 37 - "api/src/types/index.ts"
+Cohesion: 0.12
+Nodes (15): DeveloperRole, DiscordEmbed, DiscordEmbedField, MuteDuration, MuteTarget, QAReviewStep, QAStepStatus, SlackAttachment (+7 more)
 
 ### Community 38 - "bugController.ts"
 Cohesion: 0.15
@@ -223,20 +231,20 @@ Cohesion: 0.61
 Nodes (7): deleteNotification(), getMuteTargets(), getNotifications(), markAllAsRead(), markAsRead(), muteTarget(), unmuteTarget()
 
 ### Community 40 - "User"
-Cohesion: 0.16
-Nodes (20): CommandPalette(), PaletteItem, Props, CreateProjectModal(), Props, Props, COLUMN_WIP_LIMITS, COLUMNS (+12 more)
+Cohesion: 0.21
+Nodes (16): SafetyModalProps, CommandPalette(), PaletteItem, Props, CreateProjectModal(), Props, Props, Props (+8 more)
 
-### Community 41 - "api/src/types/index.ts"
-Cohesion: 0.16
-Nodes (19): DEFAULT_PASSWORD_HASH, prisma, DeveloperRole, DiscordEmbed, DiscordEmbedField, MuteDuration, MuteTarget, ProjectStats (+11 more)
+### Community 41 - "dataStore.ts"
+Cohesion: 0.28
+Nodes (7): DEFAULT_PASSWORD_HASH, checkPostgresHealth(), prisma, ProjectStats, runTest(), assert(), runTests()
 
-### Community 42 - "AuthModal.tsx"
-Cohesion: 0.29
-Nodes (6): AuthModal(), Props, InviteMemberModal(), Props, DEVELOPER_ROLES, Invitation
+### Community 42 - "roles.ts"
+Cohesion: 0.17
+Nodes (13): AuthModal(), Props, InviteMemberModal(), Props, ProjectProgressBar(), Props, DEVELOPER_ROLES, ROLE_BADGES (+5 more)
 
 ### Community 43 - "page.tsx"
-Cohesion: 0.17
-Nodes (16): BugTracker(), Props, SEVERITY_INFO, STATUS_BADGES, NotificationCenter(), ProjectProgressBar(), Props, authStorage (+8 more)
+Cohesion: 0.16
+Nodes (18): BugTracker(), Props, SEVERITY_INFO, STATUS_BADGES, CreateTaskModal(), NotificationCenter(), Props, ReportBugModal() (+10 more)
 
 ### Community 46 - "🚀 Slackers — Ubuntu VPS Docker Deployment Guide"
 Cohesion: 0.08
@@ -247,40 +255,64 @@ Cohesion: 0.09
 Nodes (21): description, @types/node, typescript, main, name, private, version, cors (+13 more)
 
 ### Community 48 - "react"
-Cohesion: 0.29
-Nodes (9): CreateChannelModal(), Props, Props, Props, ThemeToggle(), useTheme(), Channel, lucide-react (+1 more)
+Cohesion: 0.18
+Nodes (14): CreateChannelModal(), Props, COLUMN_WIP_LIMITS, COLUMNS, getDueDateBadge(), KanbanBoard(), PRIORITY_STYLES, Sidebar() (+6 more)
 
-### Community 49 - "mongoLogger"
-Cohesion: 0.13
-Nodes (10): checkPostgresHealth(), EncryptedFileRecord, mongoLogger, RedisHealth, S3Health, ActivityLog, @aws-sdk/client-s3, dotenv (+2 more)
+### Community 49 - "socketService.ts"
+Cohesion: 0.17
+Nodes (7): CreateMessageSchema, EncryptedFileRecord, AVATAR_PRESETS, mongoLogger, UserSession, ActivityLog, bcryptjs
 
-### Community 50 - "sessionController.ts"
-Cohesion: 0.53
-Nodes (4): getSessions(), revokeOtherSessions(), UserSessionResponse, router
+### Community 50 - "test-pentest-remediations.ts"
+Cohesion: 0.22
+Nodes (12): createMessage(), getMessagesByChannel(), getThreadReplies(), authRateLimiter, memoryRateLimits, messagingRateLimiter, RateLimiterOptions, webhookIngestRateLimiter (+4 more)
 
 ### Community 51 - "🛠 Manual Step-by-Step Installation (Alternative)"
 Cohesion: 0.08
 Nodes (23): 1. Point Your Domain DNS A-Record, 2. Issue Certificate with Certbot, 3. Update Application URL, 📊 Daily Maintenance & PM2 Commands, 🔒 Enable Free HTTPS (Let's Encrypt SSL), Managing Processes, 🛠 Manual Step-by-Step Installation (Alternative), MongoDB (+15 more)
 
+### Community 52 - "devDependencies"
+Cohesion: 0.22
+Nodes (9): devDependencies, eslint, eslint-config-next, tailwindcss, @tailwindcss/postcss, @types/node, @types/react, @types/react-dom (+1 more)
+
+### Community 53 - "ThemeContext.tsx"
+Cohesion: 0.29
+Nodes (5): metadata, Theme, ThemeContext, ThemeContextType, ThemeProvider()
+
+### Community 58 - "redisService.ts"
+Cohesion: 0.29
+Nodes (5): RedisHealth, S3Health, @aws-sdk/client-s3, dotenv, ioredis
+
+### Community 59 - "dependencies"
+Cohesion: 0.33
+Nodes (6): dependencies, lucide-react, next, react, react-dom, socket.io-client
+
+### Community 63 - "scripts"
+Cohesion: 0.40
+Nodes (5): scripts, build, dev, lint, start
+
+### Community 65 - "optionalDependencies"
+Cohesion: 0.67
+Nodes (3): optionalDependencies, @tailwindcss/oxide-linux-arm64-gnu, @tailwindcss/oxide-linux-x64-gnu
+
 ## Knowledge Gaps
 - **277 isolated node(s):** `entrypoint.sh script`, `name`, `version`, `private`, `description` (+272 more)
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 350 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **16 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **18 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `dataStore` connect `dataStore` to `messageController.ts`, `src/index.ts`, `Webhook`, `authService.ts`, `dmController.ts`, `api/src/types/index.ts`, `mongoLogger`, `test-pentest-remediations.ts`, `User`, `authMiddleware.ts`?**
+- **Why does `dataStore` connect `dataStore` to `src/index.ts`, `test-pentest-round2.ts`, `Webhook`, `api/src/types/index.ts`, `dmController.ts`, `dataStore.ts`, `socketService.ts`, `test-pentest-remediations.ts`, `channelController.ts`, `User`, `authMiddleware.ts`?**
   _High betweenness centrality (0.045) - this node is a cross-community bridge._
-- **Why does `express` connect `authMiddleware.ts` to `memberController.ts`, `messageController.ts`, `src/index.ts`, `projectController.ts`, `Webhook`, `bugController.ts`, `dmController.ts`, `notificationController.ts`, `api/package.json`, `mongoLogger`, `sessionController.ts`, `test-pentest-remediations.ts`, `authController.ts`, `taskController.ts`?**
+- **Why does `express` connect `authMiddleware.ts` to `memberController.ts`, `src/index.ts`, `projectController.ts`, `Webhook`, `bugController.ts`, `dmController.ts`, `notificationController.ts`, `dataStore.ts`, `api/package.json`, `socketService.ts`, `test-pentest-remediations.ts`, `channelController.ts`, `authController.ts`, `taskController.ts`?**
   _High betweenness centrality (0.033) - this node is a cross-community bridge._
-- **Why does `User` connect `User` to `memberController.ts`, `dataStore`, `messageController.ts`, `projectController.ts`, `authService.ts`, `bugController.ts`, `dmController.ts`, `api/src/types/index.ts`, `test-pentest-remediations.ts`, `authMiddleware.ts`, `authController.ts`, `taskController.ts`?**
+- **Why does `User` connect `User` to `memberController.ts`, `dataStore`, `test-pentest-round2.ts`, `api/src/types/index.ts`, `bugController.ts`, `dmController.ts`, `dataStore.ts`, `socketService`, `socketService.ts`, `test-pentest-remediations.ts`, `authMiddleware.ts`, `authController.ts`, `taskController.ts`?**
   _High betweenness centrality (0.033) - this node is a cross-community bridge._
 - **What connects `entrypoint.sh script`, `name`, `version` to the rest of the system?**
   _277 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `web/src/types/index.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.125 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.12121212121212122 - nodes in this community are weakly interconnected._
 - **Should `dataStore` be split into smaller, more focused modules?**
-  _Cohesion score 0.08205128205128205 - nodes in this community are weakly interconnected._
-- **Should `Hybrid Production Deployment Guide: Docker Databases + PM2 Apps` be split into smaller, more focused modules?**
+  _Cohesion score 0.09047619047619047 - nodes in this community are weakly interconnected._
+- **Should `src/index.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.14285714285714285 - nodes in this community are weakly interconnected._

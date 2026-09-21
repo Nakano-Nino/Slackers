@@ -150,7 +150,7 @@ export function KanbanBoard({
 
   // RBAC permissions
   const canDeleteTasks = currentUserRole === 'admin' || currentUserRole === 'manager';
-  const canCreateTasks = currentUserRole !== 'viewer' && !!onCreateTask;
+  const canCreateTasks = (currentUserRole === 'admin' || currentUserRole === 'manager') && !!onCreateTask;
 
   const canUserMoveTask = (task: Task): boolean => {
     if (!currentUser) return false;
@@ -680,7 +680,7 @@ export function KanbanBoard({
         {/* Task Cards Feed */}
         <div className="flex-1 overflow-y-auto p-2.5 space-y-2.5">
           {/* Inline Fast Add Input */}
-          {isInlineOpen && (
+          {canCreateTasks && isInlineOpen && (
             <form
               onSubmit={(e) => handleInlineSubmit(col.id, e)}
               className="p-2.5 rounded-xl bg-neutral-900 border border-indigo-500/50 shadow-md space-y-2 animate-in fade-in duration-150"

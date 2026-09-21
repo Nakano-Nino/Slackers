@@ -1639,7 +1639,7 @@ export default function Home() {
               onDeleteTask={handleDeleteTask}
               onDiscussInChat={handleDiscussInChat}
               onSelectTask={(task) => setSelectedTaskForDetail(task)}
-              onCreateTask={handleCreateTask}
+              onCreateTask={(currentUser.role === 'admin' || currentUser.role === 'manager') ? handleCreateTask : undefined}
               selectedProjectId={selectedProjectId}
               onToggleSubtask={async (taskId, subtaskId, currentCompleted) => {
                 const updated = await api.updateSubtask(taskId, subtaskId, {
@@ -1814,7 +1814,7 @@ export default function Home() {
           setSelectedProjectId(projId);
           setActiveView('kanban');
         }}
-        onOpenCreateTask={() => setIsTaskModalOpen(true)}
+        onOpenCreateTask={(currentUser?.role === 'admin' || currentUser?.role === 'manager') ? () => setIsTaskModalOpen(true) : undefined}
         onOpenReportBug={() => setIsReportBugModalOpen(true)}
         onOpenSettings={() => setIsSettingsModalOpen(true)}
         onOpenInviteMember={() => setIsInviteMemberModalOpen(true)}

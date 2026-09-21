@@ -15,6 +15,7 @@ import {
 import { Channel, DirectMessage, Message, User } from '../types';
 import { api } from '../lib/api';
 import { getSocket } from '../lib/socket';
+import { E2EEService } from '../lib/e2ee';
 import {
   encryptFileBlob,
   formatFileSize,
@@ -61,9 +62,11 @@ export function ThreadPanel({
   currentUser,
   onSendReply,
   onToggleReaction,
+  channelKey,
 }: Props) {
   const [replies, setReplies] = useState<Message[]>([]);
   const [decryptedReplies, setDecryptedReplies] = useState<Record<string, string>>({});
+  const [rootDecryptedText, setRootDecryptedText] = useState<string>(parentDecryptedContent || '');
   const [replyText, setReplyText] = useState('');
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
@@ -86,7 +89,65 @@ export function ThreadPanel({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  // Load thread replies when parent message changes
+  // Synchronize or decrypt root parent message
+  useEffect(() => {
+    if (parentDecryptedContent) {
+      setRootDecryptedText(parentDecryptedContent);
+      return;
+    }
+    if (!parentMessage) {
+      setRootDecryptedText('');
+      return;
+    }
+
+    let active = true;
+    const decryptRoot = async () => {
+      if ('decryptedContent' in parentMessage && parentMessage.decryptedContent) {
+        return parentMessage.decryptedContent;
+      }
+      if ('ciphertext' in parentMessage && parentMessage.ciphertext && parentMessage.iv) {
+        const channelId = 'channelId' in parentMessage ? (parentMessage as Message).channelId : channel?.id;
+        if (channelId) {
+          try {
+            const key = channelKey || (await E2EEService.getChannelKey(channelId));
+            return await E2EEService.decrypt(parentMessage.ciphertext, parentMessage.iv, key);
+          } catch (err) {
+            console.warn('Failed to decrypt root thread message:', err);
+          }
+        }
+      }
+      return ('content' in parentMessage ? parentMessage.content : '') || '[Encrypted message]';
+    };
+
+    decryptRoot().then((text) => {
+      if (active) setRootDecryptedText(text);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [parentDecryptedContent, parentMessage, channel?.id, channelKey]);
+
+  // Decrypt a thread reply message using channel key
+  const decryptReply = async (msg: Message): Promise<string> => {
+    if (msg.decryptedContent) return msg.decryptedContent;
+    if (!msg.ciphertext || !msg.iv) return msg.content || '';
+    try {
+      const channelId =
+        msg.channelId ||
+        channel?.id ||
+        (parentMessage && 'channelId' in parentMessage ? (parentMessage as Message).channelId : undefined);
+      if (channelId) {
+        const key = channelKey || (await E2EEService.getChannelKey(channelId));
+        return await E2EEService.decrypt(msg.ciphertext, msg.iv, key);
+      }
+    } catch (err) {
+      console.warn('Failed to decrypt thread reply:', err);
+    }
+    return msg.content || '[Encrypted message]';
+  };
+
+  // Load and decrypt thread replies when parent message changes
   useEffect(() => {
     if (!isOpen || !parentMessage) return;
 
@@ -95,14 +156,16 @@ export function ThreadPanel({
 
     api
       .getThreadReplies(parentMessage.id)
-      .then((data) => {
+      .then(async (data) => {
+        if (!active) return;
+        setReplies(data);
+
+        // Decrypt all replies in parallel
+        const entries = await Promise.all(
+          data.map(async (rep) => [rep.id, await decryptReply(rep)] as [string, string])
+        );
         if (active) {
-          setReplies(data);
-          const decryptedMap: Record<string, string> = {};
-          for (const rep of data) {
-            decryptedMap[rep.id] = rep.content || rep.decryptedContent || rep.ciphertext;
-          }
-          setDecryptedReplies(decryptedMap);
+          setDecryptedReplies(Object.fromEntries(entries));
         }
       })
       .catch((err) => console.error('Failed to load thread replies:', err))
@@ -113,14 +176,14 @@ export function ThreadPanel({
     return () => {
       active = false;
     };
-  }, [isOpen, parentMessage]);
+  }, [isOpen, parentMessage, channel?.id, channelKey]);
 
   // Real-time socket listener for incoming thread replies
   useEffect(() => {
     const socket = getSocket();
     if (!socket || !parentMessage) return;
 
-    const handleThreadReply = (data: {
+    const handleThreadReply = async (data: {
       channelId: string;
       parentId: string;
       reply: Message;
@@ -130,9 +193,10 @@ export function ThreadPanel({
           if (prev.some((r) => r.id === data.reply.id)) return prev;
           return [...prev, data.reply];
         });
+        const decryptedText = await decryptReply(data.reply);
         setDecryptedReplies((prev) => ({
           ...prev,
-          [data.reply.id]: data.reply.content || data.reply.ciphertext,
+          [data.reply.id]: decryptedText,
         }));
       }
     };
@@ -153,7 +217,7 @@ export function ThreadPanel({
       socket.off('thread:reply', handleThreadReply);
       socket.off('message:reaction', handleMessageReaction);
     };
-  }, [parentMessage]);
+  }, [parentMessage, channel?.id, channelKey]);
 
   // Auto scroll to bottom
   useEffect(() => {
@@ -254,7 +318,7 @@ export function ThreadPanel({
             </span>
           </div>
           <p className="text-xs text-slate-200 leading-relaxed break-words whitespace-pre-wrap">
-            {parentDecryptedContent || ('content' in parentMessage ? parentMessage.content : parentMessage.ciphertext)}
+            {rootDecryptedText || ('content' in parentMessage ? parentMessage.content : parentMessage.ciphertext)}
           </p>
 
           {/* Root Message Reactions */}
@@ -328,13 +392,50 @@ export function ThreadPanel({
                       )}
                     </div>
 
-                    <p className="text-xs text-slate-300 leading-relaxed break-words whitespace-pre-wrap">
-                      {reply.isDeleted ? (
-                        <span className="italic text-slate-500">This message was deleted</span>
-                      ) : (
-                        replyDecrypted
-                      )}
-                    </p>
+                    {(() => {
+                      let parsedAttachment: { text?: string; file?: FileAttachmentMetadata } | null = null;
+                      if (replyDecrypted && replyDecrypted.startsWith('{') && replyDecrypted.endsWith('}')) {
+                        try {
+                          const obj = JSON.parse(replyDecrypted);
+                          if (obj && (obj.text !== undefined || obj.file)) {
+                            parsedAttachment = obj;
+                          }
+                        } catch {
+                          // plain text
+                        }
+                      }
+
+                      if (reply.isDeleted) {
+                        return <span className="italic text-slate-500 text-xs">This message was deleted</span>;
+                      }
+
+                      if (parsedAttachment) {
+                        return (
+                          <div className="space-y-1 mt-0.5">
+                            {parsedAttachment.text && (
+                              <p className="text-xs text-slate-300 leading-relaxed break-words whitespace-pre-wrap">
+                                {parsedAttachment.text}
+                              </p>
+                            )}
+                            {parsedAttachment.file && (
+                              <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs text-indigo-400">
+                                <Paperclip className="w-3.5 h-3.5" />
+                                <span className="truncate max-w-[200px]">{parsedAttachment.file.name}</span>
+                                <span className="text-[10px] text-slate-500">
+                                  ({formatFileSize(parsedAttachment.file.size)})
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <p className="text-xs text-slate-300 leading-relaxed break-words whitespace-pre-wrap">
+                          {replyDecrypted}
+                        </p>
+                      );
+                    })()}
 
                     {/* Reaction Badges */}
                     {reply.reactions && Object.keys(reply.reactions).length > 0 && (

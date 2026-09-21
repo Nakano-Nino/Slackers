@@ -126,9 +126,9 @@
     "semantic_hash": ""
   },
   "apps/api/src/services/authService.ts": {
-    "mtime": 1789974999.8228946,
-    "seen": 1789975418.724267,
-    "ast_hash": "feaed0853c691e78ffd2157c305194c9",
+    "mtime": 1789983399.232005,
+    "seen": 1789983601.3761852,
+    "ast_hash": "ae407109be79b84f6afde24c3364469f",
     "semantic_hash": ""
   },
   "apps/api/src/services/bugService.ts": {
@@ -222,9 +222,9 @@
     "semantic_hash": "b42e03028136cae78674a96be000cce8"
   },
   "apps/web/src/app/page.tsx": {
-    "mtime": 1789817479.438294,
-    "seen": 1789817795.311432,
-    "ast_hash": "0063d0f7f57d4aa63541bbd0b62e9415",
+    "mtime": 1789983521.7867134,
+    "seen": 1789983601.3762078,
+    "ast_hash": "89c3b5623c4961cfa78ebb76d6e291ef",
     "semantic_hash": ""
   },
   "apps/web/src/components/AuthModal.tsx": {
@@ -246,9 +246,9 @@
     "semantic_hash": "1ee74d79f67fff518d909655a035bc2e"
   },
   "apps/web/src/components/ChatArea.tsx": {
-    "mtime": 1789817621.9110312,
-    "seen": 1789817795.311435,
-    "ast_hash": "c347a092b0d626800b0fc1dd753b8518",
+    "mtime": 1789983526.8186207,
+    "seen": 1789983601.376211,
+    "ast_hash": "9641b8445a81faabac7f8aba051a0738",
     "semantic_hash": ""
   },
   "apps/web/src/components/CreateChannelModal.tsx": {
@@ -312,9 +312,9 @@
     "semantic_hash": "fc71216a73541b6e019a35ce5fd6fd75"
   },
   "apps/web/src/lib/api.ts": {
-    "mtime": 1789965879.7696521,
-    "seen": 1789966499.5213299,
-    "ast_hash": "85493882c8d659aacde862545aced6eb",
+    "mtime": 1789983414.121663,
+    "seen": 1789983601.376226,
+    "ast_hash": "77ea580c12c1597abad409d9cb00749e",
     "semantic_hash": ""
   },
   "apps/web/src/lib/e2ee.ts": {
@@ -444,21 +444,21 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/NotificationCenter.tsx": {
-    "mtime": 1789530723.2966273,
-    "seen": 1789531078.707232,
-    "ast_hash": "2cda0e0ac15720db2fc30ef20306a9b6",
+    "mtime": 1789983533.1371682,
+    "seen": 1789983601.3762171,
+    "ast_hash": "618f19a5d86e1285faf695ff6f8da189",
     "semantic_hash": ""
   },
   "apps/api/src/services/socketService.ts": {
-    "mtime": 1789881272.5805907,
-    "seen": 1789881361.077812,
-    "ast_hash": "76e88a23f5b267d05791d19d2d9adbeb",
+    "mtime": 1789983406.9274704,
+    "seen": 1789983601.376197,
+    "ast_hash": "36cfd11eec0da08e32c2566a86674605",
     "semantic_hash": ""
   },
   "apps/web/src/lib/socket.ts": {
-    "mtime": 1789965882.3707561,
-    "seen": 1789966499.521334,
-    "ast_hash": "5c7e545b3a96e83873fc65638f05c89c",
+    "mtime": 1789983435.6165075,
+    "seen": 1789983601.37623,
+    "ast_hash": "ad0e66786563e93fe6adf9e72a9cfdbf",
     "semantic_hash": ""
   },
   "apps/api/src/middleware/rateLimiter.ts": {

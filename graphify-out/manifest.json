@@ -222,9 +222,9 @@
     "semantic_hash": "b42e03028136cae78674a96be000cce8"
   },
   "apps/web/src/app/page.tsx": {
-    "mtime": 1789983521.7867134,
-    "seen": 1789983601.3762078,
-    "ast_hash": "89c3b5623c4961cfa78ebb76d6e291ef",
+    "mtime": 1789984377.2385063,
+    "seen": 1789984499.370302,
+    "ast_hash": "73fdbb583f29dfcfa5dadaee027d7dc6",
     "semantic_hash": ""
   },
   "apps/web/src/components/AuthModal.tsx": {
@@ -270,9 +270,9 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/KanbanBoard.tsx": {
-    "mtime": 1789816673.6001725,
-    "seen": 1789816751.210898,
-    "ast_hash": "c12aad90ef3e5b6d20315b1cf4fc34c4",
+    "mtime": 1789984341.8096714,
+    "seen": 1789984499.370311,
+    "ast_hash": "6ef1856ccccb9cc38a6f43f8e84765bd",
     "semantic_hash": ""
   },
   "apps/web/src/components/ProjectProgressBar.tsx": {
@@ -522,15 +522,15 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/CommandPalette.tsx": {
-    "mtime": 1789646949.1310964,
-    "seen": 1789647434.4236789,
-    "ast_hash": "d5eef1433822a39e3259ee78f0f27c0a",
+    "mtime": 1789984405.2311833,
+    "seen": 1789984499.370307,
+    "ast_hash": "69b642b3b3944c26e49cb2715f7b48f9",
     "semantic_hash": ""
   },
   "apps/web/src/components/ThreadPanel.tsx": {
-    "mtime": 1789700711.2352064,
-    "seen": 1789815948.088463,
-    "ast_hash": "593f01cac618ea6eede0754b474973ca",
+    "mtime": 1789984327.7634575,
+    "seen": 1789984499.3703191,
+    "ast_hash": "b0c6ec33adcd9068922c9c33ca406941",
     "semantic_hash": ""
   },
   "apps/web/src/components/ProjectMembersModal.tsx": {

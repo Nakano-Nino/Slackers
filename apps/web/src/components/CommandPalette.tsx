@@ -29,7 +29,7 @@ interface Props {
   onSelectDmUser: (user: User) => void;
   onSelectTask: (task: Task) => void;
   onSelectProject: (projectId: string) => void;
-  onOpenCreateTask: () => void;
+  onOpenCreateTask?: () => void;
   onOpenReportBug: () => void;
   onOpenSettings: () => void;
   onOpenInviteMember?: () => void;
@@ -77,8 +77,8 @@ export function CommandPalette({
   const items: PaletteItem[] = [];
 
   // Actions
-  items.push(
-    {
+  if (onOpenCreateTask) {
+    items.push({
       id: 'action-create-task',
       type: 'action',
       title: 'Create New Task',
@@ -88,7 +88,10 @@ export function CommandPalette({
         onClose();
         onOpenCreateTask();
       },
-    },
+    });
+  }
+
+  items.push(
     {
       id: 'action-report-bug',
       type: 'action',

@@ -30,9 +30,9 @@
     "semantic_hash": ""
   },
   "apps/api/src/controllers/messageController.ts": {
-    "mtime": 1789881310.2815874,
-    "seen": 1789881361.0777779,
-    "ast_hash": "c888a3abf96baa6aa427a37b4c28a633",
+    "mtime": 1789992655.0310917,
+    "seen": 1789992869.0175118,
+    "ast_hash": "8cca761433fd57f4451073c649370ff1",
     "semantic_hash": ""
   },
   "apps/api/src/controllers/projectController.ts": {
@@ -126,9 +126,9 @@
     "semantic_hash": ""
   },
   "apps/api/src/services/authService.ts": {
-    "mtime": 1789983399.232005,
-    "seen": 1789983601.3761852,
-    "ast_hash": "ae407109be79b84f6afde24c3364469f",
+    "mtime": 1789992675.3628368,
+    "seen": 1789992869.017536,
+    "ast_hash": "1cf104b24186e7099b6e19c7d6ed2151",
     "semantic_hash": ""
   },
   "apps/api/src/services/bugService.ts": {
@@ -222,9 +222,9 @@
     "semantic_hash": "b42e03028136cae78674a96be000cce8"
   },
   "apps/web/src/app/page.tsx": {
-    "mtime": 1789992035.8743773,
-    "seen": 1789992064.170372,
-    "ast_hash": "35845d25414626f233df83d353a38a9a",
+    "mtime": 1789992816.2468038,
+    "seen": 1789992869.017558,
+    "ast_hash": "90b4b7f28195a3f461cebbc6468c0462",
     "semantic_hash": ""
   },
   "apps/web/src/components/AuthModal.tsx": {
@@ -288,9 +288,9 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/Sidebar.tsx": {
-    "mtime": 1789991777.9325159,
-    "seen": 1789992064.1703858,
-    "ast_hash": "48d2abc042e944e53036bddae7f9fa1a",
+    "mtime": 1789992726.5383892,
+    "seen": 1789992869.017573,
+    "ast_hash": "7d2bd97ddde303e8ddd0ac471d5b200a",
     "semantic_hash": ""
   },
   "apps/web/src/components/TaskDetailModal.tsx": {
@@ -438,21 +438,21 @@
     "semantic_hash": ""
   },
   "apps/api/src/services/notificationService.ts": {
-    "mtime": 1789974985.7223878,
-    "seen": 1789975418.72428,
-    "ast_hash": "661f767909c7bff1249466eb2d466608",
+    "mtime": 1789992828.7262106,
+    "seen": 1789992869.017544,
+    "ast_hash": "be41bb35fe5917b305c35411c82a6781",
     "semantic_hash": ""
   },
   "apps/web/src/components/NotificationCenter.tsx": {
-    "mtime": 1789983533.1371682,
-    "seen": 1789983601.3762171,
-    "ast_hash": "618f19a5d86e1285faf695ff6f8da189",
+    "mtime": 1789992737.0811868,
+    "seen": 1789992869.017568,
+    "ast_hash": "f4f219812c1b144e502d52fd7799ed1a",
     "semantic_hash": ""
   },
   "apps/api/src/services/socketService.ts": {
-    "mtime": 1789983406.9274704,
-    "seen": 1789983601.376197,
-    "ast_hash": "36cfd11eec0da08e32c2566a86674605",
+    "mtime": 1789992681.9116776,
+    "seen": 1789992869.017548,
+    "ast_hash": "bdb6621cd8e2911b3ef82d8743f3f810",
     "semantic_hash": ""
   },
   "apps/web/src/lib/socket.ts": {

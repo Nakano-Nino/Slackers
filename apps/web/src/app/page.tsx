@@ -745,6 +745,28 @@ export default function Home() {
     });
   }, []);
 
+  const handleIncomingUserUpdated = useCallback((updatedUser: User) => {
+    setUsers((prev) =>
+      prev.map((u) => (u.id === updatedUser.id ? { ...u, ...updatedUser } : u))
+    );
+    if (currentUserRef.current?.id === updatedUser.id) {
+      setCurrentUser((prev) => (prev ? { ...prev, ...updatedUser } : prev));
+    }
+    setMessages((prev) =>
+      prev.map((m) =>
+        m.userId === updatedUser.id && !m.isBot
+          ? { ...m, userAvatar: updatedUser.avatar, userName: updatedUser.name }
+          : m
+      )
+    );
+    setThreadParentMessage((prev) => {
+      if (prev && 'userId' in prev && prev.userId === updatedUser.id) {
+        return { ...prev, userAvatar: updatedUser.avatar, userName: updatedUser.name };
+      }
+      return prev;
+    });
+  }, []);
+
   const handleIncomingMessageReaction = useCallback(
     (data: { channelId: string; messageId: string; reactions: Record<string, string[]> }) => {
       setMessages((prev) =>
@@ -975,6 +997,7 @@ export default function Home() {
     socket.on('task:deleted', handleIncomingTaskDeleted);
     socket.on('presence:update', handleIncomingPresence);
     socket.on('user:created', handleIncomingUserCreated);
+    socket.on('user:updated', handleIncomingUserUpdated);
     socket.on('session:revoked', handleIncomingSessionRevoked);
 
     return () => {
@@ -998,6 +1021,7 @@ export default function Home() {
       socket.off('task:deleted', handleIncomingTaskDeleted);
       socket.off('presence:update', handleIncomingPresence);
       socket.off('user:created', handleIncomingUserCreated);
+      socket.off('user:updated', handleIncomingUserUpdated);
       socket.off('session:revoked', handleIncomingSessionRevoked);
     };
   }, [
@@ -1018,6 +1042,7 @@ export default function Home() {
     handleIncomingTaskDeleted,
     handleIncomingPresence,
     handleIncomingUserCreated,
+    handleIncomingUserUpdated,
     handleIncomingSessionRevoked,
   ]);
 
@@ -1647,6 +1672,7 @@ export default function Home() {
             directMessages={directMessages}
             decryptedDmMessages={decryptedDmMessages}
             currentUser={currentUser}
+            users={users}
             onSendMessage={handleSendMessage}
             onSendDirectMessage={handleSendDirectMessage}
             onMarkDmAsRead={handleMarkDmAsRead}
@@ -1824,6 +1850,19 @@ export default function Home() {
         onProfileUpdated={(updatedUser, passwordChanged) => {
           setCurrentUser(updatedUser);
           setUsers((prev) => prev.map((u) => (u.id === updatedUser.id ? { ...u, ...updatedUser } : u)));
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.userId === updatedUser.id && !m.isBot
+                ? { ...m, userAvatar: updatedUser.avatar, userName: updatedUser.name }
+                : m
+            )
+          );
+          setThreadParentMessage((prev) => {
+            if (prev && 'userId' in prev && prev.userId === updatedUser.id) {
+              return { ...prev, userAvatar: updatedUser.avatar, userName: updatedUser.name };
+            }
+            return prev;
+          });
           if (passwordChanged) {
             setToastNotification({
               id: `pwd-changed-${Date.now()}`,
@@ -1855,6 +1894,7 @@ export default function Home() {
         channel={selectedDmUser ? null : selectedChannel}
         selectedDmUser={selectedDmUser}
         currentUser={currentUser}
+        users={users}
         onSendReply={handleSendThreadReply}
         onToggleReaction={handleToggleThreadReaction}
       />

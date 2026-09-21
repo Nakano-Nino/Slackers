@@ -300,6 +300,11 @@ class SocketService {
     this.io.emit('user:created', user);
   }
 
+  emitUserUpdated(user: User) {
+    if (!this.io) return;
+    this.io.emit('user:updated', user);
+  }
+
   getOnlineUserIds(): string[] {
     return Array.from(this.onlineUsers.keys());
   }

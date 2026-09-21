@@ -277,6 +277,7 @@ export class AuthService {
     }
 
     const { passwordHash: _, ...safeUser } = user;
+    socketService.emitUserUpdated(safeUser as User);
     return { user: safeUser as User, token, passwordChanged };
   }
 }

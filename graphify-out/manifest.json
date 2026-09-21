@@ -126,9 +126,9 @@
     "semantic_hash": ""
   },
   "apps/api/src/services/authService.ts": {
-    "mtime": 1789992675.3628368,
-    "seen": 1789992869.017536,
-    "ast_hash": "1cf104b24186e7099b6e19c7d6ed2151",
+    "mtime": 1789993215.7625585,
+    "seen": 1789993435.098621,
+    "ast_hash": "e12f198918b7a0b903afae0772602923",
     "semantic_hash": ""
   },
   "apps/api/src/services/bugService.ts": {
@@ -138,9 +138,9 @@
     "semantic_hash": ""
   },
   "apps/api/src/services/dataStore.ts": {
-    "mtime": 1789974932.3533845,
-    "seen": 1789975418.724273,
-    "ast_hash": "5256ae82550b5810a016d3b4eb6fa4a1",
+    "mtime": 1789993230.1744082,
+    "seen": 1789993435.098624,
+    "ast_hash": "89f0d87e6445d3feaaa198e1deaf46eb",
     "semantic_hash": ""
   },
   "apps/api/src/services/db.ts": {
@@ -222,9 +222,9 @@
     "semantic_hash": "b42e03028136cae78674a96be000cce8"
   },
   "apps/web/src/app/page.tsx": {
-    "mtime": 1789992816.2468038,
-    "seen": 1789992869.017558,
-    "ast_hash": "90b4b7f28195a3f461cebbc6468c0462",
+    "mtime": 1789993376.097781,
+    "seen": 1789993435.098645,
+    "ast_hash": "4069b680e8320031aa8e37c1032ba920",
     "semantic_hash": ""
   },
   "apps/web/src/components/AuthModal.tsx": {
@@ -246,9 +246,9 @@
     "semantic_hash": "1ee74d79f67fff518d909655a035bc2e"
   },
   "apps/web/src/components/ChatArea.tsx": {
-    "mtime": 1789991997.8314257,
-    "seen": 1789992064.1703749,
-    "ast_hash": "66afe5807f32e4de313211d83cc0d6cd",
+    "mtime": 1789993400.0750427,
+    "seen": 1789993435.098648,
+    "ast_hash": "65769b6d0a77fedbbfc56999263955d0",
     "semantic_hash": ""
   },
   "apps/web/src/components/CreateChannelModal.tsx": {
@@ -450,9 +450,9 @@
     "semantic_hash": ""
   },
   "apps/api/src/services/socketService.ts": {
-    "mtime": 1789992681.9116776,
-    "seen": 1789992869.017548,
-    "ast_hash": "bdb6621cd8e2911b3ef82d8743f3f810",
+    "mtime": 1789993211.1828392,
+    "seen": 1789993435.098634,
+    "ast_hash": "d32bba69a6172375e5e57ea97eeab131",
     "semantic_hash": ""
   },
   "apps/web/src/lib/socket.ts": {
@@ -528,9 +528,9 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/ThreadPanel.tsx": {
-    "mtime": 1789991798.0055912,
-    "seen": 1789992064.170388,
-    "ast_hash": "1d3638b4fde6ddbb4bb0debc00c81277",
+    "mtime": 1789993331.4072394,
+    "seen": 1789993435.0986612,
+    "ast_hash": "df5b9b3418e53160a93e31ccaf1f4a6b",
     "semantic_hash": ""
   },
   "apps/web/src/components/ProjectMembersModal.tsx": {

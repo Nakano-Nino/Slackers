@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   X,
   Send,
@@ -45,6 +45,7 @@ interface Props {
   channel: Channel | null;
   selectedDmUser: User | null;
   currentUser: User | null;
+  users?: User[];
   onSendReply: (parentId: string, content: string) => Promise<void>;
   onToggleReaction: (messageId: string, emoji: string) => Promise<void>;
   channelKey?: CryptoKey | null;
@@ -60,10 +61,18 @@ export function ThreadPanel({
   channel,
   selectedDmUser,
   currentUser,
+  users = [],
   onSendReply,
   onToggleReaction,
   channelKey,
 }: Props) {
+  const usersMap = useMemo(() => {
+    const map = new Map<string, User>();
+    users.forEach((u) => map.set(u.id, u));
+    if (currentUser) map.set(currentUser.id, currentUser);
+    return map;
+  }, [users, currentUser]);
+
   const [replies, setReplies] = useState<Message[]>([]);
   const [decryptedReplies, setDecryptedReplies] = useState<Record<string, string>>({});
   const [rootDecryptedText, setRootDecryptedText] = useState<string>(parentDecryptedContent || '');
@@ -268,12 +277,15 @@ export function ThreadPanel({
 
   if (!isOpen || !parentMessage) return null;
 
+  const parentUserId = 'userId' in parentMessage ? parentMessage.userId : parentMessage.senderId;
+  const parentUser = usersMap.get(parentUserId);
   const parentAuthor =
-    'userName' in parentMessage ? parentMessage.userName : parentMessage.sender?.name || 'Unknown';
+    parentUser?.name || ('userName' in parentMessage ? parentMessage.userName : parentMessage.sender?.name || 'Unknown');
   const parentAvatar =
-    'userAvatar' in parentMessage
+    parentUser?.avatar ||
+    ('userAvatar' in parentMessage
       ? parentMessage.userAvatar
-      : parentMessage.sender?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150';
+      : parentMessage.sender?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150');
 
   return (
     <div className="fixed inset-y-0 right-0 w-full sm:w-[420px] md:w-[460px] bg-slate-900 border-l border-slate-800 z-50 flex flex-col shadow-2xl animate-in slide-in-from-right duration-200">
@@ -363,6 +375,12 @@ export function ThreadPanel({
           </div>
         ) : (
           replies.map((reply, idx) => {
+            const replyUser = !reply.isBot ? usersMap.get(reply.userId) : null;
+            const replyAuthorName = replyUser?.name || reply.userName;
+            const replyAvatar =
+              replyUser?.avatar ||
+              reply.userAvatar ||
+              'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80';
             const replyDecrypted = decryptedReplies[reply.id] || reply.content || reply.ciphertext;
             const prevReply = idx > 0 ? replies[idx - 1] : null;
             const showDateHeader = !prevReply || isDifferentDay(prevReply.createdAt, reply.createdAt);
@@ -374,13 +392,13 @@ export function ThreadPanel({
                   className={`group flex items-start gap-2.5 p-2 rounded-xl transition hover:bg-slate-950/40 relative`}
                 >
                   <img
-                    src={reply.userAvatar}
-                    alt={reply.userName}
+                    src={replyAvatar}
+                    alt={replyAuthorName}
                     className="w-6 h-6 rounded-full object-cover ring-1 ring-slate-800 shrink-0 mt-0.5"
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 mb-0.5">
-                      <span className="text-xs font-semibold text-slate-200">{reply.userName}</span>
+                      <span className="text-xs font-semibold text-slate-200">{replyAuthorName}</span>
                       <span className="text-[10px] text-slate-500">
                         {new Date(reply.createdAt).toLocaleTimeString([], {
                           hour: '2-digit',

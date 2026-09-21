@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   Hash,
   Lock,
@@ -60,6 +60,7 @@ interface Props {
   directMessages: DirectMessage[];
   decryptedDmMessages: Record<string, string>;
   currentUser: User | null;
+  users?: User[];
   onSendMessage: (content: string, options?: { expiresAt?: string }) => Promise<void>;
   onSendDirectMessage: (content: string, options?: { expiresAt?: string }) => Promise<void>;
   onMarkDmAsRead?: (partnerId: string) => void;
@@ -336,6 +337,7 @@ export function ChatArea({
   directMessages,
   decryptedDmMessages,
   currentUser,
+  users = [],
   onSendMessage,
   onSendDirectMessage,
   onMarkDmAsRead,
@@ -352,6 +354,13 @@ export function ChatArea({
   loadingOlderMessages = false,
   onLoadOlderMessages,
 }: Props) {
+  const usersMap = useMemo(() => {
+    const map = new Map<string, User>();
+    users.forEach((u) => map.set(u.id, u));
+    if (currentUser) map.set(currentUser.id, currentUser);
+    return map;
+  }, [users, currentUser]);
+
   const [content, setContent] = useState('');
   const [sending, setSending] = useState(false);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
@@ -667,17 +676,18 @@ export function ChatArea({
         .filter((m) => !m.parentId && !m.isDeleted)
         .map((m) => {
           const text = extractPlainText(m.decryptedContent || m.content || '');
+          const authorUser = !m.isBot ? usersMap.get(m.userId) : null;
           return {
             id: m.id,
             text,
             createdAt: m.createdAt,
-            senderName: m.userName || 'User',
-            senderAvatar: m.userAvatar,
+            senderName: authorUser?.name || m.userName || 'User',
+            senderAvatar: authorUser?.avatar || m.userAvatar,
           };
         })
-        .filter((item) => item.text.toLowerCase().includes(query));
-    }
-  }, [searchQuery, isDmMode, uniqueDirectMessages, decryptedDmMessages, currentUser, selectedDmUser, uniqueMessages]);
+          .filter((item) => item.text.toLowerCase().includes(query));
+      }
+    }, [searchQuery, isDmMode, uniqueDirectMessages, decryptedDmMessages, currentUser, selectedDmUser, uniqueMessages, usersMap]);
 
   const jumpToMatch = (index: number) => {
     if (searchResults.length === 0) return;
@@ -1740,6 +1750,12 @@ export function ChatArea({
           ) : (
             uniqueMessages.map((msg, idx) => {
               const isMe = currentUser?.id === msg.userId;
+              const authorUser = !msg.isBot ? usersMap.get(msg.userId) : null;
+              const avatarSrc =
+                authorUser?.avatar ||
+                msg.userAvatar ||
+                'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80';
+              const authorName = authorUser?.name || msg.userName;
               const timeFormatted = new Date(msg.createdAt).toLocaleTimeString([], {
                 hour: '2-digit',
                 minute: '2-digit',
@@ -1803,14 +1819,14 @@ export function ChatArea({
                   )}
 
                   <img
-                    src={msg.userAvatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'}
-                    alt={msg.userName}
+                    src={avatarSrc}
+                    alt={authorName}
                     className="w-9 h-9 rounded-lg object-cover ring-1 ring-slate-200 dark:ring-neutral-700/50 mt-0.5 shrink-0"
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-baseline gap-2">
                       <span className="font-semibold text-sm text-slate-900 dark:text-neutral-200">
-                        {msg.userName}
+                        {authorName}
                       </span>
                       {isMe && (
                         <span className="text-[10px] bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 font-medium px-1 rounded border border-indigo-500/30">

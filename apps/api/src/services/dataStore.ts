@@ -521,6 +521,15 @@ class DataStore {
     if (updates.keyVaultSalt !== undefined) dataToUpdate.keyVaultSalt = updates.keyVaultSalt;
     if (updates.keyVaultIv !== undefined) dataToUpdate.keyVaultIv = updates.keyVaultIv;
 
+    if (updates.avatar !== undefined || updates.name !== undefined) {
+      for (const m of this.messages) {
+        if (m.userId === id && !m.isBot) {
+          if (updates.avatar !== undefined) m.userAvatar = updates.avatar;
+          if (updates.name !== undefined) m.userName = updates.name;
+        }
+      }
+    }
+
     prisma.user
       .update({ where: { id }, data: dataToUpdate })
       .catch((err) => console.warn('Failed to update user in PostgreSQL:', err));
@@ -756,7 +765,18 @@ class DataStore {
     const nextCursor = hasMore && paginated.length > 0 ? paginated[0].id : undefined;
 
     return {
-      messages: paginated,
+      messages: paginated.map((m) => {
+        if (m.isBot) return m;
+        const u = this.getUserById(m.userId);
+        if (u) {
+          return {
+            ...m,
+            userName: u.name || m.userName,
+            userAvatar: u.avatar || m.userAvatar,
+          };
+        }
+        return m;
+      }),
       hasMore,
       nextCursor,
     };
@@ -764,15 +784,39 @@ class DataStore {
 
   getThreadReplies(parentId: string): Message[] {
     const nowTime = Date.now();
-    return this.messages.filter(
-      (m) =>
-        m.parentId === parentId &&
-        (!m.expiresAt || new Date(m.expiresAt).getTime() > nowTime)
-    );
+    return this.messages
+      .filter(
+        (m) =>
+          m.parentId === parentId &&
+          (!m.expiresAt || new Date(m.expiresAt).getTime() > nowTime)
+      )
+      .map((m) => {
+        if (m.isBot) return m;
+        const u = this.getUserById(m.userId);
+        if (u) {
+          return {
+            ...m,
+            userName: u.name || m.userName,
+            userAvatar: u.avatar || m.userAvatar,
+          };
+        }
+        return m;
+      });
   }
 
   getMessageById(id: string): Message | undefined {
-    return this.messages.find((m) => m.id === id);
+    const m = this.messages.find((m) => m.id === id);
+    if (m && !m.isBot) {
+      const u = this.getUserById(m.userId);
+      if (u) {
+        return {
+          ...m,
+          userName: u.name || m.userName,
+          userAvatar: u.avatar || m.userAvatar,
+        };
+      }
+    }
+    return m;
   }
 
   addMessage(data: {

@@ -17,6 +17,18 @@ export async function seedPostgres(): Promise<{
   bugsCount: number;
   messagesCount: number;
 }> {
+  if (process.env.SEED_DB !== 'true') {
+    console.log('ℹ️  SEED_DB is not enabled. Skipping database seed (database remains empty).');
+    return {
+      usersCount: 0,
+      channelsCount: 0,
+      projectsCount: 0,
+      tasksCount: 0,
+      bugsCount: 0,
+      messagesCount: 0,
+    };
+  }
+
   console.log('🌱 Checking PostgreSQL seed status...');
 
   // 1. Seed Users

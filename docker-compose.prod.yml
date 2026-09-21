@@ -181,7 +181,9 @@ volumes:
   minio_data:
   uploads_data:
   certbot_conf:
+    name: slackers_certbot_conf
   certbot_www:
+    name: slackers_certbot_www
 
 networks:
   slackers_network:

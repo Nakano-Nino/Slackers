@@ -13,27 +13,25 @@ class TaskService {
       const dbTasks = await prisma.task.findMany({
         orderBy: { createdAt: 'asc' },
       });
-      if (dbTasks.length > 0) {
-        this.tasks = dbTasks.map((t) => ({
-          id: t.id,
-          projectId: t.projectId,
-          title: t.title,
-          description: t.description || '',
-          status: t.status.toLowerCase() as TaskStatus,
-          priority: t.priority.toLowerCase() as TaskPriority,
-          storyPoints: t.storyPoints,
-          tags: t.tags || [],
-          dueDate: t.dueDate ? t.dueDate.toISOString().split('T')[0] : undefined,
-          assigneeId: t.assigneeId || undefined,
-          creatorId: t.creatorId || undefined,
-          qaSteps: (t.qaSteps as any) || undefined,
-          qaVerdict: (t.qaVerdict as any) || undefined,
-          subtasks: (t.subtasks as any) || undefined,
-          attachments: (t.attachments as any) || undefined,
-          createdAt: t.createdAt.toISOString(),
-          updatedAt: t.updatedAt.toISOString(),
-        }));
-      }
+      this.tasks = dbTasks.map((t) => ({
+        id: t.id,
+        projectId: t.projectId,
+        title: t.title,
+        description: t.description || '',
+        status: t.status.toLowerCase() as TaskStatus,
+        priority: t.priority.toLowerCase() as TaskPriority,
+        storyPoints: t.storyPoints,
+        tags: t.tags || [],
+        dueDate: t.dueDate ? t.dueDate.toISOString().split('T')[0] : undefined,
+        assigneeId: t.assigneeId || undefined,
+        creatorId: t.creatorId || undefined,
+        qaSteps: (t.qaSteps as any) || undefined,
+        qaVerdict: (t.qaVerdict as any) || undefined,
+        subtasks: (t.subtasks as any) || undefined,
+        attachments: (t.attachments as any) || undefined,
+        createdAt: t.createdAt.toISOString(),
+        updatedAt: t.updatedAt.toISOString(),
+      }));
       console.log(`📦 TaskService synchronized with PostgreSQL: ${this.tasks.length} tasks.`);
     } catch (err: unknown) {
       console.warn('⚠️  TaskService could not load from PostgreSQL:', err instanceof Error ? err.message : err);

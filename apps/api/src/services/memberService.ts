@@ -25,24 +25,22 @@ class MemberService {
       const dbInvitations = await prisma.invitation.findMany({
         orderBy: { createdAt: 'desc' },
       });
-      if (dbInvitations.length > 0) {
-        this.invitations = dbInvitations.map((i) => {
-          const inviter = dataStore.getUserById(i.inviterId);
-          return {
-            id: i.id,
-            token: i.token,
-            email: i.email || undefined,
-            role: i.role.toLowerCase() as UserRole,
-            developerRole: i.developerRole || undefined,
-            invitedById: i.inviterId,
-            invitedByName: inviter?.name,
-            expiresAt: i.expiresAt.toISOString(),
-            isUsed: i.status === 'accepted',
-            usedAt: i.acceptedAt ? i.acceptedAt.toISOString() : undefined,
-            createdAt: i.createdAt.toISOString(),
-          };
-        });
-      }
+      this.invitations = dbInvitations.map((i) => {
+        const inviter = dataStore.getUserById(i.inviterId);
+        return {
+          id: i.id,
+          token: i.token,
+          email: i.email || undefined,
+          role: i.role.toLowerCase() as UserRole,
+          developerRole: i.developerRole || undefined,
+          invitedById: i.inviterId,
+          invitedByName: inviter?.name,
+          expiresAt: i.expiresAt.toISOString(),
+          isUsed: i.status === 'accepted',
+          usedAt: i.acceptedAt ? i.acceptedAt.toISOString() : undefined,
+          createdAt: i.createdAt.toISOString(),
+        };
+      });
       console.log(`📦 MemberService synchronized with PostgreSQL: ${this.invitations.length} invitations.`);
     } catch (err: unknown) {
       console.warn('⚠️  MemberService could not load from PostgreSQL:', err instanceof Error ? err.message : err);

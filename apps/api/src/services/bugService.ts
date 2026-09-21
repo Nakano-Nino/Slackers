@@ -11,25 +11,23 @@ class BugService {
       const dbBugs = await prisma.bug.findMany({
         orderBy: { createdAt: 'desc' },
       });
-      if (dbBugs.length > 0) {
-        this.bugs = dbBugs.map((b) => ({
-          id: b.id,
-          projectId: b.projectId,
-          title: b.title,
-          description: b.description,
-          severity: b.severity.toLowerCase() as BugSeverity,
-          status: b.status.toLowerCase() as BugStatus,
-          environment: b.environment.toLowerCase() as BugEnvironment,
-          reproductionSteps: b.reproductionSteps || '',
-          expectedBehavior: b.expectedBehavior || '',
-          actualBehavior: b.actualBehavior || '',
-          reportedById: b.reportedById,
-          assignedToId: b.assignedToId || undefined,
-          taskId: b.taskId || undefined,
-          createdAt: b.createdAt.toISOString(),
-          updatedAt: b.updatedAt.toISOString(),
-        }));
-      }
+      this.bugs = dbBugs.map((b) => ({
+        id: b.id,
+        projectId: b.projectId,
+        title: b.title,
+        description: b.description,
+        severity: b.severity.toLowerCase() as BugSeverity,
+        status: b.status.toLowerCase() as BugStatus,
+        environment: b.environment.toLowerCase() as BugEnvironment,
+        reproductionSteps: b.reproductionSteps || '',
+        expectedBehavior: b.expectedBehavior || '',
+        actualBehavior: b.actualBehavior || '',
+        reportedById: b.reportedById,
+        assignedToId: b.assignedToId || undefined,
+        taskId: b.taskId || undefined,
+        createdAt: b.createdAt.toISOString(),
+        updatedAt: b.updatedAt.toISOString(),
+      }));
       console.log(`📦 BugService synchronized with PostgreSQL: ${this.bugs.length} bugs.`);
     } catch (err: unknown) {
       console.warn('⚠️  BugService could not load from PostgreSQL:', err instanceof Error ? err.message : err);

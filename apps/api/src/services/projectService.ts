@@ -9,19 +9,17 @@ class ProjectService {
       const dbProjects = await prisma.project.findMany({
         orderBy: { createdAt: 'asc' },
       });
-      if (dbProjects.length > 0) {
-        this.projects = dbProjects.map((p) => ({
-          id: p.id,
-          name: p.name,
-          key: p.key,
-          description: p.description || '',
-          isPrivate: p.isPrivate,
-          ownerId: p.ownerId,
-          memberIds: p.memberIds && p.memberIds.length > 0 ? p.memberIds : undefined,
-          createdAt: p.createdAt.toISOString(),
-          updatedAt: p.updatedAt.toISOString(),
-        }));
-      }
+      this.projects = dbProjects.map((p) => ({
+        id: p.id,
+        name: p.name,
+        key: p.key,
+        description: p.description || '',
+        isPrivate: p.isPrivate,
+        ownerId: p.ownerId,
+        memberIds: p.memberIds && p.memberIds.length > 0 ? p.memberIds : undefined,
+        createdAt: p.createdAt.toISOString(),
+        updatedAt: p.updatedAt.toISOString(),
+      }));
       console.log(`📦 ProjectService synchronized with PostgreSQL: ${this.projects.length} projects.`);
     } catch (err: unknown) {
       console.warn('⚠️  ProjectService could not load from PostgreSQL:', err instanceof Error ? err.message : err);

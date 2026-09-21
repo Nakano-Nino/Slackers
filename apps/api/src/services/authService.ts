@@ -151,8 +151,9 @@ export class AuthService {
     }
 
     const passwordHash = await this.hashPassword(data.password);
-    // User requested default role is MEMBER
-    const role: UserRole = data.role || 'member';
+    // First user registered on a clean/empty database becomes ADMIN; subsequent users default to MEMBER
+    const isFirstUser = dataStore.getUsers().length === 0;
+    const role: UserRole = isFirstUser ? 'admin' : (data.role || 'member');
 
     const newUser: User = {
       id: `u-${Date.now()}`,

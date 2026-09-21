@@ -46,7 +46,11 @@ echo -e "${GREEN}✓ SSL Certificate successfully issued!${NC}"
 
 # Generate SSL Nginx configuration from template
 export DOMAIN_NAME=$DOMAIN
-envsubst '${DOMAIN_NAME}' < nginx/conf.d/default-ssl.conf.template > nginx/conf.d/default.conf
+if command -v envsubst &> /dev/null; then
+    envsubst '${DOMAIN_NAME}' < nginx/conf.d/default-ssl.conf.template > nginx/conf.d/default.conf
+else
+    sed "s|\${DOMAIN_NAME}|${DOMAIN}|g" nginx/conf.d/default-ssl.conf.template > nginx/conf.d/default.conf
+fi
 
 # Reload Nginx configuration
 docker exec slackers_nginx_prod nginx -s reload

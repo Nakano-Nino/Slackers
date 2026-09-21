@@ -158,7 +158,11 @@ httpServer.listen(PORT, async () => {
   const pgOk = await connectPostgres();
   if (pgOk) {
     try {
-      await seedPostgres();
+      if (process.env.SEED_DB === 'true') {
+        await seedPostgres();
+      } else {
+        console.log('ℹ️  Running in clean database mode (SEED_DB=false).');
+      }
       await dataStore.initFromDb();
       await projectService.initFromDb();
       await taskService.initFromDb();

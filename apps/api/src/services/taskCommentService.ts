@@ -9,16 +9,14 @@ class TaskCommentService {
       const dbComments = await prisma.taskComment.findMany({
         orderBy: { createdAt: 'asc' },
       });
-      if (dbComments.length > 0) {
-        this.comments = dbComments.map((c) => ({
-          id: c.id,
-          taskId: c.taskId,
-          userId: c.userId,
-          content: c.content,
-          createdAt: c.createdAt.toISOString(),
-          updatedAt: c.updatedAt.toISOString(),
-        }));
-      }
+      this.comments = dbComments.map((c) => ({
+        id: c.id,
+        taskId: c.taskId,
+        userId: c.userId,
+        content: c.content,
+        createdAt: c.createdAt.toISOString(),
+        updatedAt: c.updatedAt.toISOString(),
+      }));
       console.log(`📦 TaskCommentService synchronized with PostgreSQL: ${this.comments.length} comments.`);
     } catch (err: unknown) {
       console.warn('⚠️  TaskCommentService could not load from PostgreSQL:', err instanceof Error ? err.message : err);

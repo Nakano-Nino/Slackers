@@ -10,21 +10,19 @@ class NotificationService {
         orderBy: { createdAt: 'desc' },
         take: 200,
       });
-      if (dbNotifs.length > 0) {
-        this.notifications = dbNotifs.map((n) => ({
-          id: n.id,
-          recipientId: n.recipientId,
-          senderId: n.senderId,
-          senderName: n.senderName,
-          senderAvatar: n.senderAvatar || undefined,
-          type: n.type as NotificationType,
-          title: n.title,
-          content: n.content,
-          link: (n.link as any) || undefined,
-          isRead: n.isRead,
-          createdAt: n.createdAt.toISOString(),
-        }));
-      }
+      this.notifications = dbNotifs.map((n) => ({
+        id: n.id,
+        recipientId: n.recipientId,
+        senderId: n.senderId,
+        senderName: n.senderName,
+        senderAvatar: n.senderAvatar || undefined,
+        type: n.type as NotificationType,
+        title: n.title,
+        content: n.content,
+        link: (n.link as any) || undefined,
+        isRead: n.isRead,
+        createdAt: n.createdAt.toISOString(),
+      }));
       console.log(`📦 NotificationService synchronized with PostgreSQL: ${this.notifications.length} notifications.`);
     } catch (err: unknown) {
       console.warn('⚠️  NotificationService could not load from PostgreSQL:', err instanceof Error ? err.message : err);

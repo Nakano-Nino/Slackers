@@ -90,46 +90,40 @@ class DataStore {
   async initFromDb(): Promise<void> {
     try {
       const dbUsers = await prisma.user.findMany();
-      if (dbUsers.length > 0) {
-        this.users = dbUsers.map((u) => ({
-          id: u.id,
-          email: u.email,
-          passwordHash: u.passwordHash,
-          name: u.name,
-          avatar: u.avatar,
-          publicKey: u.publicKey || undefined,
-          encryptedPrivateKey: u.encryptedPrivateKey || undefined,
-          keyVaultSalt: u.keyVaultSalt || undefined,
-          keyVaultIv: u.keyVaultIv || undefined,
-          role: u.role.toLowerCase() as any,
-          developerRole: u.developerRole || undefined,
-          status: u.status.toLowerCase() as any,
-        }));
-      }
+      this.users = dbUsers.map((u) => ({
+        id: u.id,
+        email: u.email,
+        passwordHash: u.passwordHash,
+        name: u.name,
+        avatar: u.avatar,
+        publicKey: u.publicKey || undefined,
+        encryptedPrivateKey: u.encryptedPrivateKey || undefined,
+        keyVaultSalt: u.keyVaultSalt || undefined,
+        keyVaultIv: u.keyVaultIv || undefined,
+        role: u.role.toLowerCase() as any,
+        developerRole: u.developerRole || undefined,
+        status: u.status.toLowerCase() as any,
+      }));
 
       const dbChannels = await prisma.channel.findMany();
-      if (dbChannels.length > 0) {
-        this.channels = dbChannels.map((c) => ({
-          id: c.id,
-          name: c.name,
-          description: c.description || '',
-          isPrivate: c.isPrivate,
-          memberCount: 0,
-          createdAt: c.createdAt.toISOString(),
-        }));
-      }
+      this.channels = dbChannels.map((c) => ({
+        id: c.id,
+        name: c.name,
+        description: c.description || '',
+        isPrivate: c.isPrivate,
+        memberCount: 0,
+        createdAt: c.createdAt.toISOString(),
+      }));
 
       const dbKeys = await prisma.channelKey.findMany();
-      if (dbKeys.length > 0) {
-        this.channelKeys = dbKeys.map((k) => ({
-          id: k.id,
-          channelId: k.channelId,
-          userId: k.userId,
-          encryptedKey: k.encryptedKey,
-          iv: k.iv,
-          createdAt: k.createdAt.toISOString(),
-        }));
-      }
+      this.channelKeys = dbKeys.map((k) => ({
+        id: k.id,
+        channelId: k.channelId,
+        userId: k.userId,
+        encryptedKey: k.encryptedKey,
+        iv: k.iv,
+        createdAt: k.createdAt.toISOString(),
+      }));
 
       const dbMessages = await prisma.message.findMany({
         where: {
@@ -141,84 +135,76 @@ class DataStore {
         include: { user: true },
         orderBy: { createdAt: 'asc' },
       });
-      if (dbMessages.length > 0) {
-        this.messages = dbMessages.map((m) => ({
-          id: m.id,
-          channelId: m.channelId,
-          userId: m.userId,
-          userName: m.user?.name || 'Unknown',
-          userAvatar: m.user?.avatar || '',
-          ciphertext: m.ciphertext,
-          iv: m.iv,
-          content: m.content || undefined,
-          taskId: m.taskId || undefined,
-          bugId: m.bugId || undefined,
-          createdAt: m.createdAt.toISOString(),
-          expiresAt: m.expiresAt ? m.expiresAt.toISOString() : undefined,
-          isEdited: m.isEdited,
-          isDeleted: m.isDeleted,
-          editedAt: m.editedAt ? m.editedAt.toISOString() : undefined,
-          reactions: (m.reactions as any) || undefined,
-          parentId: m.parentId || undefined,
-          replyCount: m.replyCount,
-          lastReplyAt: m.lastReplyAt ? m.lastReplyAt.toISOString() : undefined,
-        }));
-      }
+      this.messages = dbMessages.map((m) => ({
+        id: m.id,
+        channelId: m.channelId,
+        userId: m.userId,
+        userName: m.user?.name || 'Unknown',
+        userAvatar: m.user?.avatar || '',
+        ciphertext: m.ciphertext,
+        iv: m.iv,
+        content: m.content || undefined,
+        taskId: m.taskId || undefined,
+        bugId: m.bugId || undefined,
+        createdAt: m.createdAt.toISOString(),
+        expiresAt: m.expiresAt ? m.expiresAt.toISOString() : undefined,
+        isEdited: m.isEdited,
+        isDeleted: m.isDeleted,
+        editedAt: m.editedAt ? m.editedAt.toISOString() : undefined,
+        reactions: (m.reactions as any) || undefined,
+        parentId: m.parentId || undefined,
+        replyCount: m.replyCount,
+        lastReplyAt: m.lastReplyAt ? m.lastReplyAt.toISOString() : undefined,
+      }));
 
       try {
         const dbWebhooks = await prisma.webhook.findMany({
           include: { channel: true },
           orderBy: { createdAt: 'desc' },
         });
-        if (dbWebhooks.length > 0) {
-          this.webhooks = dbWebhooks.map((w) => ({
-            id: w.id,
-            name: w.name,
-            channelId: w.channelId,
-            channelName: w.channel?.name,
-            token: w.token,
-            secret: w.secret || undefined,
-            type: w.type as WebhookType,
-            avatar: w.avatar || undefined,
-            creatorId: w.creatorId,
-            isActive: w.isActive,
-            createdAt: w.createdAt.toISOString(),
-            updatedAt: w.updatedAt.toISOString(),
-          }));
-        }
+        this.webhooks = dbWebhooks.map((w) => ({
+          id: w.id,
+          name: w.name,
+          channelId: w.channelId,
+          channelName: w.channel?.name,
+          token: w.token,
+          secret: w.secret || undefined,
+          type: w.type as WebhookType,
+          avatar: w.avatar || undefined,
+          creatorId: w.creatorId,
+          isActive: w.isActive,
+          createdAt: w.createdAt.toISOString(),
+          updatedAt: w.updatedAt.toISOString(),
+        }));
 
         const dbRules = await prisma.automationRule.findMany({
           orderBy: { createdAt: 'desc' },
         });
-        if (dbRules.length > 0) {
-          this.automationRules = dbRules.map((r) => ({
-            id: r.id,
-            name: r.name,
-            trigger: r.trigger,
-            conditions: (r.conditions as any) || undefined,
-            actions: (r.actions as any) || {},
-            isActive: r.isActive,
-            createdAt: r.createdAt.toISOString(),
-            updatedAt: r.updatedAt.toISOString(),
-          }));
-        }
+        this.automationRules = dbRules.map((r) => ({
+          id: r.id,
+          name: r.name,
+          trigger: r.trigger,
+          conditions: (r.conditions as any) || undefined,
+          actions: (r.actions as any) || {},
+          isActive: r.isActive,
+          createdAt: r.createdAt.toISOString(),
+          updatedAt: r.updatedAt.toISOString(),
+        }));
 
         const dbLogs = await prisma.webhookLog.findMany({
           orderBy: { createdAt: 'desc' },
           take: 100,
         });
-        if (dbLogs.length > 0) {
-          this.webhookLogs = dbLogs.map((l) => ({
-            id: l.id,
-            webhookId: l.webhookId,
-            event: l.event,
-            status: l.status,
-            payload: l.payload,
-            error: l.error || undefined,
-            durationMs: l.durationMs,
-            createdAt: l.createdAt.toISOString(),
-          }));
-        }
+        this.webhookLogs = dbLogs.map((l) => ({
+          id: l.id,
+          webhookId: l.webhookId,
+          event: l.event,
+          status: l.status,
+          payload: l.payload,
+          error: l.error || undefined,
+          durationMs: l.durationMs,
+          createdAt: l.createdAt.toISOString(),
+        }));
       } catch (err) {
         console.warn('⚠️  Webhooks / Automation rules table sync notice:', (err as Error).message);
       }

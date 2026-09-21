@@ -660,9 +660,9 @@
     "semantic_hash": ""
   },
   "deploy.sh": {
-    "mtime": 1789965935.7136357,
-    "seen": 1789966499.521337,
-    "ast_hash": "f9974d41e230f95e62113bfcaad52691",
+    "mtime": 1789969787.9276464,
+    "seen": 1789969830.644153,
+    "ast_hash": "874a3e719c7cf66e781863dd5c54b6be",
     "semantic_hash": ""
   },
   "scripts/init-ssl.sh": {
@@ -672,9 +672,9 @@
     "semantic_hash": ""
   },
   "docker-compose.prod.yml": {
-    "mtime": 1789969068.8154638,
-    "seen": 1789969288.6004748,
-    "ast_hash": "c9bbbaa25047b6a35d0b529eca799c83",
+    "mtime": 1789969781.8295455,
+    "seen": 1789969830.644165,
+    "ast_hash": "d4c396de14968cd27377942be177929c",
     "semantic_hash": ""
   },
   "docs/DEPLOYMENT_UBUNTU.md": {

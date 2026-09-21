@@ -8,15 +8,16 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-axial}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-slackers_secret_2026}
       POSTGRES_DB: ${POSTGRES_DB:-slackers}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-axial} -d ${POSTGRES_DB:-slackers}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-axial} || exit 1"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 20s
     networks:
       - slackers_network
 
@@ -35,7 +36,8 @@ services:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 20s
     networks:
       - slackers_network
 
@@ -53,7 +55,8 @@ services:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 10s
     networks:
       - slackers_network
 

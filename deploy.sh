@@ -62,9 +62,17 @@ else
     echo -e "${GREEN}✓ Existing .env.production found.${NC}"
 fi
 
-# 3. Build and launch services
+# 3. Clean up any stale stopped containers and start services
 echo -e "\n${CYAN}📦 Building Docker images and starting containers...${NC}"
-docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+docker compose -f docker-compose.prod.yml down --remove-orphans 2>/dev/null || true
+if ! docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build; then
+    echo -e "\n${RED}❌ Docker Compose failed to start services. Container diagnostic logs:${NC}"
+    echo -e "${YELLOW}--- PostgreSQL Container Logs ---${NC}"
+    docker logs --tail 30 slackers_postgres_prod 2>/dev/null || true
+    echo -e "\n${YELLOW}--- API Container Logs ---${NC}"
+    docker logs --tail 30 slackers_api_prod 2>/dev/null || true
+    exit 1
+fi
 
 # 4. Wait for API and Web services to be ready
 echo -e "\n${YELLOW}⏳ Waiting for services to pass healthchecks (approx 15-30s)...${NC}"

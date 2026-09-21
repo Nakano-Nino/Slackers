@@ -142,7 +142,7 @@ function EncryptedAttachmentCard({ attachment }: { attachment: FileAttachmentMet
       a.click();
       document.body.removeChild(a);
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'Failed to download and decrypt file');
+      alert(err instanceof Error ? err.message : 'Failed to download file');
     } finally {
       setDownloading(false);
     }
@@ -154,7 +154,7 @@ function EncryptedAttachmentCard({ attachment }: { attachment: FileAttachmentMet
         {loading ? (
           <div className="h-44 flex flex-col items-center justify-center gap-2 text-xs text-slate-400 dark:text-neutral-500">
             <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-            <span>Decrypting Zero-Knowledge Image...</span>
+            <span>Loading Image...</span>
           </div>
         ) : blobUrl ? (
           <>
@@ -174,7 +174,7 @@ function EncryptedAttachmentCard({ attachment }: { attachment: FileAttachmentMet
                   type="button"
                   onClick={handleDownload}
                   className="hover:text-indigo-500 transition p-1"
-                  title="Download decrypted image"
+                  title="Download image"
                 >
                   <Download className="w-3.5 h-3.5" />
                 </button>
@@ -203,7 +203,7 @@ function EncryptedAttachmentCard({ attachment }: { attachment: FileAttachmentMet
             )}
           </>
         ) : (
-          <div className="p-4 text-xs text-rose-500">Failed to decrypt image: {error}</div>
+          <div className="p-4 text-xs text-rose-500">Failed to load image: {error}</div>
         )}
       </div>
     );
@@ -221,13 +221,11 @@ function EncryptedAttachmentCard({ attachment }: { attachment: FileAttachmentMet
           </p>
           <div className="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-neutral-400 mt-0.5">
             <span>{formatFileSize(attachment.size)}</span>
-            <span>•</span>
-            <span className="text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-0.5 font-mono">
-              <Lock className="w-2.5 h-2.5" />
-              E2EE
-            </span>
             {attachment.storage === 'minio' && (
-              <span className="text-indigo-500 font-medium font-mono text-[9px] bg-indigo-500/10 px-1 rounded">MinIO S3</span>
+              <>
+                <span>•</span>
+                <span className="text-indigo-500 font-medium font-mono text-[9px] bg-indigo-500/10 px-1 rounded">MinIO S3</span>
+              </>
             )}
           </div>
         </div>
@@ -240,7 +238,7 @@ function EncryptedAttachmentCard({ attachment }: { attachment: FileAttachmentMet
         className="ml-3 px-2.5 py-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg border border-indigo-200 dark:border-indigo-500/30 transition shrink-0 flex items-center gap-1.5"
       >
         <Download className="w-3.5 h-3.5" />
-        <span>{downloading ? 'Decrypting...' : 'Download'}</span>
+        <span>{downloading ? 'Downloading...' : 'Download'}</span>
       </button>
     </div>
   );
@@ -1035,7 +1033,7 @@ export function ChatArea({
                       ? 'Safety numbers verified (Cross-Signed). Click to inspect.'
                       : peerKeyStatus === 'key_changed'
                       ? 'Security Warning: Contact key has changed! Click to verify.'
-                      : 'E2EE active. Click to verify safety numbers.'
+                      : 'Secure connection. Click to verify safety numbers.'
                   }
                 >
                   {peerKeyStatus === 'verified' ? (
@@ -1050,7 +1048,7 @@ export function ChatArea({
                       ? 'Verified'
                       : peerKeyStatus === 'key_changed'
                       ? 'Key Changed'
-                      : 'E2EE'}
+                      : 'Secure'}
                   </span>
                 </button>
               </div>
@@ -1074,10 +1072,6 @@ export function ChatArea({
                     </span>
                   )}
                 </h2>
-                <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                  <ShieldCheck className="w-3 h-3" />
-                  E2EE
-                </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-neutral-400 truncate max-w-md">
                 {channel?.description || 'Welcome to the start of this channel!'}
@@ -1117,10 +1111,6 @@ export function ChatArea({
           ) : (
             channel && (
               <div className="hidden sm:flex items-center gap-3">
-                <div className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>End-to-End Encrypted</span>
-                </div>
                 <div className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-neutral-400 bg-slate-100 dark:bg-neutral-900 px-2.5 py-1 rounded-md border border-slate-200 dark:border-neutral-800">
                   <Users className="w-3.5 h-3.5 text-slate-400 dark:text-neutral-500" />
                   <span>{channel.memberCount} members</span>
@@ -1210,7 +1200,7 @@ export function ChatArea({
                 return next;
               });
             }}
-            title="Search decrypted messages (⌘F / Ctrl+F)"
+            title="Search messages (⌘F / Ctrl+F)"
             className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border transition cursor-pointer ${
               searchOpen
                 ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
@@ -1348,7 +1338,7 @@ export function ChatArea({
           <div className="flex items-center gap-2.5 text-xs">
             <ShieldAlert className="w-5 h-5 text-amber-500 shrink-0" />
             <div>
-              <span className="font-semibold">Security Number Changed:</span> The encryption key for {selectedDmUser.name} has changed. This could indicate they reinstalled Slackers or logged in on a new device, or an attacker is attempting a Man-In-The-Middle (MITM) attack.
+              <span className="font-semibold">Security Credentials Changed:</span> The security credentials for {selectedDmUser.name} have changed. This could indicate they reinstalled Slackers or logged in on a new device.
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -1399,8 +1389,8 @@ export function ChatArea({
                 }}
                 placeholder={
                   isDmMode
-                    ? `Search decrypted messages with ${selectedDmUser?.name || 'user'}...`
-                    : `Search decrypted messages in #${channel?.name || 'channel'}...`
+                    ? `Search messages with ${selectedDmUser?.name || 'user'}...`
+                    : `Search messages in #${channel?.name || 'channel'}...`
                 }
                 className="w-full pl-9 pr-24 py-1.5 text-xs bg-white dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 rounded-lg text-slate-900 dark:text-neutral-100 placeholder-slate-400 dark:placeholder-neutral-500 focus:outline-none focus:border-indigo-500"
               />
@@ -1438,10 +1428,6 @@ export function ChatArea({
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="hidden md:inline-flex items-center gap-1 text-[10px] font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
-              <ShieldCheck className="w-3 h-3" />
-              Client-Side E2EE Search
-            </span>
             <button
               onClick={() => {
                 setSearchOpen(false);
@@ -1491,7 +1477,7 @@ export function ChatArea({
                 Direct Message with {selectedDmUser.name}
               </h3>
               <p className="text-sm text-slate-600 dark:text-neutral-400 mt-1 max-w-lg">
-                🔒 Messages in this direct conversation are end-to-end encrypted. Only you and {selectedDmUser.name} can read what is sent.
+                This is the start of your direct conversation with {selectedDmUser.name}.
               </p>
             </div>
           )
@@ -1504,13 +1490,9 @@ export function ChatArea({
               </div>
               <h3 className="text-xl font-bold text-slate-900 dark:text-neutral-100 flex items-center gap-2">
                 Welcome to #{channel.name}!
-                <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  End-to-End Encrypted
-                </span>
               </h3>
               <p className="text-sm text-slate-600 dark:text-neutral-400 mt-1 max-w-lg">
-                🔒 All channel messages are end-to-end encrypted. Only channel members can read communications.
+                This is the start of the #{channel.name} channel.
               </p>
             </div>
           )
@@ -1525,8 +1507,8 @@ export function ChatArea({
           uniqueDirectMessages.length === 0 ? (
             <div className="text-center py-12 text-slate-500 dark:text-neutral-500">
               <Shield className="w-8 h-8 text-emerald-500/50 mx-auto mb-2" />
-              <p className="text-sm">No encrypted messages yet.</p>
-              <p className="text-xs text-slate-400 dark:text-neutral-600 mt-1">Send a message to establish an end-to-end encrypted conversation!</p>
+              <p className="text-sm">No messages yet.</p>
+              <p className="text-xs text-slate-400 dark:text-neutral-600 mt-1">Send a message to start the conversation!</p>
             </div>
           ) : (
             uniqueDirectMessages.map((dm, idx) => {
@@ -1536,7 +1518,7 @@ export function ChatArea({
                 hour: '2-digit',
                 minute: '2-digit',
               });
-              const decryptedText = decryptedDmMessages[dm.id] || '[Decrypting message...]';
+              const decryptedText = decryptedDmMessages[dm.id] || '[Loading message...]';
               const prevDm = idx > 0 ? uniqueDirectMessages[idx - 1] : null;
               const showDateHeader = !prevDm || isDifferentDay(prevDm.createdAt, dm.createdAt);
 
@@ -1609,10 +1591,6 @@ export function ChatArea({
                           YOU
                         </span>
                       )}
-                      <span className="inline-flex items-center gap-0.5 text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-1 py-0.2 rounded font-mono">
-                        <Lock className="w-2.5 h-2.5" />
-                        E2EE
-                      </span>
                       <span className="text-[11px] text-slate-400 dark:text-neutral-500">
                         {timeFormatted}
                       </span>
@@ -1766,7 +1744,7 @@ export function ChatArea({
                 hour: '2-digit',
                 minute: '2-digit',
               });
-              const displayContent = msg.decryptedContent || msg.content || '[Decrypting message...]';
+              const displayContent = msg.decryptedContent || msg.content || '[Loading message...]';
               const prevMsg = idx > 0 ? uniqueMessages[idx - 1] : null;
               const showDateHeader = !prevMsg || isDifferentDay(prevMsg.createdAt, msg.createdAt);
 
@@ -1839,10 +1817,6 @@ export function ChatArea({
                           YOU
                         </span>
                       )}
-                      <span className="inline-flex items-center gap-0.5 text-[10px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-1 py-0.2 rounded font-mono">
-                        <Lock className="w-2.5 h-2.5" />
-                        E2EE
-                      </span>
                       <span className="text-[11px] text-slate-400 dark:text-neutral-500">
                         {timeFormatted}
                       </span>
@@ -2003,13 +1977,8 @@ export function ChatArea({
                   <p className="font-semibold text-slate-900 dark:text-neutral-100 truncate max-w-xs">
                     {attachmentStaging.name}
                   </p>
-                  <p className="text-[11px] text-slate-500 dark:text-neutral-400 flex items-center gap-1.5 mt-0.5">
-                    <span>{attachmentStaging.size}</span>
-                    <span>•</span>
-                    <span className="text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-0.5 font-mono">
-                      <Lock className="w-3 h-3" />
-                      Client-Side Zero-Knowledge Encrypted
-                    </span>
+                  <p className="text-[11px] text-slate-500 dark:text-neutral-400 mt-0.5">
+                    {attachmentStaging.size}
                   </p>
                 </div>
               </div>
@@ -2029,8 +1998,8 @@ export function ChatArea({
             onKeyDown={handleKeyDown}
             placeholder={
               isDmMode
-                ? `Message @${selectedDmUser.name} (🔒 End-to-End Encrypted)`
-                : `Message #${channel?.name || 'channel'} (🔒 End-to-End Encrypted)`
+                ? `Message @${selectedDmUser.name}`
+                : `Message #${channel?.name || 'channel'}`
             }
             rows={2}
             className="w-full bg-transparent text-sm text-slate-900 dark:text-neutral-100 placeholder-slate-400 dark:placeholder-neutral-500 focus:outline-none resize-none px-2 py-1"
@@ -2050,34 +2019,27 @@ export function ChatArea({
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 className="p-1.5 text-slate-500 dark:text-neutral-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-200/60 dark:hover:bg-neutral-800 rounded-lg transition flex items-center gap-1 text-xs"
-                title="Attach file (Client-Side Encrypted)"
+                title="Attach file"
               >
                 <Paperclip className="w-4 h-4" />
                 <span className="text-[11px] font-medium hidden sm:inline">Attach</span>
               </button>
-
-              <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-neutral-500">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                <span className="text-emerald-600 dark:text-emerald-400 font-medium">
-                  End-to-End Encrypted
-                </span>
-              </div>
             </div>
 
             <button
               type="submit"
               disabled={sending || isEncrypting || (!content.trim() && !selectedFile)}
-              className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 disabled:hover:bg-emerald-600 disabled:opacity-40 text-white rounded-lg text-xs font-medium flex items-center gap-1.5 transition shadow-sm"
+              className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:hover:bg-indigo-600 disabled:opacity-40 text-white rounded-lg text-xs font-medium flex items-center gap-1.5 transition shadow-sm"
             >
-              {isEncrypting ? (
+              {isEncrypting || sending ? (
                 <>
                   <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Encrypting...</span>
+                  <span>Sending...</span>
                 </>
               ) : (
                 <>
-                  <Lock className="w-3 h-3" />
-                  <span>Send Encrypted</span>
+                  <Send className="w-3.5 h-3.5" />
+                  <span>Send</span>
                 </>
               )}
             </button>
@@ -2225,7 +2187,7 @@ function SafetyNumberModal({
           {loading ? (
             <div className="py-12 flex flex-col items-center justify-center gap-3 text-xs text-slate-400 dark:text-neutral-500">
               <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-              <span>Computing cryptographic safety numbers...</span>
+              <span>Computing safety numbers...</span>
             </div>
           ) : safetyData ? (
             <>
@@ -2234,10 +2196,10 @@ function SafetyNumberModal({
                 <SafetyNumberMatrix blocks={safetyData.blocks} />
                 <div className="space-y-1 text-xs text-slate-600 dark:text-neutral-300">
                   <p className="font-medium text-slate-900 dark:text-neutral-100">
-                    Cryptographic Safety Check
+                    Safety Check
                   </p>
                   <p className="leading-relaxed text-slate-500 dark:text-neutral-400">
-                    Compare this 60-digit safety number or visual pattern with {selectedDmUser.name}&apos;s device in person or via an end-to-end encrypted audio call to verify that no third party is intercepting your messages.
+                    Compare this 60-digit safety number or visual pattern with {selectedDmUser.name}&apos;s device in person or via a secure audio call to verify that no third party is intercepting your messages.
                   </p>
                 </div>
               </div>

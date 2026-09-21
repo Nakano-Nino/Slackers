@@ -43,17 +43,17 @@
       "source_location": "L77"
     },
     {
-      "id": "apps_web_src_components_sidebar_props",
-      "label": "Props",
+      "id": "apps_web_src_types_index_activitylog",
+      "label": "ActivityLog",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
       "community_name": "web/src/types/index.ts",
       "file_type": "code",
-      "norm_label": "props",
-      "source_file": "apps/web/src/components/Sidebar.tsx",
-      "source_location": "L25"
+      "norm_label": "activitylog",
+      "source_file": "apps/web/src/types/index.ts",
+      "source_location": "L308"
     },
     {
       "id": "apps_web_src_types_index_apiresponse",
@@ -173,17 +173,30 @@
       "source_location": "L406"
     },
     {
-      "id": "apps_web_src_types_index_mutetarget",
-      "label": "MuteTarget",
+      "id": "apps_web_src_types_index_keyvaultdata",
+      "label": "KeyVaultData",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
       "community_name": "web/src/types/index.ts",
       "file_type": "code",
-      "norm_label": "mutetarget",
+      "norm_label": "keyvaultdata",
       "source_file": "apps/web/src/types/index.ts",
-      "source_location": "L262"
+      "source_location": "L191"
+    },
+    {
+      "id": "apps_web_src_types_index_muteduration",
+      "label": "MuteDuration",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "web/src/types/index.ts",
+      "file_type": "code",
+      "norm_label": "muteduration",
+      "source_file": "apps/web/src/types/index.ts",
+      "source_location": "L260"
     },
     {
       "id": "apps_web_src_types_index_notification",
@@ -210,6 +223,58 @@
       "norm_label": "notificationtype",
       "source_file": "apps/web/src/types/index.ts",
       "source_location": "L241"
+    },
+    {
+      "id": "apps_web_src_types_index_qareviewstep",
+      "label": "QAReviewStep",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "web/src/types/index.ts",
+      "file_type": "code",
+      "norm_label": "qareviewstep",
+      "source_file": "apps/web/src/types/index.ts",
+      "source_location": "L70"
+    },
+    {
+      "id": "apps_web_src_types_index_qastepstatus",
+      "label": "QAStepStatus",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "web/src/types/index.ts",
+      "file_type": "code",
+      "norm_label": "qastepstatus",
+      "source_file": "apps/web/src/types/index.ts",
+      "source_location": "L68"
+    },
+    {
+      "id": "apps_web_src_types_index_taskattachment",
+      "label": "TaskAttachment",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "web/src/types/index.ts",
+      "file_type": "code",
+      "norm_label": "taskattachment",
+      "source_file": "apps/web/src/types/index.ts",
+      "source_location": "L57"
+    },
+    {
+      "id": "apps_web_src_types_index_taskcomment",
+      "label": "TaskComment",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "web/src/types/index.ts",
+      "file_type": "code",
+      "norm_label": "taskcomment",
+      "source_file": "apps/web/src/types/index.ts",
+      "source_location": "L231"
     },
     {
       "id": "apps_web_src_types_index_tasksubtask",
@@ -342,32 +407,6 @@
       "source_location": "L191"
     },
     {
-      "id": "apps_api_src_types_index_message",
-      "label": "Message",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "dataStore",
-      "file_type": "code",
-      "norm_label": "message",
-      "source_file": "apps/api/src/types/index.ts",
-      "source_location": "L157"
-    },
-    {
-      "id": "apps_api_src_types_index_webhooklog",
-      "label": "WebhookLog",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "dataStore",
-      "file_type": "code",
-      "norm_label": "webhooklog",
-      "source_file": "apps/api/src/types/index.ts",
-      "source_location": "L371"
-    },
-    {
       "id": "apps_api_src_services_notificationservice_notificationservice",
       "label": "notificationService",
       "_callable": true,
@@ -420,58 +459,6 @@
       "source_location": "L310"
     },
     {
-      "id": "apps_api_src_services_authservice_authservice",
-      "label": "authService",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": "authservice",
-      "source_file": "apps/api/src/services/authService.ts",
-      "source_location": "L284"
-    },
-    {
-      "id": "apps_api_src_services_memberservice_memberservice",
-      "label": "memberService",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": "memberservice",
-      "source_file": "apps/api/src/services/memberService.ts",
-      "source_location": "L399"
-    },
-    {
-      "id": "apps_api_src_services_projectservice_projectservice",
-      "label": "projectService",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": "projectservice",
-      "source_file": "apps/api/src/services/projectService.ts",
-      "source_location": "L291"
-    },
-    {
-      "id": "apps_api_src_services_socketservice_authenticatedsocket",
-      "label": "AuthenticatedSocket",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": "authenticatedsocket",
-      "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L11"
-    },
-    {
       "id": "apps_api_src_services_taskservice_taskservice",
       "label": "taskService",
       "_callable": true,
@@ -483,45 +470,6 @@
       "norm_label": "taskservice",
       "source_file": "apps/api/src/services/taskService.ts",
       "source_location": "L1109"
-    },
-    {
-      "id": "apps_api_src_types_index_authresponse",
-      "label": "AuthResponse",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": "authresponse",
-      "source_file": "apps/api/src/types/index.ts",
-      "source_location": "L338"
-    },
-    {
-      "id": "apps_api_src_types_index_invitation",
-      "label": "Invitation",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": "invitation",
-      "source_file": "apps/api/src/types/index.ts",
-      "source_location": "L271"
-    },
-    {
-      "id": "apps_api_src_types_index_project",
-      "label": "Project",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": "project",
-      "source_file": "apps/api/src/types/index.ts",
-      "source_location": "L38"
     },
     {
       "id": "apps_api_src_types_index_task",
@@ -563,17 +511,17 @@
       "source_location": "L23"
     },
     {
-      "id": "apps_api_src_types_index_userrole",
-      "label": "UserRole",
+      "id": "apps_api_src_controllers_sessioncontroller_usersessionresponse",
+      "label": "UserSessionResponse",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
+      "community": 28,
+      "community_name": "authMiddleware.ts",
       "file_type": "code",
-      "norm_label": "userrole",
-      "source_file": "apps/api/src/types/index.ts",
-      "source_location": "L1"
+      "norm_label": "usersessionresponse",
+      "source_file": "apps/api/src/controllers/sessionController.ts",
+      "source_location": "L7"
     },
     {
       "id": "apps_api_src_middleware_authmiddleware_authrequest",
@@ -602,121 +550,43 @@
       "source_location": "L5"
     },
     {
-      "id": "apps_web_src_types_index_activitylog",
-      "label": "ActivityLog",
+      "id": "apps_api_src_services_redisservice_redishealth",
+      "label": "RedisHealth",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 29,
-      "community_name": "TaskDetailModal.tsx",
+      "community_name": "socketService.ts",
       "file_type": "code",
-      "norm_label": "activitylog",
-      "source_file": "apps/web/src/types/index.ts",
-      "source_location": "L308"
+      "norm_label": "redishealth",
+      "source_file": "apps/api/src/services/redisService.ts",
+      "source_location": "L5"
     },
     {
-      "id": "apps_web_src_types_index_qareviewstep",
-      "label": "QAReviewStep",
+      "id": "apps_api_src_services_sessionservice_usersession",
+      "label": "UserSession",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 29,
-      "community_name": "TaskDetailModal.tsx",
+      "community_name": "socketService.ts",
       "file_type": "code",
-      "norm_label": "qareviewstep",
-      "source_file": "apps/web/src/types/index.ts",
-      "source_location": "L70"
+      "norm_label": "usersession",
+      "source_file": "apps/api/src/services/sessionService.ts",
+      "source_location": "L4"
     },
     {
-      "id": "apps_web_src_types_index_qastepstatus",
-      "label": "QAStepStatus",
+      "id": "apps_api_src_services_socketservice_authenticatedsocket",
+      "label": "AuthenticatedSocket",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 29,
-      "community_name": "TaskDetailModal.tsx",
+      "community_name": "socketService.ts",
       "file_type": "code",
-      "norm_label": "qastepstatus",
-      "source_file": "apps/web/src/types/index.ts",
-      "source_location": "L68"
-    },
-    {
-      "id": "apps_web_src_types_index_taskattachment",
-      "label": "TaskAttachment",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 29,
-      "community_name": "TaskDetailModal.tsx",
-      "file_type": "code",
-      "norm_label": "taskattachment",
-      "source_file": "apps/web/src/types/index.ts",
-      "source_location": "L57"
-    },
-    {
-      "id": "apps_web_src_types_index_taskcomment",
-      "label": "TaskComment",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 29,
-      "community_name": "TaskDetailModal.tsx",
-      "file_type": "code",
-      "norm_label": "taskcomment",
-      "source_file": "apps/web/src/types/index.ts",
-      "source_location": "L231"
-    },
-    {
-      "id": "apps_api_src_services_taskcommentservice_taskcommentservice",
-      "label": "taskCommentService",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "taskController.ts",
-      "file_type": "code",
-      "norm_label": "taskcommentservice",
-      "source_file": "apps/api/src/services/taskCommentService.ts",
-      "source_location": "L149"
-    },
-    {
-      "id": "apps_api_src_types_index_taskcomment",
-      "label": "TaskComment",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "taskController.ts",
-      "file_type": "code",
-      "norm_label": "taskcomment",
-      "source_file": "apps/api/src/types/index.ts",
-      "source_location": "L230"
-    },
-    {
-      "id": "apps_web_src_components_chatarea_props",
-      "label": "Props",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 33,
-      "community_name": "ChatArea.tsx",
-      "file_type": "code",
-      "norm_label": "props",
-      "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L56"
-    },
-    {
-      "id": "apps_web_src_components_threadpanel_props",
-      "label": "Props",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 33,
-      "community_name": "ChatArea.tsx",
-      "file_type": "code",
-      "norm_label": "props",
-      "source_file": "apps/web/src/components/ThreadPanel.tsx",
-      "source_location": "L40"
+      "norm_label": "authenticatedsocket",
+      "source_file": "apps/api/src/services/socketService.ts",
+      "source_location": "L11"
     },
     {
       "id": "apps_web_src_lib_filecrypto_encryptedfilepayload",
@@ -745,82 +615,17 @@
       "source_location": "L37"
     },
     {
-      "id": "apps_web_src_types_index_channel",
-      "label": "Channel",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 33,
-      "community_name": "ChatArea.tsx",
-      "file_type": "code",
-      "norm_label": "channel",
-      "source_file": "apps/web/src/types/index.ts",
-      "source_location": "L198"
-    },
-    {
-      "id": "apps_web_src_types_index_directmessage",
-      "label": "DirectMessage",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 33,
-      "community_name": "ChatArea.tsx",
-      "file_type": "code",
-      "norm_label": "directmessage",
-      "source_file": "apps/web/src/types/index.ts",
-      "source_location": "L207"
-    },
-    {
-      "id": "apps_web_src_types_index_message",
-      "label": "Message",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 33,
-      "community_name": "ChatArea.tsx",
-      "file_type": "code",
-      "norm_label": "message",
-      "source_file": "apps/web/src/types/index.ts",
-      "source_location": "L156"
-    },
-    {
-      "id": "apps_web_src_types_index_muteduration",
-      "label": "MuteDuration",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 33,
-      "community_name": "ChatArea.tsx",
-      "file_type": "code",
-      "norm_label": "muteduration",
-      "source_file": "apps/web/src/types/index.ts",
-      "source_location": "L260"
-    },
-    {
       "id": "apps_api_src_services_sessionservice_sessionservice",
       "label": "sessionService",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 34,
-      "community_name": "authService.ts",
+      "community_name": "sessionService",
       "file_type": "code",
       "norm_label": "sessionservice",
       "source_file": "apps/api/src/services/sessionService.ts",
       "source_location": "L236"
-    },
-    {
-      "id": "apps_api_src_services_sessionservice_usersession",
-      "label": "UserSession",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "authService.ts",
-      "file_type": "code",
-      "norm_label": "usersession",
-      "source_file": "apps/api/src/services/sessionService.ts",
-      "source_location": "L4"
     },
     {
       "id": "apps_api_src_services_fileservice_fileservice",
@@ -862,84 +667,6 @@
       "source_location": "L344"
     },
     {
-      "id": "apps_api_src_services_automationservice_smartreferenceresult",
-      "label": "SmartReferenceResult",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "bugController.ts",
-      "file_type": "code",
-      "norm_label": "smartreferenceresult",
-      "source_file": "apps/api/src/services/automationService.ts",
-      "source_location": "L10"
-    },
-    {
-      "id": "apps_api_src_services_bugservice_bugservice",
-      "label": "bugService",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "bugController.ts",
-      "file_type": "code",
-      "norm_label": "bugservice",
-      "source_file": "apps/api/src/services/bugService.ts",
-      "source_location": "L497"
-    },
-    {
-      "id": "apps_api_src_types_index_bug",
-      "label": "Bug",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "bugController.ts",
-      "file_type": "code",
-      "norm_label": "bug",
-      "source_file": "apps/api/src/types/index.ts",
-      "source_location": "L116"
-    },
-    {
-      "id": "apps_api_src_types_index_bugenvironment",
-      "label": "BugEnvironment",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "bugController.ts",
-      "file_type": "code",
-      "norm_label": "bugenvironment",
-      "source_file": "apps/api/src/types/index.ts",
-      "source_location": "L21"
-    },
-    {
-      "id": "apps_api_src_types_index_bugseverity",
-      "label": "BugSeverity",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "bugController.ts",
-      "file_type": "code",
-      "norm_label": "bugseverity",
-      "source_file": "apps/api/src/types/index.ts",
-      "source_location": "L19"
-    },
-    {
-      "id": "apps_api_src_types_index_bugstats",
-      "label": "BugStats",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "bugController.ts",
-      "file_type": "code",
-      "norm_label": "bugstats",
-      "source_file": "apps/api/src/types/index.ts",
-      "source_location": "L137"
-    },
-    {
       "id": "apps_api_src_types_index_bugstatus",
       "label": "BugStatus",
       "_callable": true,
@@ -953,19 +680,6 @@
       "source_location": "L20"
     },
     {
-      "id": "apps_api_src_services_automationservice_automationservice",
-      "label": "automationService",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "Webhook",
-      "file_type": "code",
-      "norm_label": "automationservice",
-      "source_file": "apps/api/src/services/automationService.ts",
-      "source_location": "L266"
-    },
-    {
       "id": "apps_api_src_services_webhookservice_webhookservice",
       "label": "webhookService",
       "_callable": true,
@@ -977,19 +691,6 @@
       "norm_label": "webhookservice",
       "source_file": "apps/api/src/services/webhookService.ts",
       "source_location": "L451"
-    },
-    {
-      "id": "apps_api_src_types_index_automationtrigger",
-      "label": "AutomationTrigger",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "Webhook",
-      "file_type": "code",
-      "norm_label": "automationtrigger",
-      "source_file": "apps/api/src/types/index.ts",
-      "source_location": "L382"
     },
     {
       "id": "apps_api_src_types_index_incomingwebhookpayload",
@@ -1016,6 +717,19 @@
       "norm_label": "webhook",
       "source_file": "apps/api/src/types/index.ts",
       "source_location": "L355"
+    },
+    {
+      "id": "apps_web_src_components_authmodal_props",
+      "label": "Props",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 40,
+      "community_name": "User",
+      "file_type": "code",
+      "norm_label": "props",
+      "source_file": "apps/web/src/components/AuthModal.tsx",
+      "source_location": "L10"
     },
     {
       "id": "apps_web_src_components_chatarea_safetymodalprops",
@@ -1057,6 +771,19 @@
       "source_location": "L21"
     },
     {
+      "id": "apps_web_src_components_createchannelmodal_props",
+      "label": "Props",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 40,
+      "community_name": "User",
+      "file_type": "code",
+      "norm_label": "props",
+      "source_file": "apps/web/src/components/CreateChannelModal.tsx",
+      "source_location": "L7"
+    },
+    {
       "id": "apps_web_src_components_createprojectmodal_props",
       "label": "Props",
       "_callable": true,
@@ -1070,7 +797,7 @@
       "source_location": "L7"
     },
     {
-      "id": "apps_web_src_components_createtaskmodal_props",
+      "id": "apps_web_src_components_invitemembermodal_props",
       "label": "Props",
       "_callable": true,
       "_callable_class": true,
@@ -1079,21 +806,8 @@
       "community_name": "User",
       "file_type": "code",
       "norm_label": "props",
-      "source_file": "apps/web/src/components/CreateTaskModal.tsx",
-      "source_location": "L8"
-    },
-    {
-      "id": "apps_web_src_components_kanbanboard_props",
-      "label": "Props",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 40,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": "props",
-      "source_file": "apps/web/src/components/KanbanBoard.tsx",
-      "source_location": "L72"
+      "source_file": "apps/web/src/components/InviteMemberModal.tsx",
+      "source_location": "L24"
     },
     {
       "id": "apps_web_src_components_projectmembersmodal_props",
@@ -1122,6 +836,19 @@
       "source_location": "L204"
     },
     {
+      "id": "apps_web_src_types_index_invitation",
+      "label": "Invitation",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 40,
+      "community_name": "User",
+      "file_type": "code",
+      "norm_label": "invitation",
+      "source_file": "apps/web/src/types/index.ts",
+      "source_location": "L293"
+    },
+    {
       "id": "apps_web_src_types_index_project",
       "label": "Project",
       "_callable": true,
@@ -1148,32 +875,6 @@
       "source_location": "L91"
     },
     {
-      "id": "apps_web_src_types_index_taskpriority",
-      "label": "TaskPriority",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 40,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": "taskpriority",
-      "source_file": "apps/web/src/types/index.ts",
-      "source_location": "L17"
-    },
-    {
-      "id": "apps_web_src_types_index_taskstatus",
-      "label": "TaskStatus",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 40,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": "taskstatus",
-      "source_file": "apps/web/src/types/index.ts",
-      "source_location": "L16"
-    },
-    {
       "id": "apps_web_src_types_index_user",
       "label": "User",
       "_callable": true,
@@ -1185,6 +886,32 @@
       "norm_label": "user",
       "source_file": "apps/web/src/types/index.ts",
       "source_location": "L23"
+    },
+    {
+      "id": "apps_api_src_types_index_bugenvironment",
+      "label": "BugEnvironment",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 41,
+      "community_name": "api/src/types/index.ts",
+      "file_type": "code",
+      "norm_label": "bugenvironment",
+      "source_file": "apps/api/src/types/index.ts",
+      "source_location": "L21"
+    },
+    {
+      "id": "apps_api_src_types_index_bugstats",
+      "label": "BugStats",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 41,
+      "community_name": "api/src/types/index.ts",
+      "file_type": "code",
+      "norm_label": "bugstats",
+      "source_file": "apps/api/src/types/index.ts",
+      "source_location": "L137"
     },
     {
       "id": "apps_api_src_types_index_developerrole",
@@ -1250,19 +977,6 @@
       "norm_label": "mutetarget",
       "source_file": "apps/api/src/types/index.ts",
       "source_location": "L261"
-    },
-    {
-      "id": "apps_api_src_types_index_projectstats",
-      "label": "ProjectStats",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 41,
-      "community_name": "api/src/types/index.ts",
-      "file_type": "code",
-      "norm_label": "projectstats",
-      "source_file": "apps/api/src/types/index.ts",
-      "source_location": "L147"
     },
     {
       "id": "apps_api_src_types_index_qareviewstep",
@@ -1369,43 +1083,17 @@
       "source_location": "L286"
     },
     {
-      "id": "apps_api_src_types_index_webhooktype",
-      "label": "WebhookType",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 41,
-      "community_name": "api/src/types/index.ts",
-      "file_type": "code",
-      "norm_label": "webhooktype",
-      "source_file": "apps/api/src/types/index.ts",
-      "source_location": "L353"
-    },
-    {
-      "id": "apps_web_src_components_authmodal_props",
+      "id": "apps_web_src_components_bugtracker_props",
       "label": "Props",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 42,
-      "community_name": "roles.ts",
+      "community_name": "BugTracker.tsx",
       "file_type": "code",
       "norm_label": "props",
-      "source_file": "apps/web/src/components/AuthModal.tsx",
-      "source_location": "L10"
-    },
-    {
-      "id": "apps_web_src_components_invitemembermodal_props",
-      "label": "Props",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 42,
-      "community_name": "roles.ts",
-      "file_type": "code",
-      "norm_label": "props",
-      "source_file": "apps/web/src/components/InviteMemberModal.tsx",
-      "source_location": "L24"
+      "source_file": "apps/web/src/components/BugTracker.tsx",
+      "source_location": "L31"
     },
     {
       "id": "apps_web_src_components_projectprogressbar_props",
@@ -1414,50 +1102,37 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 42,
-      "community_name": "roles.ts",
+      "community_name": "BugTracker.tsx",
       "file_type": "code",
       "norm_label": "props",
       "source_file": "apps/web/src/components/ProjectProgressBar.tsx",
       "source_location": "L15"
     },
     {
-      "id": "apps_web_src_lib_roles_roleinfo",
-      "label": "RoleInfo",
+      "id": "apps_web_src_types_index_bug",
+      "label": "Bug",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 42,
-      "community_name": "roles.ts",
+      "community_name": "BugTracker.tsx",
       "file_type": "code",
-      "norm_label": "roleinfo",
-      "source_file": "apps/web/src/lib/roles.ts",
-      "source_location": "L3"
+      "norm_label": "bug",
+      "source_file": "apps/web/src/types/index.ts",
+      "source_location": "L115"
     },
     {
-      "id": "apps_web_src_types_index_developerrole",
-      "label": "DeveloperRole",
+      "id": "apps_web_src_types_index_bugstatus",
+      "label": "BugStatus",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 42,
-      "community_name": "roles.ts",
+      "community_name": "BugTracker.tsx",
       "file_type": "code",
-      "norm_label": "developerrole",
+      "norm_label": "bugstatus",
       "source_file": "apps/web/src/types/index.ts",
-      "source_location": "L3"
-    },
-    {
-      "id": "apps_web_src_types_index_invitation",
-      "label": "Invitation",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 42,
-      "community_name": "roles.ts",
-      "file_type": "code",
-      "norm_label": "invitation",
-      "source_file": "apps/web/src/types/index.ts",
-      "source_location": "L293"
+      "source_location": "L20"
     },
     {
       "id": "apps_web_src_types_index_projectstats",
@@ -1466,7 +1141,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 42,
-      "community_name": "roles.ts",
+      "community_name": "BugTracker.tsx",
       "file_type": "code",
       "norm_label": "projectstats",
       "source_file": "apps/web/src/types/index.ts",
@@ -1479,24 +1154,11 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 42,
-      "community_name": "roles.ts",
+      "community_name": "BugTracker.tsx",
       "file_type": "code",
       "norm_label": "userrole",
       "source_file": "apps/web/src/types/index.ts",
       "source_location": "L1"
-    },
-    {
-      "id": "apps_web_src_components_bugtracker_props",
-      "label": "Props",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 43,
-      "community_name": "page.tsx",
-      "file_type": "code",
-      "norm_label": "props",
-      "source_file": "apps/web/src/components/BugTracker.tsx",
-      "source_location": "L31"
     },
     {
       "id": "apps_web_src_components_reportbugmodal_props",
@@ -1510,19 +1172,6 @@
       "norm_label": "props",
       "source_file": "apps/web/src/components/ReportBugModal.tsx",
       "source_location": "L8"
-    },
-    {
-      "id": "apps_web_src_types_index_bug",
-      "label": "Bug",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 43,
-      "community_name": "page.tsx",
-      "file_type": "code",
-      "norm_label": "bug",
-      "source_file": "apps/web/src/types/index.ts",
-      "source_location": "L115"
     },
     {
       "id": "apps_web_src_types_index_bugenvironment",
@@ -1551,19 +1200,6 @@
       "source_location": "L19"
     },
     {
-      "id": "apps_web_src_types_index_bugstatus",
-      "label": "BugStatus",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 43,
-      "community_name": "page.tsx",
-      "file_type": "code",
-      "norm_label": "bugstatus",
-      "source_file": "apps/web/src/types/index.ts",
-      "source_location": "L20"
-    },
-    {
       "id": "apps_api_src_services_s3service_s3service",
       "label": "s3Service",
       "_callable": true,
@@ -1577,43 +1213,121 @@
       "source_location": "L205"
     },
     {
-      "id": "apps_api_src_controllers_sessioncontroller_usersessionresponse",
-      "label": "UserSessionResponse",
+      "id": "apps_api_src_services_memberservice_memberservice",
+      "label": "memberService",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 45,
-      "community_name": "sessionController.ts",
+      "community_name": "memberService",
       "file_type": "code",
-      "norm_label": "usersessionresponse",
-      "source_file": "apps/api/src/controllers/sessionController.ts",
-      "source_location": "L7"
+      "norm_label": "memberservice",
+      "source_file": "apps/api/src/services/memberService.ts",
+      "source_location": "L399"
     },
     {
-      "id": "apps_web_src_components_createchannelmodal_props",
+      "id": "apps_api_src_types_index_invitation",
+      "label": "Invitation",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 45,
+      "community_name": "memberService",
+      "file_type": "code",
+      "norm_label": "invitation",
+      "source_file": "apps/api/src/types/index.ts",
+      "source_location": "L271"
+    },
+    {
+      "id": "apps_api_src_types_index_userrole",
+      "label": "UserRole",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 45,
+      "community_name": "memberService",
+      "file_type": "code",
+      "norm_label": "userrole",
+      "source_file": "apps/api/src/types/index.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "apps_web_src_components_createtaskmodal_props",
       "label": "Props",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 48,
-      "community_name": "react",
+      "community_name": "KanbanBoard.tsx",
       "file_type": "code",
       "norm_label": "props",
-      "source_file": "apps/web/src/components/CreateChannelModal.tsx",
-      "source_location": "L7"
+      "source_file": "apps/web/src/components/CreateTaskModal.tsx",
+      "source_location": "L8"
     },
     {
-      "id": "apps_web_src_components_themetoggle_props",
+      "id": "apps_web_src_components_kanbanboard_props",
       "label": "Props",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 48,
-      "community_name": "react",
+      "community_name": "KanbanBoard.tsx",
       "file_type": "code",
       "norm_label": "props",
-      "source_file": "apps/web/src/components/ThemeToggle.tsx",
-      "source_location": "L7"
+      "source_file": "apps/web/src/components/KanbanBoard.tsx",
+      "source_location": "L72"
+    },
+    {
+      "id": "apps_web_src_lib_roles_roleinfo",
+      "label": "RoleInfo",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 48,
+      "community_name": "KanbanBoard.tsx",
+      "file_type": "code",
+      "norm_label": "roleinfo",
+      "source_file": "apps/web/src/lib/roles.ts",
+      "source_location": "L3"
+    },
+    {
+      "id": "apps_web_src_types_index_developerrole",
+      "label": "DeveloperRole",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 48,
+      "community_name": "KanbanBoard.tsx",
+      "file_type": "code",
+      "norm_label": "developerrole",
+      "source_file": "apps/web/src/types/index.ts",
+      "source_location": "L3"
+    },
+    {
+      "id": "apps_web_src_types_index_taskpriority",
+      "label": "TaskPriority",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 48,
+      "community_name": "KanbanBoard.tsx",
+      "file_type": "code",
+      "norm_label": "taskpriority",
+      "source_file": "apps/web/src/types/index.ts",
+      "source_location": "L17"
+    },
+    {
+      "id": "apps_web_src_types_index_taskstatus",
+      "label": "TaskStatus",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 48,
+      "community_name": "KanbanBoard.tsx",
+      "file_type": "code",
+      "norm_label": "taskstatus",
+      "source_file": "apps/web/src/types/index.ts",
+      "source_location": "L16"
     },
     {
       "id": "apps_api_src_services_fileservice_encryptedfilerecord",
@@ -1622,7 +1336,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 49,
-      "community_name": "mongoLogger",
+      "community_name": "dataStore.ts",
       "file_type": "code",
       "norm_label": "encryptedfilerecord",
       "source_file": "apps/api/src/services/fileService.ts",
@@ -1635,24 +1349,11 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 49,
-      "community_name": "mongoLogger",
+      "community_name": "dataStore.ts",
       "file_type": "code",
       "norm_label": "mongologger",
       "source_file": "apps/api/src/services/mongoLogger.ts",
       "source_location": "L155"
-    },
-    {
-      "id": "apps_api_src_services_redisservice_redishealth",
-      "label": "RedisHealth",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 49,
-      "community_name": "mongoLogger",
-      "file_type": "code",
-      "norm_label": "redishealth",
-      "source_file": "apps/api/src/services/redisService.ts",
-      "source_location": "L5"
     },
     {
       "id": "apps_api_src_services_s3service_s3health",
@@ -1661,7 +1362,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 49,
-      "community_name": "mongoLogger",
+      "community_name": "dataStore.ts",
       "file_type": "code",
       "norm_label": "s3health",
       "source_file": "apps/api/src/services/s3Service.ts",
@@ -1674,11 +1375,89 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 49,
-      "community_name": "mongoLogger",
+      "community_name": "dataStore.ts",
       "file_type": "code",
       "norm_label": "activitylog",
       "source_file": "apps/api/src/types/index.ts",
       "source_location": "L297"
+    },
+    {
+      "id": "apps_api_src_types_index_projectstats",
+      "label": "ProjectStats",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 49,
+      "community_name": "dataStore.ts",
+      "file_type": "code",
+      "norm_label": "projectstats",
+      "source_file": "apps/api/src/types/index.ts",
+      "source_location": "L147"
+    },
+    {
+      "id": "apps_api_src_services_automationservice_smartreferenceresult",
+      "label": "SmartReferenceResult",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 50,
+      "community_name": "automationService.ts",
+      "file_type": "code",
+      "norm_label": "smartreferenceresult",
+      "source_file": "apps/api/src/services/automationService.ts",
+      "source_location": "L10"
+    },
+    {
+      "id": "apps_api_src_services_bugservice_bugservice",
+      "label": "bugService",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 50,
+      "community_name": "automationService.ts",
+      "file_type": "code",
+      "norm_label": "bugservice",
+      "source_file": "apps/api/src/services/bugService.ts",
+      "source_location": "L497"
+    },
+    {
+      "id": "apps_api_src_types_index_bug",
+      "label": "Bug",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 50,
+      "community_name": "automationService.ts",
+      "file_type": "code",
+      "norm_label": "bug",
+      "source_file": "apps/api/src/types/index.ts",
+      "source_location": "L116"
+    },
+    {
+      "id": "apps_api_src_types_index_bugseverity",
+      "label": "BugSeverity",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 50,
+      "community_name": "automationService.ts",
+      "file_type": "code",
+      "norm_label": "bugseverity",
+      "source_file": "apps/api/src/types/index.ts",
+      "source_location": "L19"
+    },
+    {
+      "id": "apps_web_src_components_themetoggle_props",
+      "label": "Props",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 53,
+      "community_name": "ThemeContext.tsx",
+      "file_type": "code",
+      "norm_label": "props",
+      "source_file": "apps/web/src/components/ThemeToggle.tsx",
+      "source_location": "L7"
     },
     {
       "id": "apps_web_src_context_themecontext_theme",
@@ -1705,6 +1484,19 @@
       "norm_label": "themecontexttype",
       "source_file": "apps/web/src/context/ThemeContext.tsx",
       "source_location": "L7"
+    },
+    {
+      "id": "apps_api_src_types_index_webhooktype",
+      "label": "WebhookType",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 58,
+      "community_name": "webhookService.ts",
+      "file_type": "code",
+      "norm_label": "webhooktype",
+      "source_file": "apps/api/src/types/index.ts",
+      "source_location": "L353"
     },
     {
       "id": "apps_api_src_services_dmservice_dmservice",
@@ -1746,6 +1538,227 @@
       "source_location": "L207"
     },
     {
+      "id": "apps_api_src_services_projectservice_projectservice",
+      "label": "projectService",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 66,
+      "community_name": "projectService",
+      "file_type": "code",
+      "norm_label": "projectservice",
+      "source_file": "apps/api/src/services/projectService.ts",
+      "source_location": "L291"
+    },
+    {
+      "id": "apps_api_src_types_index_project",
+      "label": "Project",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 66,
+      "community_name": "projectService",
+      "file_type": "code",
+      "norm_label": "project",
+      "source_file": "apps/api/src/types/index.ts",
+      "source_location": "L38"
+    },
+    {
+      "id": "apps_api_src_types_index_message",
+      "label": "Message",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 67,
+      "community_name": "Message",
+      "file_type": "code",
+      "norm_label": "message",
+      "source_file": "apps/api/src/types/index.ts",
+      "source_location": "L157"
+    },
+    {
+      "id": "apps_api_src_services_authservice_authservice",
+      "label": "authService",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 68,
+      "community_name": "authService",
+      "file_type": "code",
+      "norm_label": "authservice",
+      "source_file": "apps/api/src/services/authService.ts",
+      "source_location": "L284"
+    },
+    {
+      "id": "apps_api_src_types_index_authresponse",
+      "label": "AuthResponse",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 68,
+      "community_name": "authService",
+      "file_type": "code",
+      "norm_label": "authresponse",
+      "source_file": "apps/api/src/types/index.ts",
+      "source_location": "L338"
+    },
+    {
+      "id": "apps_api_src_services_taskcommentservice_taskcommentservice",
+      "label": "taskCommentService",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 69,
+      "community_name": "taskCommentService",
+      "file_type": "code",
+      "norm_label": "taskcommentservice",
+      "source_file": "apps/api/src/services/taskCommentService.ts",
+      "source_location": "L149"
+    },
+    {
+      "id": "apps_api_src_types_index_taskcomment",
+      "label": "TaskComment",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 69,
+      "community_name": "taskCommentService",
+      "file_type": "code",
+      "norm_label": "taskcomment",
+      "source_file": "apps/api/src/types/index.ts",
+      "source_location": "L230"
+    },
+    {
+      "id": "apps_web_src_components_chatarea_props",
+      "label": "Props",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 70,
+      "community_name": "Sidebar.tsx",
+      "file_type": "code",
+      "norm_label": "props",
+      "source_file": "apps/web/src/components/ChatArea.tsx",
+      "source_location": "L56"
+    },
+    {
+      "id": "apps_web_src_components_sidebar_props",
+      "label": "Props",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 70,
+      "community_name": "Sidebar.tsx",
+      "file_type": "code",
+      "norm_label": "props",
+      "source_file": "apps/web/src/components/Sidebar.tsx",
+      "source_location": "L25"
+    },
+    {
+      "id": "apps_web_src_components_threadpanel_props",
+      "label": "Props",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 70,
+      "community_name": "Sidebar.tsx",
+      "file_type": "code",
+      "norm_label": "props",
+      "source_file": "apps/web/src/components/ThreadPanel.tsx",
+      "source_location": "L40"
+    },
+    {
+      "id": "apps_web_src_types_index_channel",
+      "label": "Channel",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 70,
+      "community_name": "Sidebar.tsx",
+      "file_type": "code",
+      "norm_label": "channel",
+      "source_file": "apps/web/src/types/index.ts",
+      "source_location": "L198"
+    },
+    {
+      "id": "apps_web_src_types_index_directmessage",
+      "label": "DirectMessage",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 70,
+      "community_name": "Sidebar.tsx",
+      "file_type": "code",
+      "norm_label": "directmessage",
+      "source_file": "apps/web/src/types/index.ts",
+      "source_location": "L207"
+    },
+    {
+      "id": "apps_web_src_types_index_message",
+      "label": "Message",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 70,
+      "community_name": "Sidebar.tsx",
+      "file_type": "code",
+      "norm_label": "message",
+      "source_file": "apps/web/src/types/index.ts",
+      "source_location": "L156"
+    },
+    {
+      "id": "apps_web_src_types_index_mutetarget",
+      "label": "MuteTarget",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 70,
+      "community_name": "Sidebar.tsx",
+      "file_type": "code",
+      "norm_label": "mutetarget",
+      "source_file": "apps/web/src/types/index.ts",
+      "source_location": "L262"
+    },
+    {
+      "id": "apps_api_src_services_automationservice_automationservice",
+      "label": "automationService",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "automationService",
+      "file_type": "code",
+      "norm_label": "automationservice",
+      "source_file": "apps/api/src/services/automationService.ts",
+      "source_location": "L266"
+    },
+    {
+      "id": "apps_api_src_types_index_automationtrigger",
+      "label": "AutomationTrigger",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "automationService",
+      "file_type": "code",
+      "norm_label": "automationtrigger",
+      "source_file": "apps/api/src/types/index.ts",
+      "source_location": "L382"
+    },
+    {
+      "id": "apps_api_src_types_index_webhooklog",
+      "label": "WebhookLog",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 72,
+      "community_name": "WebhookLog",
+      "file_type": "code",
+      "norm_label": "webhooklog",
+      "source_file": "apps/api/src/types/index.ts",
+      "source_location": "L371"
+    },
+    {
       "id": "apps_web_src_lib_e2ee_e2eeservice",
       "label": "E2EEService",
       "_callable": true,
@@ -1757,19 +1770,6 @@
       "norm_label": "e2eeservice",
       "source_file": "apps/web/src/lib/e2ee.ts",
       "source_location": "L35"
-    },
-    {
-      "id": "apps_web_src_types_index_keyvaultdata",
-      "label": "KeyVaultData",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "E2EEService",
-      "file_type": "code",
-      "norm_label": "keyvaultdata",
-      "source_file": "apps/web/src/types/index.ts",
-      "source_location": "L191"
     },
     {
       "id": "apps_web_src_components_backendstatus_backendstatus",
@@ -1808,16 +1808,16 @@
       "source_location": "L1069"
     },
     {
-      "id": "apps_api_src_services_datastore_datastore_addmessage",
-      "label": ".addMessage()",
+      "id": "apps_api_src_services_datastore_datastore_adduser",
+      "label": ".addUser()",
       "_callable": true,
       "_origin": "ast",
       "community": 1,
       "community_name": "dataStore",
       "file_type": "code",
-      "norm_label": ".addmessage()",
+      "norm_label": ".adduser()",
       "source_file": "apps/api/src/services/dataStore.ts",
-      "source_location": "L778"
+      "source_location": "L470"
     },
     {
       "id": "apps_api_src_services_datastore_datastore_addwebhook",
@@ -1830,18 +1830,6 @@
       "norm_label": ".addwebhook()",
       "source_file": "apps/api/src/services/dataStore.ts",
       "source_location": "L970"
-    },
-    {
-      "id": "apps_api_src_services_datastore_datastore_addwebhooklog",
-      "label": ".addWebhookLog()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "dataStore",
-      "file_type": "code",
-      "norm_label": ".addwebhooklog()",
-      "source_file": "apps/api/src/services/dataStore.ts",
-      "source_location": "L1035"
     },
     {
       "id": "apps_api_src_services_datastore_datastore_cleanoldivs",
@@ -1892,18 +1880,6 @@
       "source_location": "L1112"
     },
     {
-      "id": "apps_api_src_services_datastore_datastore_deletemessage",
-      "label": ".deleteMessage()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "dataStore",
-      "file_type": "code",
-      "norm_label": ".deletemessage()",
-      "source_file": "apps/api/src/services/dataStore.ts",
-      "source_location": "L928"
-    },
-    {
       "id": "apps_api_src_services_datastore_datastore_deletewebhook",
       "label": ".deleteWebhook()",
       "_callable": true,
@@ -1914,18 +1890,6 @@
       "norm_label": ".deletewebhook()",
       "source_file": "apps/api/src/services/dataStore.ts",
       "source_location": "L1021"
-    },
-    {
-      "id": "apps_api_src_services_datastore_datastore_editmessage",
-      "label": ".editMessage()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "dataStore",
-      "file_type": "code",
-      "norm_label": ".editmessage()",
-      "source_file": "apps/api/src/services/dataStore.ts",
-      "source_location": "L900"
     },
     {
       "id": "apps_api_src_services_datastore_datastore_getautomationrulebyid",
@@ -2000,40 +1964,28 @@
       "source_location": "L693"
     },
     {
-      "id": "apps_api_src_services_datastore_datastore_getmessagebyid",
-      "label": ".getMessageById()",
+      "id": "apps_api_src_services_datastore_datastore_getcurrentuser",
+      "label": ".getCurrentUser()",
       "_callable": true,
       "_origin": "ast",
       "community": 1,
       "community_name": "dataStore",
       "file_type": "code",
-      "norm_label": ".getmessagebyid()",
+      "norm_label": ".getcurrentuser()",
       "source_file": "apps/api/src/services/dataStore.ts",
-      "source_location": "L774"
+      "source_location": "L689"
     },
     {
-      "id": "apps_api_src_services_datastore_datastore_getmessagesbychannel",
-      "label": ".getMessagesByChannel()",
+      "id": "apps_api_src_services_datastore_datastore_getuserbyemail",
+      "label": ".getUserByEmail()",
       "_callable": true,
       "_origin": "ast",
       "community": 1,
       "community_name": "dataStore",
       "file_type": "code",
-      "norm_label": ".getmessagesbychannel()",
+      "norm_label": ".getuserbyemail()",
       "source_file": "apps/api/src/services/dataStore.ts",
-      "source_location": "L725"
-    },
-    {
-      "id": "apps_api_src_services_datastore_datastore_getthreadreplies",
-      "label": ".getThreadReplies()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "dataStore",
-      "file_type": "code",
-      "norm_label": ".getthreadreplies()",
-      "source_file": "apps/api/src/services/dataStore.ts",
-      "source_location": "L765"
+      "source_location": "L466"
     },
     {
       "id": "apps_api_src_services_datastore_datastore_getuserbyid",
@@ -2072,16 +2024,28 @@
       "source_location": "L540"
     },
     {
-      "id": "apps_api_src_services_datastore_datastore_getwebhooklogs",
-      "label": ".getWebhookLogs()",
+      "id": "apps_api_src_services_datastore_datastore_getusers",
+      "label": ".getUsers()",
       "_callable": true,
       "_origin": "ast",
       "community": 1,
       "community_name": "dataStore",
       "file_type": "code",
-      "norm_label": ".getwebhooklogs()",
+      "norm_label": ".getusers()",
       "source_file": "apps/api/src/services/dataStore.ts",
-      "source_location": "L1031"
+      "source_location": "L454"
+    },
+    {
+      "id": "apps_api_src_services_datastore_datastore_getusersinternal",
+      "label": ".getUsersInternal()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "dataStore",
+      "file_type": "code",
+      "norm_label": ".getusersinternal()",
+      "source_file": "apps/api/src/services/dataStore.ts",
+      "source_location": "L458"
     },
     {
       "id": "apps_api_src_services_datastore_datastore_initfromdb",
@@ -2120,18 +2084,6 @@
       "source_location": "L579"
     },
     {
-      "id": "apps_api_src_services_datastore_datastore_togglemessagereaction",
-      "label": ".toggleMessageReaction()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "dataStore",
-      "file_type": "code",
-      "norm_label": ".togglemessagereaction()",
-      "source_file": "apps/api/src/services/dataStore.ts",
-      "source_location": "L870"
-    },
-    {
       "id": "apps_api_src_services_datastore_datastore_updateautomationrule",
       "label": ".updateAutomationRule()",
       "_callable": true,
@@ -2142,6 +2094,18 @@
       "norm_label": ".updateautomationrule()",
       "source_file": "apps/api/src/services/dataStore.ts",
       "source_location": "L1093"
+    },
+    {
+      "id": "apps_api_src_services_datastore_datastore_updateuser",
+      "label": ".updateUser()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "dataStore",
+      "file_type": "code",
+      "norm_label": ".updateuser()",
+      "source_file": "apps/api/src/services/dataStore.ts",
+      "source_location": "L507"
     },
     {
       "id": "apps_api_src_services_datastore_datastore_updateuserkeyvault",
@@ -2178,18 +2142,6 @@
       "norm_label": "generateseedkeyvault()",
       "source_file": "apps/api/src/services/dataStore.ts",
       "source_location": "L20"
-    },
-    {
-      "id": "apps_api_src_services_webhookservice_webhookservice_getwebhooklogs",
-      "label": ".getWebhookLogs()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "dataStore",
-      "file_type": "code",
-      "norm_label": ".getwebhooklogs()",
-      "source_file": "apps/api/src/services/webhookService.ts",
-      "source_location": "L62"
     },
     {
       "id": "apps_api_src_services_notificationservice_notificationservice_createnotification",
@@ -2636,6 +2588,18 @@
       "source_location": "L23"
     },
     {
+      "id": "apps_api_src_middleware_authmiddleware_authenticate",
+      "label": "authenticate()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 25,
+      "community_name": "test-pentest-remediations.ts",
+      "file_type": "code",
+      "norm_label": "authenticate()",
+      "source_file": "apps/api/src/middleware/authMiddleware.ts",
+      "source_location": "L14"
+    },
+    {
       "id": "scratch_test_pentest_remediations_assert",
       "label": "assert()",
       "_callable": true,
@@ -2670,414 +2634,6 @@
       "norm_label": "runverification()",
       "source_file": "scratch/test-pentest-remediations.ts",
       "source_location": "L51"
-    },
-    {
-      "id": "apps_api_src_services_authservice_authservice_comparepassword",
-      "label": ".comparePassword()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".comparepassword()",
-      "source_file": "apps/api/src/services/authService.ts",
-      "source_location": "L39"
-    },
-    {
-      "id": "apps_api_src_services_authservice_authservice_constructor",
-      "label": ".constructor()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".constructor()",
-      "source_file": "apps/api/src/services/authService.ts",
-      "source_location": "L21"
-    },
-    {
-      "id": "apps_api_src_services_authservice_authservice_generatetoken",
-      "label": ".generateToken()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".generatetoken()",
-      "source_file": "apps/api/src/services/authService.ts",
-      "source_location": "L43"
-    },
-    {
-      "id": "apps_api_src_services_authservice_authservice_hashpassword",
-      "label": ".hashPassword()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".hashpassword()",
-      "source_file": "apps/api/src/services/authService.ts",
-      "source_location": "L35"
-    },
-    {
-      "id": "apps_api_src_services_authservice_authservice_login",
-      "label": ".login()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".login()",
-      "source_file": "apps/api/src/services/authService.ts",
-      "source_location": "L77"
-    },
-    {
-      "id": "apps_api_src_services_authservice_authservice_register",
-      "label": ".register()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".register()",
-      "source_file": "apps/api/src/services/authService.ts",
-      "source_location": "L121"
-    },
-    {
-      "id": "apps_api_src_services_authservice_authservice_seedusercredentials",
-      "label": ".seedUserCredentials()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".seedusercredentials()",
-      "source_file": "apps/api/src/services/authService.ts",
-      "source_location": "L26"
-    },
-    {
-      "id": "apps_api_src_services_authservice_authservice_updateprofile",
-      "label": ".updateProfile()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".updateprofile()",
-      "source_file": "apps/api/src/services/authService.ts",
-      "source_location": "L181"
-    },
-    {
-      "id": "apps_api_src_services_authservice_authservice_verifytoken",
-      "label": ".verifyToken()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".verifytoken()",
-      "source_file": "apps/api/src/services/authService.ts",
-      "source_location": "L55"
-    },
-    {
-      "id": "apps_api_src_services_datastore_datastore_adduser",
-      "label": ".addUser()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".adduser()",
-      "source_file": "apps/api/src/services/dataStore.ts",
-      "source_location": "L470"
-    },
-    {
-      "id": "apps_api_src_services_datastore_datastore_getcurrentuser",
-      "label": ".getCurrentUser()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".getcurrentuser()",
-      "source_file": "apps/api/src/services/dataStore.ts",
-      "source_location": "L689"
-    },
-    {
-      "id": "apps_api_src_services_datastore_datastore_getuserbyemail",
-      "label": ".getUserByEmail()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".getuserbyemail()",
-      "source_file": "apps/api/src/services/dataStore.ts",
-      "source_location": "L466"
-    },
-    {
-      "id": "apps_api_src_services_datastore_datastore_getusers",
-      "label": ".getUsers()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".getusers()",
-      "source_file": "apps/api/src/services/dataStore.ts",
-      "source_location": "L454"
-    },
-    {
-      "id": "apps_api_src_services_datastore_datastore_getusersinternal",
-      "label": ".getUsersInternal()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".getusersinternal()",
-      "source_file": "apps/api/src/services/dataStore.ts",
-      "source_location": "L458"
-    },
-    {
-      "id": "apps_api_src_services_datastore_datastore_updateuser",
-      "label": ".updateUser()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".updateuser()",
-      "source_file": "apps/api/src/services/dataStore.ts",
-      "source_location": "L507"
-    },
-    {
-      "id": "apps_api_src_services_memberservice_memberservice_acceptinvitation",
-      "label": ".acceptInvitation()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".acceptinvitation()",
-      "source_file": "apps/api/src/services/memberService.ts",
-      "source_location": "L258"
-    },
-    {
-      "id": "apps_api_src_services_memberservice_memberservice_addmember",
-      "label": ".addMember()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".addmember()",
-      "source_file": "apps/api/src/services/memberService.ts",
-      "source_location": "L62"
-    },
-    {
-      "id": "apps_api_src_services_memberservice_memberservice_createinvitation",
-      "label": ".createInvitation()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".createinvitation()",
-      "source_file": "apps/api/src/services/memberService.ts",
-      "source_location": "L132"
-    },
-    {
-      "id": "apps_api_src_services_memberservice_memberservice_generatetemppassword",
-      "label": ".generateTempPassword()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".generatetemppassword()",
-      "source_file": "apps/api/src/services/memberService.ts",
-      "source_location": "L52"
-    },
-    {
-      "id": "apps_api_src_services_memberservice_memberservice_getinvitations",
-      "label": ".getInvitations()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".getinvitations()",
-      "source_file": "apps/api/src/services/memberService.ts",
-      "source_location": "L196"
-    },
-    {
-      "id": "apps_api_src_services_memberservice_memberservice_initfromdb",
-      "label": ".initFromDb()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".initfromdb()",
-      "source_file": "apps/api/src/services/memberService.ts",
-      "source_location": "L23"
-    },
-    {
-      "id": "apps_api_src_services_memberservice_memberservice_revokeinvitation",
-      "label": ".revokeInvitation()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".revokeinvitation()",
-      "source_file": "apps/api/src/services/memberService.ts",
-      "source_location": "L203"
-    },
-    {
-      "id": "apps_api_src_services_memberservice_memberservice_updatememberrole",
-      "label": ".updateMemberRole()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".updatememberrole()",
-      "source_file": "apps/api/src/services/memberService.ts",
-      "source_location": "L350"
-    },
-    {
-      "id": "apps_api_src_services_memberservice_memberservice_verifyinvitation",
-      "label": ".verifyInvitation()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".verifyinvitation()",
-      "source_file": "apps/api/src/services/memberService.ts",
-      "source_location": "L226"
-    },
-    {
-      "id": "apps_api_src_services_projectservice_projectservice_createproject",
-      "label": ".createProject()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".createproject()",
-      "source_file": "apps/api/src/services/projectService.ts",
-      "source_location": "L163"
-    },
-    {
-      "id": "apps_api_src_services_projectservice_projectservice_deleteproject",
-      "label": ".deleteProject()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".deleteproject()",
-      "source_file": "apps/api/src/services/projectService.ts",
-      "source_location": "L275"
-    },
-    {
-      "id": "apps_api_src_services_projectservice_projectservice_enrichproject",
-      "label": ".enrichProject()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".enrichproject()",
-      "source_file": "apps/api/src/services/projectService.ts",
-      "source_location": "L150"
-    },
-    {
-      "id": "apps_api_src_services_projectservice_projectservice_getprojectbyid",
-      "label": ".getProjectById()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".getprojectbyid()",
-      "source_file": "apps/api/src/services/projectService.ts",
-      "source_location": "L131"
-    },
-    {
-      "id": "apps_api_src_services_projectservice_projectservice_getprojectraw",
-      "label": ".getProjectRaw()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".getprojectraw()",
-      "source_file": "apps/api/src/services/projectService.ts",
-      "source_location": "L142"
-    },
-    {
-      "id": "apps_api_src_services_projectservice_projectservice_getprojects",
-      "label": ".getProjects()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".getprojects()",
-      "source_file": "apps/api/src/services/projectService.ts",
-      "source_location": "L125"
-    },
-    {
-      "id": "apps_api_src_services_projectservice_projectservice_getprojectsraw",
-      "label": ".getProjectsRaw()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".getprojectsraw()",
-      "source_file": "apps/api/src/services/projectService.ts",
-      "source_location": "L146"
-    },
-    {
-      "id": "apps_api_src_services_projectservice_projectservice_hasprojectaccess",
-      "label": ".hasProjectAccess()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".hasprojectaccess()",
-      "source_file": "apps/api/src/services/projectService.ts",
-      "source_location": "L115"
-    },
-    {
-      "id": "apps_api_src_services_projectservice_projectservice_initfromdb",
-      "label": ".initFromDb()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".initfromdb()",
-      "source_file": "apps/api/src/services/projectService.ts",
-      "source_location": "L7"
-    },
-    {
-      "id": "apps_api_src_services_projectservice_projectservice_updateproject",
-      "label": ".updateProject()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 27,
-      "community_name": "User",
-      "file_type": "code",
-      "norm_label": ".updateproject()",
-      "source_file": "apps/api/src/services/projectService.ts",
-      "source_location": "L229"
     },
     {
       "id": "apps_api_src_services_taskservice_taskservice_addqastep",
@@ -3296,28 +2852,28 @@
       "source_location": "L6"
     },
     {
-      "id": "apps_api_src_controllers_messagecontroller_getthreadreplies",
-      "label": "getThreadReplies()",
+      "id": "apps_api_src_controllers_sessioncontroller_getsessions",
+      "label": "getSessions()",
       "_callable": true,
       "_origin": "ast",
       "community": 28,
       "community_name": "authMiddleware.ts",
       "file_type": "code",
-      "norm_label": "getthreadreplies()",
-      "source_file": "apps/api/src/controllers/messageController.ts",
-      "source_location": "L68"
+      "norm_label": "getsessions()",
+      "source_file": "apps/api/src/controllers/sessionController.ts",
+      "source_location": "L11"
     },
     {
-      "id": "apps_api_src_middleware_authmiddleware_authenticate",
-      "label": "authenticate()",
+      "id": "apps_api_src_controllers_sessioncontroller_revokeothersessions",
+      "label": "revokeOtherSessions()",
       "_callable": true,
       "_origin": "ast",
       "community": 28,
       "community_name": "authMiddleware.ts",
       "file_type": "code",
-      "norm_label": "authenticate()",
-      "source_file": "apps/api/src/middleware/authMiddleware.ts",
-      "source_location": "L14"
+      "norm_label": "revokeothersessions()",
+      "source_file": "apps/api/src/controllers/sessionController.ts",
+      "source_location": "L87"
     },
     {
       "id": "apps_api_src_middleware_authmiddleware_optionalauth",
@@ -3356,42 +2912,6 @@
       "source_location": "L16"
     },
     {
-      "id": "apps_web_src_components_taskdetailmodal_formatactivityaction",
-      "label": "formatActivityAction()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 29,
-      "community_name": "TaskDetailModal.tsx",
-      "file_type": "code",
-      "norm_label": "formatactivityaction()",
-      "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L234"
-    },
-    {
-      "id": "apps_web_src_components_taskdetailmodal_getduedatestatus",
-      "label": "getDueDateStatus()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 29,
-      "community_name": "TaskDetailModal.tsx",
-      "file_type": "code",
-      "norm_label": "getduedatestatus()",
-      "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L164"
-    },
-    {
-      "id": "apps_web_src_components_taskdetailmodal_taskdetailmodal",
-      "label": "TaskDetailModal()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 29,
-      "community_name": "TaskDetailModal.tsx",
-      "file_type": "code",
-      "norm_label": "taskdetailmodal()",
-      "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L292"
-    },
-    {
       "id": "apps_api_src_controllers_authcontroller_getme",
       "label": "getMe()",
       "_callable": true,
@@ -3401,7 +2921,7 @@
       "file_type": "code",
       "norm_label": "getme()",
       "source_file": "apps/api/src/controllers/authController.ts",
-      "source_location": "L93"
+      "source_location": "L57"
     },
     {
       "id": "apps_api_src_controllers_authcontroller_login",
@@ -3413,7 +2933,7 @@
       "file_type": "code",
       "norm_label": "login()",
       "source_file": "apps/api/src/controllers/authController.ts",
-      "source_location": "L24"
+      "source_location": "L17"
     },
     {
       "id": "apps_api_src_controllers_authcontroller_logout",
@@ -3425,7 +2945,7 @@
       "file_type": "code",
       "norm_label": "logout()",
       "source_file": "apps/api/src/controllers/authController.ts",
-      "source_location": "L110"
+      "source_location": "L74"
     },
     {
       "id": "apps_api_src_controllers_authcontroller_register",
@@ -3437,7 +2957,7 @@
       "file_type": "code",
       "norm_label": "register()",
       "source_file": "apps/api/src/controllers/authController.ts",
-      "source_location": "L56"
+      "source_location": "L49"
     },
     {
       "id": "apps_api_src_controllers_authcontroller_updateprofile",
@@ -3449,7 +2969,7 @@
       "file_type": "code",
       "norm_label": "updateprofile()",
       "source_file": "apps/api/src/controllers/authController.ts",
-      "source_location": "L155"
+      "source_location": "L119"
     },
     {
       "id": "apps_api_src_controllers_authcontroller_uploadavatar",
@@ -3461,7 +2981,7 @@
       "file_type": "code",
       "norm_label": "uploadavatar()",
       "source_file": "apps/api/src/controllers/authController.ts",
-      "source_location": "L198"
+      "source_location": "L162"
     },
     {
       "id": "apps_api_src_controllers_taskcommentcontroller_createtaskcomment",
@@ -3654,78 +3174,6 @@
       "norm_label": "updatetask()",
       "source_file": "apps/api/src/controllers/taskController.ts",
       "source_location": "L148"
-    },
-    {
-      "id": "apps_api_src_services_taskcommentservice_taskcommentservice_addcomment",
-      "label": ".addComment()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "taskController.ts",
-      "file_type": "code",
-      "norm_label": ".addcomment()",
-      "source_file": "apps/api/src/services/taskCommentService.ts",
-      "source_location": "L72"
-    },
-    {
-      "id": "apps_api_src_services_taskcommentservice_taskcommentservice_deletecomment",
-      "label": ".deleteComment()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "taskController.ts",
-      "file_type": "code",
-      "norm_label": ".deletecomment()",
-      "source_file": "apps/api/src/services/taskCommentService.ts",
-      "source_location": "L119"
-    },
-    {
-      "id": "apps_api_src_services_taskcommentservice_taskcommentservice_enrichcomment",
-      "label": ".enrichComment()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "taskController.ts",
-      "file_type": "code",
-      "norm_label": ".enrichcomment()",
-      "source_file": "apps/api/src/services/taskCommentService.ts",
-      "source_location": "L53"
-    },
-    {
-      "id": "apps_api_src_services_taskcommentservice_taskcommentservice_getcommentcountfortask",
-      "label": ".getCommentCountForTask()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "taskController.ts",
-      "file_type": "code",
-      "norm_label": ".getcommentcountfortask()",
-      "source_file": "apps/api/src/services/taskCommentService.ts",
-      "source_location": "L68"
-    },
-    {
-      "id": "apps_api_src_services_taskcommentservice_taskcommentservice_getcommentsbytask",
-      "label": ".getCommentsByTask()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "taskController.ts",
-      "file_type": "code",
-      "norm_label": ".getcommentsbytask()",
-      "source_file": "apps/api/src/services/taskCommentService.ts",
-      "source_location": "L61"
-    },
-    {
-      "id": "apps_api_src_services_taskcommentservice_taskcommentservice_initfromdb",
-      "label": ".initFromDb()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "taskController.ts",
-      "file_type": "code",
-      "norm_label": ".initfromdb()",
-      "source_file": "apps/api/src/services/taskCommentService.ts",
-      "source_location": "L7"
     },
     {
       "id": "apps_api_src_controllers_membercontroller_acceptinvitation",
@@ -3980,18 +3428,6 @@
       "source_location": "L46"
     },
     {
-      "id": "apps_web_src_lib_e2ee_e2eeservice_getpeerpublickey",
-      "label": ".getPeerPublicKey()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 33,
-      "community_name": "ChatArea.tsx",
-      "file_type": "code",
-      "norm_label": ".getpeerpublickey()",
-      "source_file": "apps/web/src/lib/e2ee.ts",
-      "source_location": "L249"
-    },
-    {
       "id": "apps_web_src_lib_filecrypto_base64tobuffer",
       "label": "base64ToBuffer()",
       "_callable": true,
@@ -4069,7 +3505,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 34,
-      "community_name": "authService.ts",
+      "community_name": "sessionService",
       "file_type": "code",
       "norm_label": "parsedevicename()",
       "source_file": "apps/api/src/services/sessionService.ts",
@@ -4081,7 +3517,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 34,
-      "community_name": "authService.ts",
+      "community_name": "sessionService",
       "file_type": "code",
       "norm_label": ".createsession()",
       "source_file": "apps/api/src/services/sessionService.ts",
@@ -4093,7 +3529,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 34,
-      "community_name": "authService.ts",
+      "community_name": "sessionService",
       "file_type": "code",
       "norm_label": ".getusersessions()",
       "source_file": "apps/api/src/services/sessionService.ts",
@@ -4105,7 +3541,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 34,
-      "community_name": "authService.ts",
+      "community_name": "sessionService",
       "file_type": "code",
       "norm_label": ".issessionvalid()",
       "source_file": "apps/api/src/services/sessionService.ts",
@@ -4117,7 +3553,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 34,
-      "community_name": "authService.ts",
+      "community_name": "sessionService",
       "file_type": "code",
       "norm_label": ".revokeothersessions()",
       "source_file": "apps/api/src/services/sessionService.ts",
@@ -4129,7 +3565,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 34,
-      "community_name": "authService.ts",
+      "community_name": "sessionService",
       "file_type": "code",
       "norm_label": ".revokesession()",
       "source_file": "apps/api/src/services/sessionService.ts",
@@ -4141,7 +3577,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 34,
-      "community_name": "authService.ts",
+      "community_name": "sessionService",
       "file_type": "code",
       "norm_label": ".touchsession()",
       "source_file": "apps/api/src/services/sessionService.ts",
@@ -4278,6 +3714,18 @@
       "norm_label": "editmessage()",
       "source_file": "apps/api/src/controllers/messageController.ts",
       "source_location": "L239"
+    },
+    {
+      "id": "apps_api_src_controllers_messagecontroller_getthreadreplies",
+      "label": "getThreadReplies()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 37,
+      "community_name": "messageController.ts",
+      "file_type": "code",
+      "norm_label": "getthreadreplies()",
+      "source_file": "apps/api/src/controllers/messageController.ts",
+      "source_location": "L68"
     },
     {
       "id": "apps_api_src_controllers_messagecontroller_togglereaction",
@@ -4424,114 +3872,6 @@
       "source_location": "L89"
     },
     {
-      "id": "apps_api_src_services_bugservice_bugservice_convertbugtotask",
-      "label": ".convertBugToTask()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "bugController.ts",
-      "file_type": "code",
-      "norm_label": ".convertbugtotask()",
-      "source_file": "apps/api/src/services/bugService.ts",
-      "source_location": "L360"
-    },
-    {
-      "id": "apps_api_src_services_bugservice_bugservice_createbug",
-      "label": ".createBug()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "bugController.ts",
-      "file_type": "code",
-      "norm_label": ".createbug()",
-      "source_file": "apps/api/src/services/bugService.ts",
-      "source_location": "L172"
-    },
-    {
-      "id": "apps_api_src_services_bugservice_bugservice_deletebug",
-      "label": ".deleteBug()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "bugController.ts",
-      "file_type": "code",
-      "norm_label": ".deletebug()",
-      "source_file": "apps/api/src/services/bugService.ts",
-      "source_location": "L334"
-    },
-    {
-      "id": "apps_api_src_services_bugservice_bugservice_enrichbug",
-      "label": ".enrichBug()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "bugController.ts",
-      "file_type": "code",
-      "norm_label": ".enrichbug()",
-      "source_file": "apps/api/src/services/bugService.ts",
-      "source_location": "L119"
-    },
-    {
-      "id": "apps_api_src_services_bugservice_bugservice_getbugbyid",
-      "label": ".getBugById()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "bugController.ts",
-      "file_type": "code",
-      "norm_label": ".getbugbyid()",
-      "source_file": "apps/api/src/services/bugService.ts",
-      "source_location": "L163"
-    },
-    {
-      "id": "apps_api_src_services_bugservice_bugservice_getbugs",
-      "label": ".getBugs()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "bugController.ts",
-      "file_type": "code",
-      "norm_label": ".getbugs()",
-      "source_file": "apps/api/src/services/bugService.ts",
-      "source_location": "L132"
-    },
-    {
-      "id": "apps_api_src_services_bugservice_bugservice_getbugstats",
-      "label": ".getBugStats()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "bugController.ts",
-      "file_type": "code",
-      "norm_label": ".getbugstats()",
-      "source_file": "apps/api/src/services/bugService.ts",
-      "source_location": "L424"
-    },
-    {
-      "id": "apps_api_src_services_bugservice_bugservice_initfromdb",
-      "label": ".initFromDb()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "bugController.ts",
-      "file_type": "code",
-      "norm_label": ".initfromdb()",
-      "source_file": "apps/api/src/services/bugService.ts",
-      "source_location": "L9"
-    },
-    {
-      "id": "apps_api_src_services_bugservice_bugservice_updatebug",
-      "label": ".updateBug()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "bugController.ts",
-      "file_type": "code",
-      "norm_label": ".updatebug()",
-      "source_file": "apps/api/src/services/bugService.ts",
-      "source_location": "L264"
-    },
-    {
       "id": "apps_api_src_controllers_notificationcontroller_deletenotification",
       "label": "deleteNotification()",
       "_callable": true,
@@ -4616,66 +3956,6 @@
       "source_location": "L166"
     },
     {
-      "id": "apps_api_src_services_automationservice_automationservice_evaluateconditions",
-      "label": ".evaluateConditions()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "Webhook",
-      "file_type": "code",
-      "norm_label": ".evaluateconditions()",
-      "source_file": "apps/api/src/services/automationService.ts",
-      "source_location": "L149"
-    },
-    {
-      "id": "apps_api_src_services_automationservice_automationservice_executeactions",
-      "label": ".executeActions()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "Webhook",
-      "file_type": "code",
-      "norm_label": ".executeactions()",
-      "source_file": "apps/api/src/services/automationService.ts",
-      "source_location": "L169"
-    },
-    {
-      "id": "apps_api_src_services_automationservice_automationservice_parseandprocesssmartreferences",
-      "label": ".parseAndProcessSmartReferences()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "Webhook",
-      "file_type": "code",
-      "norm_label": ".parseandprocesssmartreferences()",
-      "source_file": "apps/api/src/services/automationService.ts",
-      "source_location": "L21"
-    },
-    {
-      "id": "apps_api_src_services_automationservice_automationservice_rendertemplate",
-      "label": ".renderTemplate()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "Webhook",
-      "file_type": "code",
-      "norm_label": ".rendertemplate()",
-      "source_file": "apps/api/src/services/automationService.ts",
-      "source_location": "L250"
-    },
-    {
-      "id": "apps_api_src_services_automationservice_automationservice_trigger",
-      "label": ".trigger()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "Webhook",
-      "file_type": "code",
-      "norm_label": ".trigger()",
-      "source_file": "apps/api/src/services/automationService.ts",
-      "source_location": "L132"
-    },
-    {
       "id": "apps_api_src_services_datastore_datastore_getwebhookbyid",
       "label": ".getWebhookById()",
       "_callable": true,
@@ -4724,30 +4004,6 @@
       "source_location": "L1001"
     },
     {
-      "id": "apps_api_src_services_webhookcryptoservice_decryptchannelmessagenode",
-      "label": "decryptChannelMessageNode()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "Webhook",
-      "file_type": "code",
-      "norm_label": "decryptchannelmessagenode()",
-      "source_file": "apps/api/src/services/webhookCryptoService.ts",
-      "source_location": "L50"
-    },
-    {
-      "id": "apps_api_src_services_webhookcryptoservice_derivechannelkeynode",
-      "label": "deriveChannelKeyNode()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "Webhook",
-      "file_type": "code",
-      "norm_label": "derivechannelkeynode()",
-      "source_file": "apps/api/src/services/webhookCryptoService.ts",
-      "source_location": "L9"
-    },
-    {
       "id": "apps_api_src_services_webhookcryptoservice_encryptchannelmessagenode",
       "label": "encryptChannelMessageNode()",
       "_callable": true,
@@ -4758,54 +4014,6 @@
       "norm_label": "encryptchannelmessagenode()",
       "source_file": "apps/api/src/services/webhookCryptoService.ts",
       "source_location": "L27"
-    },
-    {
-      "id": "apps_api_src_services_webhookcryptoservice_generatewebhooksecret",
-      "label": "generateWebhookSecret()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "Webhook",
-      "file_type": "code",
-      "norm_label": "generatewebhooksecret()",
-      "source_file": "apps/api/src/services/webhookCryptoService.ts",
-      "source_location": "L110"
-    },
-    {
-      "id": "apps_api_src_services_webhookcryptoservice_generatewebhooktoken",
-      "label": "generateWebhookToken()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "Webhook",
-      "file_type": "code",
-      "norm_label": "generatewebhooktoken()",
-      "source_file": "apps/api/src/services/webhookCryptoService.ts",
-      "source_location": "L106"
-    },
-    {
-      "id": "apps_api_src_services_webhookcryptoservice_verifyhmacsha256",
-      "label": "verifyHmacSha256()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "Webhook",
-      "file_type": "code",
-      "norm_label": "verifyhmacsha256()",
-      "source_file": "apps/api/src/services/webhookCryptoService.ts",
-      "source_location": "L77"
-    },
-    {
-      "id": "apps_api_src_services_webhookservice_webhookservice_createwebhook",
-      "label": ".createWebhook()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "Webhook",
-      "file_type": "code",
-      "norm_label": ".createwebhook()",
-      "source_file": "apps/api/src/services/webhookService.ts",
-      "source_location": "L20"
     },
     {
       "id": "apps_api_src_services_webhookservice_webhookservice_deletewebhook",
@@ -4916,6 +4124,18 @@
       "source_location": "L54"
     },
     {
+      "id": "apps_web_src_components_authmodal_authmodal",
+      "label": "AuthModal()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 40,
+      "community_name": "User",
+      "file_type": "code",
+      "norm_label": "authmodal()",
+      "source_file": "apps/web/src/components/AuthModal.tsx",
+      "source_location": "L16"
+    },
+    {
       "id": "apps_web_src_components_commandpalette_commandpalette",
       "label": "CommandPalette()",
       "_callable": true,
@@ -4926,6 +4146,18 @@
       "norm_label": "commandpalette()",
       "source_file": "apps/web/src/components/CommandPalette.tsx",
       "source_location": "L47"
+    },
+    {
+      "id": "apps_web_src_components_createchannelmodal_createchannelmodal",
+      "label": "CreateChannelModal()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 40,
+      "community_name": "User",
+      "file_type": "code",
+      "norm_label": "createchannelmodal()",
+      "source_file": "apps/web/src/components/CreateChannelModal.tsx",
+      "source_location": "L13"
     },
     {
       "id": "apps_web_src_components_createprojectmodal_createprojectmodal",
@@ -4940,6 +4172,18 @@
       "source_location": "L21"
     },
     {
+      "id": "apps_web_src_components_invitemembermodal_invitemembermodal",
+      "label": "InviteMemberModal()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 40,
+      "community_name": "User",
+      "file_type": "code",
+      "norm_label": "invitemembermodal()",
+      "source_file": "apps/web/src/components/InviteMemberModal.tsx",
+      "source_location": "L31"
+    },
+    {
       "id": "apps_web_src_components_projectmembersmodal_projectmembersmodal",
       "label": "ProjectMembersModal()",
       "_callable": true,
@@ -4952,64 +4196,40 @@
       "source_location": "L16"
     },
     {
-      "id": "apps_api_src_services_db_ispostgresconnected",
-      "label": "isPostgresConnected()",
+      "id": "apps_web_src_lib_e2ee_e2eeservice_getpeerpublickey",
+      "label": ".getPeerPublicKey()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 40,
+      "community_name": "User",
+      "file_type": "code",
+      "norm_label": ".getpeerpublickey()",
+      "source_file": "apps/web/src/lib/e2ee.ts",
+      "source_location": "L249"
+    },
+    {
+      "id": "apps_api_src_services_bugservice_bugservice_getbugstats",
+      "label": ".getBugStats()",
       "_callable": true,
       "_origin": "ast",
       "community": 41,
       "community_name": "api/src/types/index.ts",
       "file_type": "code",
-      "norm_label": "ispostgresconnected()",
-      "source_file": "apps/api/src/services/db.ts",
-      "source_location": "L52"
+      "norm_label": ".getbugstats()",
+      "source_file": "apps/api/src/services/bugService.ts",
+      "source_location": "L424"
     },
     {
-      "id": "scratch_test_project_members_assert",
-      "label": "assert()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 41,
-      "community_name": "api/src/types/index.ts",
-      "file_type": "code",
-      "norm_label": "assert()",
-      "source_file": "scratch/test-project-members.ts",
-      "source_location": "L7"
-    },
-    {
-      "id": "scratch_test_project_members_runtests",
-      "label": "runTests()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 41,
-      "community_name": "api/src/types/index.ts",
-      "file_type": "code",
-      "norm_label": "runtests()",
-      "source_file": "scratch/test-project-members.ts",
-      "source_location": "L15"
-    },
-    {
-      "id": "apps_web_src_components_authmodal_authmodal",
-      "label": "AuthModal()",
+      "id": "apps_web_src_components_bugtracker_bugtracker",
+      "label": "BugTracker()",
       "_callable": true,
       "_origin": "ast",
       "community": 42,
-      "community_name": "roles.ts",
+      "community_name": "BugTracker.tsx",
       "file_type": "code",
-      "norm_label": "authmodal()",
-      "source_file": "apps/web/src/components/AuthModal.tsx",
-      "source_location": "L16"
-    },
-    {
-      "id": "apps_web_src_components_invitemembermodal_invitemembermodal",
-      "label": "InviteMemberModal()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 42,
-      "community_name": "roles.ts",
-      "file_type": "code",
-      "norm_label": "invitemembermodal()",
-      "source_file": "apps/web/src/components/InviteMemberModal.tsx",
-      "source_location": "L31"
+      "norm_label": "bugtracker()",
+      "source_file": "apps/web/src/components/BugTracker.tsx",
+      "source_location": "L60"
     },
     {
       "id": "apps_web_src_components_projectprogressbar_projectprogressbar",
@@ -5017,23 +4237,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 42,
-      "community_name": "roles.ts",
+      "community_name": "BugTracker.tsx",
       "file_type": "code",
       "norm_label": "projectprogressbar()",
       "source_file": "apps/web/src/components/ProjectProgressBar.tsx",
       "source_location": "L27"
-    },
-    {
-      "id": "apps_web_src_components_bugtracker_bugtracker",
-      "label": "BugTracker()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 43,
-      "community_name": "page.tsx",
-      "file_type": "code",
-      "norm_label": "bugtracker()",
-      "source_file": "apps/web/src/components/BugTracker.tsx",
-      "source_location": "L60"
     },
     {
       "id": "apps_web_src_components_createtaskmodal_createtaskmodal",
@@ -5082,6 +4290,42 @@
       "norm_label": "reportbugmodal()",
       "source_file": "apps/web/src/components/ReportBugModal.tsx",
       "source_location": "L27"
+    },
+    {
+      "id": "apps_web_src_components_taskdetailmodal_formatactivityaction",
+      "label": "formatActivityAction()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 43,
+      "community_name": "page.tsx",
+      "file_type": "code",
+      "norm_label": "formatactivityaction()",
+      "source_file": "apps/web/src/components/TaskDetailModal.tsx",
+      "source_location": "L234"
+    },
+    {
+      "id": "apps_web_src_components_taskdetailmodal_getduedatestatus",
+      "label": "getDueDateStatus()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 43,
+      "community_name": "page.tsx",
+      "file_type": "code",
+      "norm_label": "getduedatestatus()",
+      "source_file": "apps/web/src/components/TaskDetailModal.tsx",
+      "source_location": "L164"
+    },
+    {
+      "id": "apps_web_src_components_taskdetailmodal_taskdetailmodal",
+      "label": "TaskDetailModal()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 43,
+      "community_name": "page.tsx",
+      "file_type": "code",
+      "norm_label": "taskdetailmodal()",
+      "source_file": "apps/web/src/components/TaskDetailModal.tsx",
+      "source_location": "L292"
     },
     {
       "id": "apps_web_src_lib_roles_formatuserrole",
@@ -5228,40 +4472,124 @@
       "source_location": "L85"
     },
     {
-      "id": "apps_api_src_controllers_sessioncontroller_getsessions",
-      "label": "getSessions()",
+      "id": "apps_api_src_services_authservice_authservice_verifytoken",
+      "label": ".verifyToken()",
       "_callable": true,
       "_origin": "ast",
       "community": 45,
-      "community_name": "sessionController.ts",
+      "community_name": "memberService",
       "file_type": "code",
-      "norm_label": "getsessions()",
-      "source_file": "apps/api/src/controllers/sessionController.ts",
-      "source_location": "L11"
+      "norm_label": ".verifytoken()",
+      "source_file": "apps/api/src/services/authService.ts",
+      "source_location": "L55"
     },
     {
-      "id": "apps_api_src_controllers_sessioncontroller_revokeothersessions",
-      "label": "revokeOtherSessions()",
+      "id": "apps_api_src_services_memberservice_memberservice_acceptinvitation",
+      "label": ".acceptInvitation()",
       "_callable": true,
       "_origin": "ast",
       "community": 45,
-      "community_name": "sessionController.ts",
+      "community_name": "memberService",
       "file_type": "code",
-      "norm_label": "revokeothersessions()",
-      "source_file": "apps/api/src/controllers/sessionController.ts",
-      "source_location": "L87"
+      "norm_label": ".acceptinvitation()",
+      "source_file": "apps/api/src/services/memberService.ts",
+      "source_location": "L258"
     },
     {
-      "id": "apps_web_src_components_createchannelmodal_createchannelmodal",
-      "label": "CreateChannelModal()",
+      "id": "apps_api_src_services_memberservice_memberservice_addmember",
+      "label": ".addMember()",
       "_callable": true,
       "_origin": "ast",
-      "community": 48,
-      "community_name": "react",
+      "community": 45,
+      "community_name": "memberService",
       "file_type": "code",
-      "norm_label": "createchannelmodal()",
-      "source_file": "apps/web/src/components/CreateChannelModal.tsx",
-      "source_location": "L13"
+      "norm_label": ".addmember()",
+      "source_file": "apps/api/src/services/memberService.ts",
+      "source_location": "L62"
+    },
+    {
+      "id": "apps_api_src_services_memberservice_memberservice_createinvitation",
+      "label": ".createInvitation()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 45,
+      "community_name": "memberService",
+      "file_type": "code",
+      "norm_label": ".createinvitation()",
+      "source_file": "apps/api/src/services/memberService.ts",
+      "source_location": "L132"
+    },
+    {
+      "id": "apps_api_src_services_memberservice_memberservice_generatetemppassword",
+      "label": ".generateTempPassword()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 45,
+      "community_name": "memberService",
+      "file_type": "code",
+      "norm_label": ".generatetemppassword()",
+      "source_file": "apps/api/src/services/memberService.ts",
+      "source_location": "L52"
+    },
+    {
+      "id": "apps_api_src_services_memberservice_memberservice_getinvitations",
+      "label": ".getInvitations()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 45,
+      "community_name": "memberService",
+      "file_type": "code",
+      "norm_label": ".getinvitations()",
+      "source_file": "apps/api/src/services/memberService.ts",
+      "source_location": "L196"
+    },
+    {
+      "id": "apps_api_src_services_memberservice_memberservice_initfromdb",
+      "label": ".initFromDb()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 45,
+      "community_name": "memberService",
+      "file_type": "code",
+      "norm_label": ".initfromdb()",
+      "source_file": "apps/api/src/services/memberService.ts",
+      "source_location": "L23"
+    },
+    {
+      "id": "apps_api_src_services_memberservice_memberservice_revokeinvitation",
+      "label": ".revokeInvitation()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 45,
+      "community_name": "memberService",
+      "file_type": "code",
+      "norm_label": ".revokeinvitation()",
+      "source_file": "apps/api/src/services/memberService.ts",
+      "source_location": "L203"
+    },
+    {
+      "id": "apps_api_src_services_memberservice_memberservice_updatememberrole",
+      "label": ".updateMemberRole()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 45,
+      "community_name": "memberService",
+      "file_type": "code",
+      "norm_label": ".updatememberrole()",
+      "source_file": "apps/api/src/services/memberService.ts",
+      "source_location": "L350"
+    },
+    {
+      "id": "apps_api_src_services_memberservice_memberservice_verifyinvitation",
+      "label": ".verifyInvitation()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 45,
+      "community_name": "memberService",
+      "file_type": "code",
+      "norm_label": ".verifyinvitation()",
+      "source_file": "apps/api/src/services/memberService.ts",
+      "source_location": "L226"
     },
     {
       "id": "apps_web_src_components_kanbanboard_getduedatebadge",
@@ -5269,7 +4597,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 48,
-      "community_name": "react",
+      "community_name": "KanbanBoard.tsx",
       "file_type": "code",
       "norm_label": "getduedatebadge()",
       "source_file": "apps/web/src/components/KanbanBoard.tsx",
@@ -5281,7 +4609,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 48,
-      "community_name": "react",
+      "community_name": "KanbanBoard.tsx",
       "file_type": "code",
       "norm_label": "kanbanboard()",
       "source_file": "apps/web/src/components/KanbanBoard.tsx",
@@ -5293,35 +4621,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 48,
-      "community_name": "react",
+      "community_name": "KanbanBoard.tsx",
       "file_type": "code",
       "norm_label": "sidebar()",
       "source_file": "apps/web/src/components/Sidebar.tsx",
       "source_location": "L52"
-    },
-    {
-      "id": "apps_web_src_components_themetoggle_themetoggle",
-      "label": "ThemeToggle()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 48,
-      "community_name": "react",
-      "file_type": "code",
-      "norm_label": "themetoggle()",
-      "source_file": "apps/web/src/components/ThemeToggle.tsx",
-      "source_location": "L12"
-    },
-    {
-      "id": "apps_web_src_context_themecontext_usetheme",
-      "label": "useTheme()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 48,
-      "community_name": "react",
-      "file_type": "code",
-      "norm_label": "usetheme()",
-      "source_file": "apps/web/src/context/ThemeContext.tsx",
-      "source_location": "L66"
     },
     {
       "id": "apps_web_src_lib_roles_getuserrolebadge",
@@ -5329,7 +4633,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 48,
-      "community_name": "react",
+      "community_name": "KanbanBoard.tsx",
       "file_type": "code",
       "norm_label": "getuserrolebadge()",
       "source_file": "apps/web/src/lib/roles.ts",
@@ -5341,11 +4645,23 @@
       "_callable": true,
       "_origin": "ast",
       "community": 49,
-      "community_name": "mongoLogger",
+      "community_name": "dataStore.ts",
       "file_type": "code",
       "norm_label": "checkpostgreshealth()",
       "source_file": "apps/api/src/services/db.ts",
       "source_location": "L26"
+    },
+    {
+      "id": "apps_api_src_services_db_ispostgresconnected",
+      "label": "isPostgresConnected()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 49,
+      "community_name": "dataStore.ts",
+      "file_type": "code",
+      "norm_label": "ispostgresconnected()",
+      "source_file": "apps/api/src/services/db.ts",
+      "source_location": "L52"
     },
     {
       "id": "apps_api_src_services_mongologger_mongologger_checkmongohealth",
@@ -5353,7 +4669,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 49,
-      "community_name": "mongoLogger",
+      "community_name": "dataStore.ts",
       "file_type": "code",
       "norm_label": ".checkmongohealth()",
       "source_file": "apps/api/src/services/mongoLogger.ts",
@@ -5365,7 +4681,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 49,
-      "community_name": "mongoLogger",
+      "community_name": "dataStore.ts",
       "file_type": "code",
       "norm_label": ".constructor()",
       "source_file": "apps/api/src/services/mongoLogger.ts",
@@ -5377,7 +4693,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 49,
-      "community_name": "mongoLogger",
+      "community_name": "dataStore.ts",
       "file_type": "code",
       "norm_label": ".getrecentlogs()",
       "source_file": "apps/api/src/services/mongoLogger.ts",
@@ -5389,7 +4705,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 49,
-      "community_name": "mongoLogger",
+      "community_name": "dataStore.ts",
       "file_type": "code",
       "norm_label": ".gettaskactivitylogs()",
       "source_file": "apps/api/src/services/mongoLogger.ts",
@@ -5401,7 +4717,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 49,
-      "community_name": "mongoLogger",
+      "community_name": "dataStore.ts",
       "file_type": "code",
       "norm_label": ".initialize()",
       "source_file": "apps/api/src/services/mongoLogger.ts",
@@ -5413,7 +4729,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 49,
-      "community_name": "mongoLogger",
+      "community_name": "dataStore.ts",
       "file_type": "code",
       "norm_label": ".ismongoconnected()",
       "source_file": "apps/api/src/services/mongoLogger.ts",
@@ -5425,7 +4741,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 49,
-      "community_name": "mongoLogger",
+      "community_name": "dataStore.ts",
       "file_type": "code",
       "norm_label": ".log()",
       "source_file": "apps/api/src/services/mongoLogger.ts",
@@ -5437,7 +4753,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 49,
-      "community_name": "mongoLogger",
+      "community_name": "dataStore.ts",
       "file_type": "code",
       "norm_label": "check()",
       "source_file": "scratch/check-errors.ts",
@@ -5449,35 +4765,203 @@
       "_callable": true,
       "_origin": "ast",
       "community": 49,
-      "community_name": "mongoLogger",
+      "community_name": "dataStore.ts",
       "file_type": "code",
       "norm_label": "runtest()",
       "source_file": "scratch/test-db-integration.ts",
       "source_location": "L8"
     },
     {
-      "id": "apps_web_src_app_layout_rootlayout",
-      "label": "RootLayout()",
+      "id": "apps_api_src_services_bugservice_bugservice_convertbugtotask",
+      "label": ".convertBugToTask()",
       "_callable": true,
       "_origin": "ast",
-      "community": 53,
-      "community_name": "ThemeContext.tsx",
+      "community": 50,
+      "community_name": "automationService.ts",
       "file_type": "code",
-      "norm_label": "rootlayout()",
-      "source_file": "apps/web/src/app/layout.tsx",
-      "source_location": "L10"
+      "norm_label": ".convertbugtotask()",
+      "source_file": "apps/api/src/services/bugService.ts",
+      "source_location": "L360"
     },
     {
-      "id": "apps_web_src_context_themecontext_themeprovider",
-      "label": "ThemeProvider()",
+      "id": "apps_api_src_services_bugservice_bugservice_createbug",
+      "label": ".createBug()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 50,
+      "community_name": "automationService.ts",
+      "file_type": "code",
+      "norm_label": ".createbug()",
+      "source_file": "apps/api/src/services/bugService.ts",
+      "source_location": "L172"
+    },
+    {
+      "id": "apps_api_src_services_bugservice_bugservice_deletebug",
+      "label": ".deleteBug()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 50,
+      "community_name": "automationService.ts",
+      "file_type": "code",
+      "norm_label": ".deletebug()",
+      "source_file": "apps/api/src/services/bugService.ts",
+      "source_location": "L334"
+    },
+    {
+      "id": "apps_api_src_services_bugservice_bugservice_enrichbug",
+      "label": ".enrichBug()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 50,
+      "community_name": "automationService.ts",
+      "file_type": "code",
+      "norm_label": ".enrichbug()",
+      "source_file": "apps/api/src/services/bugService.ts",
+      "source_location": "L119"
+    },
+    {
+      "id": "apps_api_src_services_bugservice_bugservice_getbugbyid",
+      "label": ".getBugById()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 50,
+      "community_name": "automationService.ts",
+      "file_type": "code",
+      "norm_label": ".getbugbyid()",
+      "source_file": "apps/api/src/services/bugService.ts",
+      "source_location": "L163"
+    },
+    {
+      "id": "apps_api_src_services_bugservice_bugservice_getbugs",
+      "label": ".getBugs()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 50,
+      "community_name": "automationService.ts",
+      "file_type": "code",
+      "norm_label": ".getbugs()",
+      "source_file": "apps/api/src/services/bugService.ts",
+      "source_location": "L132"
+    },
+    {
+      "id": "apps_api_src_services_bugservice_bugservice_initfromdb",
+      "label": ".initFromDb()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 50,
+      "community_name": "automationService.ts",
+      "file_type": "code",
+      "norm_label": ".initfromdb()",
+      "source_file": "apps/api/src/services/bugService.ts",
+      "source_location": "L9"
+    },
+    {
+      "id": "apps_api_src_services_bugservice_bugservice_updatebug",
+      "label": ".updateBug()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 50,
+      "community_name": "automationService.ts",
+      "file_type": "code",
+      "norm_label": ".updatebug()",
+      "source_file": "apps/api/src/services/bugService.ts",
+      "source_location": "L264"
+    },
+    {
+      "id": "apps_web_src_components_themetoggle_themetoggle",
+      "label": "ThemeToggle()",
       "_callable": true,
       "_origin": "ast",
       "community": 53,
       "community_name": "ThemeContext.tsx",
       "file_type": "code",
-      "norm_label": "themeprovider()",
+      "norm_label": "themetoggle()",
+      "source_file": "apps/web/src/components/ThemeToggle.tsx",
+      "source_location": "L12"
+    },
+    {
+      "id": "apps_web_src_context_themecontext_usetheme",
+      "label": "useTheme()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 53,
+      "community_name": "ThemeContext.tsx",
+      "file_type": "code",
+      "norm_label": "usetheme()",
       "source_file": "apps/web/src/context/ThemeContext.tsx",
-      "source_location": "L17"
+      "source_location": "L66"
+    },
+    {
+      "id": "apps_api_src_services_webhookcryptoservice_decryptchannelmessagenode",
+      "label": "decryptChannelMessageNode()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 58,
+      "community_name": "webhookService.ts",
+      "file_type": "code",
+      "norm_label": "decryptchannelmessagenode()",
+      "source_file": "apps/api/src/services/webhookCryptoService.ts",
+      "source_location": "L50"
+    },
+    {
+      "id": "apps_api_src_services_webhookcryptoservice_derivechannelkeynode",
+      "label": "deriveChannelKeyNode()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 58,
+      "community_name": "webhookService.ts",
+      "file_type": "code",
+      "norm_label": "derivechannelkeynode()",
+      "source_file": "apps/api/src/services/webhookCryptoService.ts",
+      "source_location": "L9"
+    },
+    {
+      "id": "apps_api_src_services_webhookcryptoservice_generatewebhooksecret",
+      "label": "generateWebhookSecret()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 58,
+      "community_name": "webhookService.ts",
+      "file_type": "code",
+      "norm_label": "generatewebhooksecret()",
+      "source_file": "apps/api/src/services/webhookCryptoService.ts",
+      "source_location": "L110"
+    },
+    {
+      "id": "apps_api_src_services_webhookcryptoservice_generatewebhooktoken",
+      "label": "generateWebhookToken()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 58,
+      "community_name": "webhookService.ts",
+      "file_type": "code",
+      "norm_label": "generatewebhooktoken()",
+      "source_file": "apps/api/src/services/webhookCryptoService.ts",
+      "source_location": "L106"
+    },
+    {
+      "id": "apps_api_src_services_webhookcryptoservice_verifyhmacsha256",
+      "label": "verifyHmacSha256()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 58,
+      "community_name": "webhookService.ts",
+      "file_type": "code",
+      "norm_label": "verifyhmacsha256()",
+      "source_file": "apps/api/src/services/webhookCryptoService.ts",
+      "source_location": "L77"
+    },
+    {
+      "id": "apps_api_src_services_webhookservice_webhookservice_createwebhook",
+      "label": ".createWebhook()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 58,
+      "community_name": "webhookService.ts",
+      "file_type": "code",
+      "norm_label": ".createwebhook()",
+      "source_file": "apps/api/src/services/webhookService.ts",
+      "source_location": "L20"
     },
     {
       "id": "apps_api_src_controllers_dmcontroller_deletedirectmessage",
@@ -5852,18 +5336,6 @@
       "source_location": "L210"
     },
     {
-      "id": "apps_api_src_services_socketservice_socketservice_emitmessageedited",
-      "label": ".emitMessageEdited()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "dmController.ts",
-      "file_type": "code",
-      "norm_label": ".emitmessageedited()",
-      "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L205"
-    },
-    {
       "id": "apps_api_src_services_socketservice_socketservice_emitmessagereaction",
       "label": ".emitMessageReaction()",
       "_callable": true,
@@ -5886,18 +5358,6 @@
       "norm_label": ".emitnewdirectmessage()",
       "source_file": "apps/api/src/services/socketService.ts",
       "source_location": "L230"
-    },
-    {
-      "id": "apps_api_src_services_socketservice_socketservice_emitnewmessage",
-      "label": ".emitNewMessage()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "dmController.ts",
-      "file_type": "code",
-      "norm_label": ".emitnewmessage()",
-      "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L195"
     },
     {
       "id": "apps_api_src_services_socketservice_socketservice_emitsessionrevoked",
@@ -5948,18 +5408,6 @@
       "source_location": "L270"
     },
     {
-      "id": "apps_api_src_services_socketservice_socketservice_emitthreadreply",
-      "label": ".emitThreadReply()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "dmController.ts",
-      "file_type": "code",
-      "norm_label": ".emitthreadreply()",
-      "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L215"
-    },
-    {
       "id": "apps_api_src_services_socketservice_socketservice_emitusercreated",
       "label": ".emitUserCreated()",
       "_callable": true,
@@ -5994,6 +5442,558 @@
       "norm_label": ".init()",
       "source_file": "apps/api/src/services/socketService.ts",
       "source_location": "L19"
+    },
+    {
+      "id": "apps_web_src_app_layout_rootlayout",
+      "label": "RootLayout()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "layout.tsx",
+      "file_type": "code",
+      "norm_label": "rootlayout()",
+      "source_file": "apps/web/src/app/layout.tsx",
+      "source_location": "L10"
+    },
+    {
+      "id": "apps_web_src_context_themecontext_themeprovider",
+      "label": "ThemeProvider()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "layout.tsx",
+      "file_type": "code",
+      "norm_label": "themeprovider()",
+      "source_file": "apps/web/src/context/ThemeContext.tsx",
+      "source_location": "L17"
+    },
+    {
+      "id": "apps_api_src_services_projectservice_projectservice_createproject",
+      "label": ".createProject()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 66,
+      "community_name": "projectService",
+      "file_type": "code",
+      "norm_label": ".createproject()",
+      "source_file": "apps/api/src/services/projectService.ts",
+      "source_location": "L163"
+    },
+    {
+      "id": "apps_api_src_services_projectservice_projectservice_deleteproject",
+      "label": ".deleteProject()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 66,
+      "community_name": "projectService",
+      "file_type": "code",
+      "norm_label": ".deleteproject()",
+      "source_file": "apps/api/src/services/projectService.ts",
+      "source_location": "L275"
+    },
+    {
+      "id": "apps_api_src_services_projectservice_projectservice_enrichproject",
+      "label": ".enrichProject()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 66,
+      "community_name": "projectService",
+      "file_type": "code",
+      "norm_label": ".enrichproject()",
+      "source_file": "apps/api/src/services/projectService.ts",
+      "source_location": "L150"
+    },
+    {
+      "id": "apps_api_src_services_projectservice_projectservice_getprojectbyid",
+      "label": ".getProjectById()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 66,
+      "community_name": "projectService",
+      "file_type": "code",
+      "norm_label": ".getprojectbyid()",
+      "source_file": "apps/api/src/services/projectService.ts",
+      "source_location": "L131"
+    },
+    {
+      "id": "apps_api_src_services_projectservice_projectservice_getprojectraw",
+      "label": ".getProjectRaw()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 66,
+      "community_name": "projectService",
+      "file_type": "code",
+      "norm_label": ".getprojectraw()",
+      "source_file": "apps/api/src/services/projectService.ts",
+      "source_location": "L142"
+    },
+    {
+      "id": "apps_api_src_services_projectservice_projectservice_getprojects",
+      "label": ".getProjects()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 66,
+      "community_name": "projectService",
+      "file_type": "code",
+      "norm_label": ".getprojects()",
+      "source_file": "apps/api/src/services/projectService.ts",
+      "source_location": "L125"
+    },
+    {
+      "id": "apps_api_src_services_projectservice_projectservice_getprojectsraw",
+      "label": ".getProjectsRaw()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 66,
+      "community_name": "projectService",
+      "file_type": "code",
+      "norm_label": ".getprojectsraw()",
+      "source_file": "apps/api/src/services/projectService.ts",
+      "source_location": "L146"
+    },
+    {
+      "id": "apps_api_src_services_projectservice_projectservice_hasprojectaccess",
+      "label": ".hasProjectAccess()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 66,
+      "community_name": "projectService",
+      "file_type": "code",
+      "norm_label": ".hasprojectaccess()",
+      "source_file": "apps/api/src/services/projectService.ts",
+      "source_location": "L115"
+    },
+    {
+      "id": "apps_api_src_services_projectservice_projectservice_initfromdb",
+      "label": ".initFromDb()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 66,
+      "community_name": "projectService",
+      "file_type": "code",
+      "norm_label": ".initfromdb()",
+      "source_file": "apps/api/src/services/projectService.ts",
+      "source_location": "L7"
+    },
+    {
+      "id": "apps_api_src_services_projectservice_projectservice_updateproject",
+      "label": ".updateProject()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 66,
+      "community_name": "projectService",
+      "file_type": "code",
+      "norm_label": ".updateproject()",
+      "source_file": "apps/api/src/services/projectService.ts",
+      "source_location": "L229"
+    },
+    {
+      "id": "apps_api_src_services_datastore_datastore_addmessage",
+      "label": ".addMessage()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 67,
+      "community_name": "Message",
+      "file_type": "code",
+      "norm_label": ".addmessage()",
+      "source_file": "apps/api/src/services/dataStore.ts",
+      "source_location": "L778"
+    },
+    {
+      "id": "apps_api_src_services_datastore_datastore_deletemessage",
+      "label": ".deleteMessage()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 67,
+      "community_name": "Message",
+      "file_type": "code",
+      "norm_label": ".deletemessage()",
+      "source_file": "apps/api/src/services/dataStore.ts",
+      "source_location": "L928"
+    },
+    {
+      "id": "apps_api_src_services_datastore_datastore_editmessage",
+      "label": ".editMessage()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 67,
+      "community_name": "Message",
+      "file_type": "code",
+      "norm_label": ".editmessage()",
+      "source_file": "apps/api/src/services/dataStore.ts",
+      "source_location": "L900"
+    },
+    {
+      "id": "apps_api_src_services_datastore_datastore_getmessagebyid",
+      "label": ".getMessageById()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 67,
+      "community_name": "Message",
+      "file_type": "code",
+      "norm_label": ".getmessagebyid()",
+      "source_file": "apps/api/src/services/dataStore.ts",
+      "source_location": "L774"
+    },
+    {
+      "id": "apps_api_src_services_datastore_datastore_getmessagesbychannel",
+      "label": ".getMessagesByChannel()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 67,
+      "community_name": "Message",
+      "file_type": "code",
+      "norm_label": ".getmessagesbychannel()",
+      "source_file": "apps/api/src/services/dataStore.ts",
+      "source_location": "L725"
+    },
+    {
+      "id": "apps_api_src_services_datastore_datastore_getthreadreplies",
+      "label": ".getThreadReplies()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 67,
+      "community_name": "Message",
+      "file_type": "code",
+      "norm_label": ".getthreadreplies()",
+      "source_file": "apps/api/src/services/dataStore.ts",
+      "source_location": "L765"
+    },
+    {
+      "id": "apps_api_src_services_datastore_datastore_togglemessagereaction",
+      "label": ".toggleMessageReaction()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 67,
+      "community_name": "Message",
+      "file_type": "code",
+      "norm_label": ".togglemessagereaction()",
+      "source_file": "apps/api/src/services/dataStore.ts",
+      "source_location": "L870"
+    },
+    {
+      "id": "apps_api_src_services_socketservice_socketservice_emitmessageedited",
+      "label": ".emitMessageEdited()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 67,
+      "community_name": "Message",
+      "file_type": "code",
+      "norm_label": ".emitmessageedited()",
+      "source_file": "apps/api/src/services/socketService.ts",
+      "source_location": "L205"
+    },
+    {
+      "id": "apps_api_src_services_socketservice_socketservice_emitnewmessage",
+      "label": ".emitNewMessage()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 67,
+      "community_name": "Message",
+      "file_type": "code",
+      "norm_label": ".emitnewmessage()",
+      "source_file": "apps/api/src/services/socketService.ts",
+      "source_location": "L195"
+    },
+    {
+      "id": "apps_api_src_services_socketservice_socketservice_emitthreadreply",
+      "label": ".emitThreadReply()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 67,
+      "community_name": "Message",
+      "file_type": "code",
+      "norm_label": ".emitthreadreply()",
+      "source_file": "apps/api/src/services/socketService.ts",
+      "source_location": "L215"
+    },
+    {
+      "id": "apps_api_src_services_authservice_authservice_comparepassword",
+      "label": ".comparePassword()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 68,
+      "community_name": "authService",
+      "file_type": "code",
+      "norm_label": ".comparepassword()",
+      "source_file": "apps/api/src/services/authService.ts",
+      "source_location": "L39"
+    },
+    {
+      "id": "apps_api_src_services_authservice_authservice_constructor",
+      "label": ".constructor()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 68,
+      "community_name": "authService",
+      "file_type": "code",
+      "norm_label": ".constructor()",
+      "source_file": "apps/api/src/services/authService.ts",
+      "source_location": "L21"
+    },
+    {
+      "id": "apps_api_src_services_authservice_authservice_generatetoken",
+      "label": ".generateToken()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 68,
+      "community_name": "authService",
+      "file_type": "code",
+      "norm_label": ".generatetoken()",
+      "source_file": "apps/api/src/services/authService.ts",
+      "source_location": "L43"
+    },
+    {
+      "id": "apps_api_src_services_authservice_authservice_hashpassword",
+      "label": ".hashPassword()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 68,
+      "community_name": "authService",
+      "file_type": "code",
+      "norm_label": ".hashpassword()",
+      "source_file": "apps/api/src/services/authService.ts",
+      "source_location": "L35"
+    },
+    {
+      "id": "apps_api_src_services_authservice_authservice_login",
+      "label": ".login()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 68,
+      "community_name": "authService",
+      "file_type": "code",
+      "norm_label": ".login()",
+      "source_file": "apps/api/src/services/authService.ts",
+      "source_location": "L77"
+    },
+    {
+      "id": "apps_api_src_services_authservice_authservice_register",
+      "label": ".register()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 68,
+      "community_name": "authService",
+      "file_type": "code",
+      "norm_label": ".register()",
+      "source_file": "apps/api/src/services/authService.ts",
+      "source_location": "L121"
+    },
+    {
+      "id": "apps_api_src_services_authservice_authservice_seedusercredentials",
+      "label": ".seedUserCredentials()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 68,
+      "community_name": "authService",
+      "file_type": "code",
+      "norm_label": ".seedusercredentials()",
+      "source_file": "apps/api/src/services/authService.ts",
+      "source_location": "L26"
+    },
+    {
+      "id": "apps_api_src_services_authservice_authservice_updateprofile",
+      "label": ".updateProfile()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 68,
+      "community_name": "authService",
+      "file_type": "code",
+      "norm_label": ".updateprofile()",
+      "source_file": "apps/api/src/services/authService.ts",
+      "source_location": "L181"
+    },
+    {
+      "id": "apps_api_src_services_taskcommentservice_taskcommentservice_addcomment",
+      "label": ".addComment()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 69,
+      "community_name": "taskCommentService",
+      "file_type": "code",
+      "norm_label": ".addcomment()",
+      "source_file": "apps/api/src/services/taskCommentService.ts",
+      "source_location": "L72"
+    },
+    {
+      "id": "apps_api_src_services_taskcommentservice_taskcommentservice_deletecomment",
+      "label": ".deleteComment()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 69,
+      "community_name": "taskCommentService",
+      "file_type": "code",
+      "norm_label": ".deletecomment()",
+      "source_file": "apps/api/src/services/taskCommentService.ts",
+      "source_location": "L119"
+    },
+    {
+      "id": "apps_api_src_services_taskcommentservice_taskcommentservice_enrichcomment",
+      "label": ".enrichComment()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 69,
+      "community_name": "taskCommentService",
+      "file_type": "code",
+      "norm_label": ".enrichcomment()",
+      "source_file": "apps/api/src/services/taskCommentService.ts",
+      "source_location": "L53"
+    },
+    {
+      "id": "apps_api_src_services_taskcommentservice_taskcommentservice_getcommentcountfortask",
+      "label": ".getCommentCountForTask()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 69,
+      "community_name": "taskCommentService",
+      "file_type": "code",
+      "norm_label": ".getcommentcountfortask()",
+      "source_file": "apps/api/src/services/taskCommentService.ts",
+      "source_location": "L68"
+    },
+    {
+      "id": "apps_api_src_services_taskcommentservice_taskcommentservice_getcommentsbytask",
+      "label": ".getCommentsByTask()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 69,
+      "community_name": "taskCommentService",
+      "file_type": "code",
+      "norm_label": ".getcommentsbytask()",
+      "source_file": "apps/api/src/services/taskCommentService.ts",
+      "source_location": "L61"
+    },
+    {
+      "id": "apps_api_src_services_taskcommentservice_taskcommentservice_initfromdb",
+      "label": ".initFromDb()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 69,
+      "community_name": "taskCommentService",
+      "file_type": "code",
+      "norm_label": ".initfromdb()",
+      "source_file": "apps/api/src/services/taskCommentService.ts",
+      "source_location": "L7"
+    },
+    {
+      "id": "apps_api_src_services_automationservice_automationservice_evaluateconditions",
+      "label": ".evaluateConditions()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "automationService",
+      "file_type": "code",
+      "norm_label": ".evaluateconditions()",
+      "source_file": "apps/api/src/services/automationService.ts",
+      "source_location": "L149"
+    },
+    {
+      "id": "apps_api_src_services_automationservice_automationservice_executeactions",
+      "label": ".executeActions()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "automationService",
+      "file_type": "code",
+      "norm_label": ".executeactions()",
+      "source_file": "apps/api/src/services/automationService.ts",
+      "source_location": "L169"
+    },
+    {
+      "id": "apps_api_src_services_automationservice_automationservice_parseandprocesssmartreferences",
+      "label": ".parseAndProcessSmartReferences()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "automationService",
+      "file_type": "code",
+      "norm_label": ".parseandprocesssmartreferences()",
+      "source_file": "apps/api/src/services/automationService.ts",
+      "source_location": "L21"
+    },
+    {
+      "id": "apps_api_src_services_automationservice_automationservice_rendertemplate",
+      "label": ".renderTemplate()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "automationService",
+      "file_type": "code",
+      "norm_label": ".rendertemplate()",
+      "source_file": "apps/api/src/services/automationService.ts",
+      "source_location": "L250"
+    },
+    {
+      "id": "apps_api_src_services_automationservice_automationservice_trigger",
+      "label": ".trigger()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 71,
+      "community_name": "automationService",
+      "file_type": "code",
+      "norm_label": ".trigger()",
+      "source_file": "apps/api/src/services/automationService.ts",
+      "source_location": "L132"
+    },
+    {
+      "id": "apps_api_src_services_datastore_datastore_addwebhooklog",
+      "label": ".addWebhookLog()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 72,
+      "community_name": "WebhookLog",
+      "file_type": "code",
+      "norm_label": ".addwebhooklog()",
+      "source_file": "apps/api/src/services/dataStore.ts",
+      "source_location": "L1035"
+    },
+    {
+      "id": "apps_api_src_services_datastore_datastore_getwebhooklogs",
+      "label": ".getWebhookLogs()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 72,
+      "community_name": "WebhookLog",
+      "file_type": "code",
+      "norm_label": ".getwebhooklogs()",
+      "source_file": "apps/api/src/services/dataStore.ts",
+      "source_location": "L1031"
+    },
+    {
+      "id": "apps_api_src_services_webhookservice_webhookservice_getwebhooklogs",
+      "label": ".getWebhookLogs()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 72,
+      "community_name": "WebhookLog",
+      "file_type": "code",
+      "norm_label": ".getwebhooklogs()",
+      "source_file": "apps/api/src/services/webhookService.ts",
+      "source_location": "L62"
+    },
+    {
+      "id": "scratch_test_project_members_assert",
+      "label": "assert()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 73,
+      "community_name": "test-project-members.ts",
+      "file_type": "code",
+      "norm_label": "assert()",
+      "source_file": "scratch/test-project-members.ts",
+      "source_location": "L7"
+    },
+    {
+      "id": "scratch_test_project_members_runtests",
+      "label": "runTests()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 73,
+      "community_name": "test-project-members.ts",
+      "file_type": "code",
+      "norm_label": "runtests()",
+      "source_file": "scratch/test-project-members.ts",
+      "source_location": "L15"
     },
     {
       "id": "apps_web_src_app_page_home",
@@ -6338,6 +6338,39 @@
       "norm_label": "avatar_presets",
       "source_file": "apps/web/src/components/SettingsModal.tsx",
       "source_location": "L62"
+    },
+    {
+      "id": "apps_web_src_components_taskdetailmodal",
+      "label": "TaskDetailModal.tsx",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "web/src/types/index.ts",
+      "file_type": "code",
+      "norm_label": "taskdetailmodal.tsx",
+      "source_file": "apps/web/src/components/TaskDetailModal.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "apps_web_src_components_taskdetailmodal_priority_labels",
+      "label": "PRIORITY_LABELS",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "web/src/types/index.ts",
+      "file_type": "code",
+      "norm_label": "priority_labels",
+      "source_file": "apps/web/src/components/TaskDetailModal.tsx",
+      "source_location": "L227"
+    },
+    {
+      "id": "apps_web_src_components_taskdetailmodal_status_labels",
+      "label": "STATUS_LABELS",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "web/src/types/index.ts",
+      "file_type": "code",
+      "norm_label": "status_labels",
+      "source_file": "apps/web/src/components/TaskDetailModal.tsx",
+      "source_location": "L219"
     },
     {
       "id": "apps_web_src_lib_api",
@@ -7224,6 +7257,17 @@
       "source_location": "L11"
     },
     {
+      "id": "apps_api_src_routes_dmroutes_router",
+      "label": "router",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "src/index.ts",
+      "file_type": "code",
+      "norm_label": "router",
+      "source_file": "apps/api/src/routes/dmRoutes.ts",
+      "source_location": "L19"
+    },
+    {
       "id": "apps_api_src_routes_healthroutes_router",
       "label": "router",
       "_origin": "ast",
@@ -7235,15 +7279,15 @@
       "source_location": "L8"
     },
     {
-      "id": "apps_api_src_routes_logroutes_router",
+      "id": "apps_api_src_routes_memberroutes_router",
       "label": "router",
       "_origin": "ast",
       "community": 2,
       "community_name": "src/index.ts",
       "file_type": "code",
       "norm_label": "router",
-      "source_file": "apps/api/src/routes/logRoutes.ts",
-      "source_location": "L5"
+      "source_file": "apps/api/src/routes/memberRoutes.ts",
+      "source_location": "L14"
     },
     {
       "id": "apps_api_src_routes_notificationroutes_router",
@@ -7257,15 +7301,26 @@
       "source_location": "L13"
     },
     {
-      "id": "apps_api_src_routes_webhookroutes_router",
+      "id": "apps_api_src_routes_sessionroutes_router",
       "label": "router",
       "_origin": "ast",
       "community": 2,
       "community_name": "src/index.ts",
       "file_type": "code",
       "norm_label": "router",
-      "source_file": "apps/api/src/routes/webhookRoutes.ts",
-      "source_location": "L6"
+      "source_file": "apps/api/src/routes/sessionRoutes.ts",
+      "source_location": "L9"
+    },
+    {
+      "id": "apps_api_src_routes_taskroutes_router",
+      "label": "router",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "src/index.ts",
+      "file_type": "code",
+      "norm_label": "router",
+      "source_file": "apps/api/src/routes/taskRoutes.ts",
+      "source_location": "L24"
     },
     {
       "id": "agents_workflows_graphify",
@@ -7629,17 +7684,6 @@
       "source_location": "L108"
     },
     {
-      "id": "apps_api_src_middleware_ratelimiter_webhookingestratelimiter",
-      "label": "webhookIngestRateLimiter",
-      "_origin": "ast",
-      "community": 25,
-      "community_name": "test-pentest-remediations.ts",
-      "file_type": "code",
-      "norm_label": "webhookingestratelimiter",
-      "source_file": "apps/api/src/middleware/rateLimiter.ts",
-      "source_location": "L120"
-    },
-    {
       "id": "apps_api_src_routes_channelroutes",
       "label": "channelRoutes.ts",
       "_origin": "ast",
@@ -7750,6 +7794,17 @@
       "source_location": "L1"
     },
     {
+      "id": "apps_api_src_controllers_sessioncontroller",
+      "label": "sessionController.ts",
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "authMiddleware.ts",
+      "file_type": "code",
+      "norm_label": "sessioncontroller.ts",
+      "source_file": "apps/api/src/controllers/sessionController.ts",
+      "source_location": "L1"
+    },
+    {
       "id": "apps_api_src_middleware_authmiddleware",
       "label": "authMiddleware.ts",
       "_origin": "ast",
@@ -7794,15 +7849,15 @@
       "source_location": "L14"
     },
     {
-      "id": "apps_api_src_middleware_ratelimiter_messagingratelimiter",
-      "label": "messagingRateLimiter",
+      "id": "apps_api_src_middleware_ratelimiter_webhookingestratelimiter",
+      "label": "webhookIngestRateLimiter",
       "_origin": "ast",
       "community": 28,
       "community_name": "authMiddleware.ts",
       "file_type": "code",
-      "norm_label": "messagingratelimiter",
+      "norm_label": "webhookingestratelimiter",
       "source_file": "apps/api/src/middleware/rateLimiter.ts",
-      "source_location": "L112"
+      "source_location": "L120"
     },
     {
       "id": "apps_api_src_routes_fileroutes",
@@ -7838,26 +7893,26 @@
       "source_location": "L1"
     },
     {
-      "id": "apps_api_src_routes_messageroutes",
-      "label": "messageRoutes.ts",
-      "_origin": "ast",
-      "community": 28,
-      "community_name": "authMiddleware.ts",
-      "file_type": "code",
-      "norm_label": "messageroutes.ts",
-      "source_file": "apps/api/src/routes/messageRoutes.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "apps_api_src_routes_messageroutes_router",
+      "id": "apps_api_src_routes_logroutes_router",
       "label": "router",
       "_origin": "ast",
       "community": 28,
       "community_name": "authMiddleware.ts",
       "file_type": "code",
       "norm_label": "router",
-      "source_file": "apps/api/src/routes/messageRoutes.ts",
-      "source_location": "L13"
+      "source_file": "apps/api/src/routes/logRoutes.ts",
+      "source_location": "L5"
+    },
+    {
+      "id": "apps_api_src_routes_sessionroutes",
+      "label": "sessionRoutes.ts",
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "authMiddleware.ts",
+      "file_type": "code",
+      "norm_label": "sessionroutes.ts",
+      "source_file": "apps/api/src/routes/sessionRoutes.ts",
+      "source_location": "L1"
     },
     {
       "id": "apps_api_src_routes_webhookroutes",
@@ -7871,6 +7926,17 @@
       "source_location": "L1"
     },
     {
+      "id": "apps_api_src_routes_webhookroutes_router",
+      "label": "router",
+      "_origin": "ast",
+      "community": 28,
+      "community_name": "authMiddleware.ts",
+      "file_type": "code",
+      "norm_label": "router",
+      "source_file": "apps/api/src/routes/webhookRoutes.ts",
+      "source_location": "L6"
+    },
+    {
       "id": "ref_express",
       "label": "express",
       "_origin": "ast",
@@ -7882,37 +7948,125 @@
       "source_location": "L22"
     },
     {
-      "id": "apps_web_src_components_taskdetailmodal",
-      "label": "TaskDetailModal.tsx",
+      "id": "apps_api_src_services_authservice",
+      "label": "authService.ts",
       "_origin": "ast",
       "community": 29,
-      "community_name": "TaskDetailModal.tsx",
+      "community_name": "socketService.ts",
       "file_type": "code",
-      "norm_label": "taskdetailmodal.tsx",
-      "source_file": "apps/web/src/components/TaskDetailModal.tsx",
+      "norm_label": "authservice.ts",
+      "source_file": "apps/api/src/services/authService.ts",
       "source_location": "L1"
     },
     {
-      "id": "apps_web_src_components_taskdetailmodal_priority_labels",
-      "label": "PRIORITY_LABELS",
+      "id": "apps_api_src_services_memberservice",
+      "label": "memberService.ts",
       "_origin": "ast",
       "community": 29,
-      "community_name": "TaskDetailModal.tsx",
+      "community_name": "socketService.ts",
       "file_type": "code",
-      "norm_label": "priority_labels",
-      "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L227"
+      "norm_label": "memberservice.ts",
+      "source_file": "apps/api/src/services/memberService.ts",
+      "source_location": "L1"
     },
     {
-      "id": "apps_web_src_components_taskdetailmodal_status_labels",
-      "label": "STATUS_LABELS",
+      "id": "apps_api_src_services_memberservice_avatar_presets",
+      "label": "AVATAR_PRESETS",
       "_origin": "ast",
       "community": 29,
-      "community_name": "TaskDetailModal.tsx",
+      "community_name": "socketService.ts",
       "file_type": "code",
-      "norm_label": "status_labels",
-      "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L219"
+      "norm_label": "avatar_presets",
+      "source_file": "apps/api/src/services/memberService.ts",
+      "source_location": "L11"
+    },
+    {
+      "id": "apps_api_src_services_redisservice",
+      "label": "redisService.ts",
+      "_origin": "ast",
+      "community": 29,
+      "community_name": "socketService.ts",
+      "file_type": "code",
+      "norm_label": "redisservice.ts",
+      "source_file": "apps/api/src/services/redisService.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "apps_api_src_services_sessionservice",
+      "label": "sessionService.ts",
+      "_origin": "ast",
+      "community": 29,
+      "community_name": "socketService.ts",
+      "file_type": "code",
+      "norm_label": "sessionservice.ts",
+      "source_file": "apps/api/src/services/sessionService.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "apps_api_src_services_socketservice",
+      "label": "socketService.ts",
+      "_origin": "ast",
+      "community": 29,
+      "community_name": "socketService.ts",
+      "file_type": "code",
+      "norm_label": "socketservice.ts",
+      "source_file": "apps/api/src/services/socketService.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "ref_bcryptjs",
+      "label": "bcryptjs",
+      "_origin": "ast",
+      "community": 29,
+      "community_name": "socketService.ts",
+      "file_type": "concept",
+      "norm_label": "bcryptjs",
+      "source_file": "apps/api/package.json",
+      "source_location": "L19"
+    },
+    {
+      "id": "ref_ioredis",
+      "label": "ioredis",
+      "_origin": "ast",
+      "community": 29,
+      "community_name": "socketService.ts",
+      "file_type": "concept",
+      "norm_label": "ioredis",
+      "source_file": "apps/api/package.json",
+      "source_location": "L23"
+    },
+    {
+      "id": "ref_jsonwebtoken",
+      "label": "jsonwebtoken",
+      "_origin": "ast",
+      "community": 29,
+      "community_name": "socketService.ts",
+      "file_type": "concept",
+      "norm_label": "jsonwebtoken",
+      "source_file": "apps/api/package.json",
+      "source_location": "L24"
+    },
+    {
+      "id": "ref_socket_io",
+      "label": "socket.io",
+      "_origin": "ast",
+      "community": 29,
+      "community_name": "socketService.ts",
+      "file_type": "concept",
+      "norm_label": "socket.io",
+      "source_file": "apps/api/package.json",
+      "source_location": "L27"
+    },
+    {
+      "id": "ref_socket_io_redis_adapter",
+      "label": "@socket.io/redis-adapter",
+      "_origin": "ast",
+      "community": 29,
+      "community_name": "socketService.ts",
+      "file_type": "concept",
+      "norm_label": "@socket.io/redis-adapter",
+      "source_file": "apps/api/package.json",
+      "source_location": "L18"
     },
     {
       "id": "docs_deployment_hybrid",
@@ -8105,17 +8259,6 @@
       "source_location": "L12"
     },
     {
-      "id": "apps_api_src_controllers_authcontroller_registerschema",
-      "label": "RegisterSchema",
-      "_origin": "ast",
-      "community": 30,
-      "community_name": "authController.ts",
-      "file_type": "code",
-      "norm_label": "registerschema",
-      "source_file": "apps/api/src/controllers/authController.ts",
-      "source_location": "L17"
-    },
-    {
       "id": "apps_api_src_controllers_authcontroller_updateprofileschema",
       "label": "UpdateProfileSchema",
       "_origin": "ast",
@@ -8124,7 +8267,7 @@
       "file_type": "code",
       "norm_label": "updateprofileschema",
       "source_file": "apps/api/src/controllers/authController.ts",
-      "source_location": "L146"
+      "source_location": "L110"
     },
     {
       "id": "apps_api_src_controllers_authcontroller_uploadavatarschema",
@@ -8135,7 +8278,7 @@
       "file_type": "code",
       "norm_label": "uploadavatarschema",
       "source_file": "apps/api/src/controllers/authController.ts",
-      "source_location": "L194"
+      "source_location": "L158"
     },
     {
       "id": "apps_api_src_routes_authroutes",
@@ -8270,17 +8413,6 @@
       "source_location": "L1"
     },
     {
-      "id": "apps_api_src_routes_taskroutes_router",
-      "label": "router",
-      "_origin": "ast",
-      "community": 31,
-      "community_name": "taskController.ts",
-      "file_type": "code",
-      "norm_label": "router",
-      "source_file": "apps/api/src/routes/taskRoutes.ts",
-      "source_location": "L24"
-    },
-    {
       "id": "ref_zod",
       "label": "zod",
       "_origin": "ast",
@@ -8358,17 +8490,6 @@
       "source_location": "L1"
     },
     {
-      "id": "apps_api_src_routes_memberroutes_router",
-      "label": "router",
-      "_origin": "ast",
-      "community": 32,
-      "community_name": "memberController.ts",
-      "file_type": "code",
-      "norm_label": "router",
-      "source_file": "apps/api/src/routes/memberRoutes.ts",
-      "source_location": "L14"
-    },
-    {
       "id": "apps_web_src_components_chatarea",
       "label": "ChatArea.tsx",
       "_origin": "ast",
@@ -8422,72 +8543,6 @@
       "norm_label": "filecrypto.ts",
       "source_file": "apps/web/src/lib/fileCrypto.ts",
       "source_location": "L1"
-    },
-    {
-      "id": "apps_api_src_services_authservice",
-      "label": "authService.ts",
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "authService.ts",
-      "file_type": "code",
-      "norm_label": "authservice.ts",
-      "source_file": "apps/api/src/services/authService.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "apps_api_src_services_memberservice",
-      "label": "memberService.ts",
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "authService.ts",
-      "file_type": "code",
-      "norm_label": "memberservice.ts",
-      "source_file": "apps/api/src/services/memberService.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "apps_api_src_services_memberservice_avatar_presets",
-      "label": "AVATAR_PRESETS",
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "authService.ts",
-      "file_type": "code",
-      "norm_label": "avatar_presets",
-      "source_file": "apps/api/src/services/memberService.ts",
-      "source_location": "L11"
-    },
-    {
-      "id": "apps_api_src_services_mongologger",
-      "label": "mongoLogger.ts",
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "authService.ts",
-      "file_type": "code",
-      "norm_label": "mongologger.ts",
-      "source_file": "apps/api/src/services/mongoLogger.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "apps_api_src_services_sessionservice",
-      "label": "sessionService.ts",
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "authService.ts",
-      "file_type": "code",
-      "norm_label": "sessionservice.ts",
-      "source_file": "apps/api/src/services/sessionService.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "ref_bcryptjs",
-      "label": "bcryptjs",
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "authService.ts",
-      "file_type": "concept",
-      "norm_label": "bcryptjs",
-      "source_file": "apps/api/package.json",
-      "source_location": "L19"
     },
     {
       "id": "apps_api_src_controllers_projectcontroller",
@@ -8565,6 +8620,39 @@
       "norm_label": "createmessageschema",
       "source_file": "apps/api/src/controllers/messageController.ts",
       "source_location": "L10"
+    },
+    {
+      "id": "apps_api_src_middleware_ratelimiter_messagingratelimiter",
+      "label": "messagingRateLimiter",
+      "_origin": "ast",
+      "community": 37,
+      "community_name": "messageController.ts",
+      "file_type": "code",
+      "norm_label": "messagingratelimiter",
+      "source_file": "apps/api/src/middleware/rateLimiter.ts",
+      "source_location": "L112"
+    },
+    {
+      "id": "apps_api_src_routes_messageroutes",
+      "label": "messageRoutes.ts",
+      "_origin": "ast",
+      "community": 37,
+      "community_name": "messageController.ts",
+      "file_type": "code",
+      "norm_label": "messageroutes.ts",
+      "source_file": "apps/api/src/routes/messageRoutes.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "apps_api_src_routes_messageroutes_router",
+      "label": "router",
+      "_origin": "ast",
+      "community": 37,
+      "community_name": "messageController.ts",
+      "file_type": "code",
+      "norm_label": "router",
+      "source_file": "apps/api/src/routes/messageRoutes.ts",
+      "source_location": "L13"
     },
     {
       "id": "scratch_test_pentest_round2",
@@ -8655,48 +8743,15 @@
       "source_location": "L1"
     },
     {
-      "id": "apps_api_src_controllers_webhookcontroller",
-      "label": "webhookController.ts",
+      "id": "apps_web_src_components_authmodal",
+      "label": "AuthModal.tsx",
       "_origin": "ast",
-      "community": 4,
-      "community_name": "Webhook",
+      "community": 40,
+      "community_name": "User",
       "file_type": "code",
-      "norm_label": "webhookcontroller.ts",
-      "source_file": "apps/api/src/controllers/webhookController.ts",
+      "norm_label": "authmodal.tsx",
+      "source_file": "apps/web/src/components/AuthModal.tsx",
       "source_location": "L1"
-    },
-    {
-      "id": "apps_api_src_controllers_webhookcontroller_webhookcontroller",
-      "label": "webhookController",
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "Webhook",
-      "file_type": "code",
-      "norm_label": "webhookcontroller",
-      "source_file": "apps/api/src/controllers/webhookController.ts",
-      "source_location": "L6"
-    },
-    {
-      "id": "apps_api_src_services_webhookcryptoservice",
-      "label": "webhookCryptoService.ts",
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "Webhook",
-      "file_type": "code",
-      "norm_label": "webhookcryptoservice.ts",
-      "source_file": "apps/api/src/services/webhookCryptoService.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "apps_api_src_services_webhookcryptoservice_channelkeycache",
-      "label": "channelKeyCache",
-      "_origin": "ast",
-      "community": 4,
-      "community_name": "Webhook",
-      "file_type": "code",
-      "norm_label": "channelkeycache",
-      "source_file": "apps/api/src/services/webhookCryptoService.ts",
-      "source_location": "L3"
     },
     {
       "id": "apps_web_src_components_commandpalette",
@@ -8707,6 +8762,17 @@
       "file_type": "code",
       "norm_label": "commandpalette.tsx",
       "source_file": "apps/web/src/components/CommandPalette.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "apps_web_src_components_createchannelmodal",
+      "label": "CreateChannelModal.tsx",
+      "_origin": "ast",
+      "community": 40,
+      "community_name": "User",
+      "file_type": "code",
+      "norm_label": "createchannelmodal.tsx",
+      "source_file": "apps/web/src/components/CreateChannelModal.tsx",
       "source_location": "L1"
     },
     {
@@ -8721,14 +8787,14 @@
       "source_location": "L1"
     },
     {
-      "id": "apps_web_src_components_createtaskmodal",
-      "label": "CreateTaskModal.tsx",
+      "id": "apps_web_src_components_invitemembermodal",
+      "label": "InviteMemberModal.tsx",
       "_origin": "ast",
       "community": 40,
       "community_name": "User",
       "file_type": "code",
-      "norm_label": "createtaskmodal.tsx",
-      "source_file": "apps/web/src/components/CreateTaskModal.tsx",
+      "norm_label": "invitemembermodal.tsx",
+      "source_file": "apps/web/src/components/InviteMemberModal.tsx",
       "source_location": "L1"
     },
     {
@@ -8743,158 +8809,37 @@
       "source_location": "L1"
     },
     {
-      "id": "apps_api_src_services_automationservice",
-      "label": "automationService.ts",
+      "id": "apps_web_src_lib_roles_developer_roles",
+      "label": "DEVELOPER_ROLES",
       "_origin": "ast",
-      "community": 41,
-      "community_name": "api/src/types/index.ts",
+      "community": 40,
+      "community_name": "User",
       "file_type": "code",
-      "norm_label": "automationservice.ts",
-      "source_file": "apps/api/src/services/automationService.ts",
-      "source_location": "L1"
+      "norm_label": "developer_roles",
+      "source_file": "apps/web/src/lib/roles.ts",
+      "source_location": "L10"
     },
     {
-      "id": "apps_api_src_services_bugservice",
-      "label": "bugService.ts",
+      "id": "ref_lucide_react",
+      "label": "lucide-react",
       "_origin": "ast",
-      "community": 41,
-      "community_name": "api/src/types/index.ts",
-      "file_type": "code",
-      "norm_label": "bugservice.ts",
-      "source_file": "apps/api/src/services/bugService.ts",
-      "source_location": "L1"
+      "community": 40,
+      "community_name": "User",
+      "file_type": "concept",
+      "norm_label": "lucide-react",
+      "source_file": "apps/web/package.json",
+      "source_location": "L12"
     },
     {
-      "id": "apps_api_src_services_datastore",
-      "label": "dataStore.ts",
+      "id": "ref_react",
+      "label": "react",
       "_origin": "ast",
-      "community": 41,
-      "community_name": "api/src/types/index.ts",
-      "file_type": "code",
-      "norm_label": "datastore.ts",
-      "source_file": "apps/api/src/services/dataStore.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "apps_api_src_services_datastore_default_password_hash",
-      "label": "DEFAULT_PASSWORD_HASH",
-      "_origin": "ast",
-      "community": 41,
-      "community_name": "api/src/types/index.ts",
-      "file_type": "code",
-      "norm_label": "default_password_hash",
-      "source_file": "apps/api/src/services/dataStore.ts",
-      "source_location": "L18"
-    },
-    {
-      "id": "apps_api_src_services_db",
-      "label": "db.ts",
-      "_origin": "ast",
-      "community": 41,
-      "community_name": "api/src/types/index.ts",
-      "file_type": "code",
-      "norm_label": "db.ts",
-      "source_file": "apps/api/src/services/db.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "apps_api_src_services_db_prisma",
-      "label": "prisma",
-      "_origin": "ast",
-      "community": 41,
-      "community_name": "api/src/types/index.ts",
-      "file_type": "code",
-      "norm_label": "prisma",
-      "source_file": "apps/api/src/services/db.ts",
-      "source_location": "L3"
-    },
-    {
-      "id": "apps_api_src_services_dbseed",
-      "label": "dbSeed.ts",
-      "_origin": "ast",
-      "community": 41,
-      "community_name": "api/src/types/index.ts",
-      "file_type": "code",
-      "norm_label": "dbseed.ts",
-      "source_file": "apps/api/src/services/dbSeed.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "apps_api_src_services_dmservice",
-      "label": "dmService.ts",
-      "_origin": "ast",
-      "community": 41,
-      "community_name": "api/src/types/index.ts",
-      "file_type": "code",
-      "norm_label": "dmservice.ts",
-      "source_file": "apps/api/src/services/dmService.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "apps_api_src_services_notificationservice",
-      "label": "notificationService.ts",
-      "_origin": "ast",
-      "community": 41,
-      "community_name": "api/src/types/index.ts",
-      "file_type": "code",
-      "norm_label": "notificationservice.ts",
-      "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "apps_api_src_services_projectservice",
-      "label": "projectService.ts",
-      "_origin": "ast",
-      "community": 41,
-      "community_name": "api/src/types/index.ts",
-      "file_type": "code",
-      "norm_label": "projectservice.ts",
-      "source_file": "apps/api/src/services/projectService.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "apps_api_src_services_socketservice",
-      "label": "socketService.ts",
-      "_origin": "ast",
-      "community": 41,
-      "community_name": "api/src/types/index.ts",
-      "file_type": "code",
-      "norm_label": "socketservice.ts",
-      "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "apps_api_src_services_taskcommentservice",
-      "label": "taskCommentService.ts",
-      "_origin": "ast",
-      "community": 41,
-      "community_name": "api/src/types/index.ts",
-      "file_type": "code",
-      "norm_label": "taskcommentservice.ts",
-      "source_file": "apps/api/src/services/taskCommentService.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "apps_api_src_services_taskservice",
-      "label": "taskService.ts",
-      "_origin": "ast",
-      "community": 41,
-      "community_name": "api/src/types/index.ts",
-      "file_type": "code",
-      "norm_label": "taskservice.ts",
-      "source_file": "apps/api/src/services/taskService.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "apps_api_src_services_webhookservice",
-      "label": "webhookService.ts",
-      "_origin": "ast",
-      "community": 41,
-      "community_name": "api/src/types/index.ts",
-      "file_type": "code",
-      "norm_label": "webhookservice.ts",
-      "source_file": "apps/api/src/services/webhookService.ts",
-      "source_location": "L1"
+      "community": 40,
+      "community_name": "User",
+      "file_type": "concept",
+      "norm_label": "react",
+      "source_file": "apps/web/package.json",
+      "source_location": "L14"
     },
     {
       "id": "apps_api_src_types_index",
@@ -8908,81 +8853,48 @@
       "source_location": "L1"
     },
     {
-      "id": "scratch_test_project_members",
-      "label": "test-project-members.ts",
+      "id": "apps_web_src_components_bugtracker",
+      "label": "BugTracker.tsx",
       "_origin": "ast",
-      "community": 41,
-      "community_name": "api/src/types/index.ts",
+      "community": 42,
+      "community_name": "BugTracker.tsx",
       "file_type": "code",
-      "norm_label": "test-project-members.ts",
-      "source_file": "scratch/test-project-members.ts",
+      "norm_label": "bugtracker.tsx",
+      "source_file": "apps/web/src/components/BugTracker.tsx",
       "source_location": "L1"
     },
     {
-      "id": "apps_web_src_components_authmodal",
-      "label": "AuthModal.tsx",
+      "id": "apps_web_src_components_bugtracker_severity_info",
+      "label": "SEVERITY_INFO",
       "_origin": "ast",
       "community": 42,
-      "community_name": "roles.ts",
+      "community_name": "BugTracker.tsx",
       "file_type": "code",
-      "norm_label": "authmodal.tsx",
-      "source_file": "apps/web/src/components/AuthModal.tsx",
-      "source_location": "L1"
+      "norm_label": "severity_info",
+      "source_file": "apps/web/src/components/BugTracker.tsx",
+      "source_location": "L45"
     },
     {
-      "id": "apps_web_src_components_invitemembermodal",
-      "label": "InviteMemberModal.tsx",
+      "id": "apps_web_src_components_bugtracker_status_badges",
+      "label": "STATUS_BADGES",
       "_origin": "ast",
       "community": 42,
-      "community_name": "roles.ts",
+      "community_name": "BugTracker.tsx",
       "file_type": "code",
-      "norm_label": "invitemembermodal.tsx",
-      "source_file": "apps/web/src/components/InviteMemberModal.tsx",
-      "source_location": "L1"
+      "norm_label": "status_badges",
+      "source_file": "apps/web/src/components/BugTracker.tsx",
+      "source_location": "L52"
     },
     {
       "id": "apps_web_src_components_projectprogressbar",
       "label": "ProjectProgressBar.tsx",
       "_origin": "ast",
       "community": 42,
-      "community_name": "roles.ts",
+      "community_name": "BugTracker.tsx",
       "file_type": "code",
       "norm_label": "projectprogressbar.tsx",
       "source_file": "apps/web/src/components/ProjectProgressBar.tsx",
       "source_location": "L1"
-    },
-    {
-      "id": "apps_web_src_lib_roles",
-      "label": "roles.ts",
-      "_origin": "ast",
-      "community": 42,
-      "community_name": "roles.ts",
-      "file_type": "code",
-      "norm_label": "roles.ts",
-      "source_file": "apps/web/src/lib/roles.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "apps_web_src_lib_roles_developer_roles",
-      "label": "DEVELOPER_ROLES",
-      "_origin": "ast",
-      "community": 42,
-      "community_name": "roles.ts",
-      "file_type": "code",
-      "norm_label": "developer_roles",
-      "source_file": "apps/web/src/lib/roles.ts",
-      "source_location": "L10"
-    },
-    {
-      "id": "apps_web_src_lib_roles_role_badges",
-      "label": "ROLE_BADGES",
-      "_origin": "ast",
-      "community": 42,
-      "community_name": "roles.ts",
-      "file_type": "code",
-      "norm_label": "role_badges",
-      "source_file": "apps/web/src/lib/roles.ts",
-      "source_location": "L24"
     },
     {
       "id": "apps_web_src_app_page",
@@ -8994,39 +8906,6 @@
       "norm_label": "page.tsx",
       "source_file": "apps/web/src/app/page.tsx",
       "source_location": "L1"
-    },
-    {
-      "id": "apps_web_src_components_bugtracker",
-      "label": "BugTracker.tsx",
-      "_origin": "ast",
-      "community": 43,
-      "community_name": "page.tsx",
-      "file_type": "code",
-      "norm_label": "bugtracker.tsx",
-      "source_file": "apps/web/src/components/BugTracker.tsx",
-      "source_location": "L1"
-    },
-    {
-      "id": "apps_web_src_components_bugtracker_severity_info",
-      "label": "SEVERITY_INFO",
-      "_origin": "ast",
-      "community": 43,
-      "community_name": "page.tsx",
-      "file_type": "code",
-      "norm_label": "severity_info",
-      "source_file": "apps/web/src/components/BugTracker.tsx",
-      "source_location": "L45"
-    },
-    {
-      "id": "apps_web_src_components_bugtracker_status_badges",
-      "label": "STATUS_BADGES",
-      "_origin": "ast",
-      "community": 43,
-      "community_name": "page.tsx",
-      "file_type": "code",
-      "norm_label": "status_badges",
-      "source_file": "apps/web/src/components/BugTracker.tsx",
-      "source_location": "L52"
     },
     {
       "id": "apps_web_src_components_reportbugmodal",
@@ -9060,39 +8939,6 @@
       "norm_label": "socket.ts",
       "source_file": "apps/web/src/lib/socket.ts",
       "source_location": "L1"
-    },
-    {
-      "id": "apps_api_src_controllers_sessioncontroller",
-      "label": "sessionController.ts",
-      "_origin": "ast",
-      "community": 45,
-      "community_name": "sessionController.ts",
-      "file_type": "code",
-      "norm_label": "sessioncontroller.ts",
-      "source_file": "apps/api/src/controllers/sessionController.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "apps_api_src_routes_sessionroutes",
-      "label": "sessionRoutes.ts",
-      "_origin": "ast",
-      "community": 45,
-      "community_name": "sessionController.ts",
-      "file_type": "code",
-      "norm_label": "sessionroutes.ts",
-      "source_file": "apps/api/src/routes/sessionRoutes.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "apps_api_src_routes_sessionroutes_router",
-      "label": "router",
-      "_origin": "ast",
-      "community": 45,
-      "community_name": "sessionController.ts",
-      "file_type": "code",
-      "norm_label": "router",
-      "source_file": "apps/api/src/routes/sessionRoutes.ts",
-      "source_location": "L9"
     },
     {
       "id": "docs_deployment_ubuntu",
@@ -9494,17 +9340,6 @@
       "source_location": "L20"
     },
     {
-      "id": "ref_jsonwebtoken",
-      "label": "jsonwebtoken",
-      "_origin": "ast",
-      "community": 47,
-      "community_name": "api/package.json",
-      "file_type": "concept",
-      "norm_label": "jsonwebtoken",
-      "source_file": "apps/api/package.json",
-      "source_location": "L24"
-    },
-    {
       "id": "ref_mongodb",
       "label": "mongodb",
       "_origin": "ast",
@@ -9547,28 +9382,6 @@
       "norm_label": "@prisma/client",
       "source_file": "apps/api/package.json",
       "source_location": "L17"
-    },
-    {
-      "id": "ref_socket_io",
-      "label": "socket.io",
-      "_origin": "ast",
-      "community": 47,
-      "community_name": "api/package.json",
-      "file_type": "concept",
-      "norm_label": "socket.io",
-      "source_file": "apps/api/package.json",
-      "source_location": "L27"
-    },
-    {
-      "id": "ref_socket_io_redis_adapter",
-      "label": "@socket.io/redis-adapter",
-      "_origin": "ast",
-      "community": 47,
-      "community_name": "api/package.json",
-      "file_type": "concept",
-      "norm_label": "@socket.io/redis-adapter",
-      "source_file": "apps/api/package.json",
-      "source_location": "L18"
     },
     {
       "id": "ref_tsx",
@@ -9637,14 +9450,14 @@
       "source_location": "L35"
     },
     {
-      "id": "apps_web_src_components_createchannelmodal",
-      "label": "CreateChannelModal.tsx",
+      "id": "apps_web_src_components_createtaskmodal",
+      "label": "CreateTaskModal.tsx",
       "_origin": "ast",
       "community": 48,
-      "community_name": "react",
+      "community_name": "KanbanBoard.tsx",
       "file_type": "code",
-      "norm_label": "createchannelmodal.tsx",
-      "source_file": "apps/web/src/components/CreateChannelModal.tsx",
+      "norm_label": "createtaskmodal.tsx",
+      "source_file": "apps/web/src/components/CreateTaskModal.tsx",
       "source_location": "L1"
     },
     {
@@ -9652,7 +9465,7 @@
       "label": "KanbanBoard.tsx",
       "_origin": "ast",
       "community": 48,
-      "community_name": "react",
+      "community_name": "KanbanBoard.tsx",
       "file_type": "code",
       "norm_label": "kanbanboard.tsx",
       "source_file": "apps/web/src/components/KanbanBoard.tsx",
@@ -9663,7 +9476,7 @@
       "label": "COLUMN_WIP_LIMITS",
       "_origin": "ast",
       "community": 48,
-      "community_name": "react",
+      "community_name": "KanbanBoard.tsx",
       "file_type": "code",
       "norm_label": "column_wip_limits",
       "source_file": "apps/web/src/components/KanbanBoard.tsx",
@@ -9674,7 +9487,7 @@
       "label": "COLUMNS",
       "_origin": "ast",
       "community": 48,
-      "community_name": "react",
+      "community_name": "KanbanBoard.tsx",
       "file_type": "code",
       "norm_label": "columns",
       "source_file": "apps/web/src/components/KanbanBoard.tsx",
@@ -9685,65 +9498,120 @@
       "label": "PRIORITY_STYLES",
       "_origin": "ast",
       "community": 48,
-      "community_name": "react",
+      "community_name": "KanbanBoard.tsx",
       "file_type": "code",
       "norm_label": "priority_styles",
       "source_file": "apps/web/src/components/KanbanBoard.tsx",
       "source_location": "L109"
     },
     {
-      "id": "apps_web_src_components_sidebar",
-      "label": "Sidebar.tsx",
+      "id": "apps_web_src_lib_roles",
+      "label": "roles.ts",
       "_origin": "ast",
       "community": 48,
-      "community_name": "react",
+      "community_name": "KanbanBoard.tsx",
       "file_type": "code",
-      "norm_label": "sidebar.tsx",
-      "source_file": "apps/web/src/components/Sidebar.tsx",
+      "norm_label": "roles.ts",
+      "source_file": "apps/web/src/lib/roles.ts",
       "source_location": "L1"
     },
     {
-      "id": "apps_web_src_components_themetoggle",
-      "label": "ThemeToggle.tsx",
+      "id": "apps_web_src_lib_roles_role_badges",
+      "label": "ROLE_BADGES",
       "_origin": "ast",
       "community": 48,
-      "community_name": "react",
+      "community_name": "KanbanBoard.tsx",
       "file_type": "code",
-      "norm_label": "themetoggle.tsx",
-      "source_file": "apps/web/src/components/ThemeToggle.tsx",
-      "source_location": "L1"
-    },
-    {
-      "id": "ref_lucide_react",
-      "label": "lucide-react",
-      "_origin": "ast",
-      "community": 48,
-      "community_name": "react",
-      "file_type": "concept",
-      "norm_label": "lucide-react",
-      "source_file": "apps/web/package.json",
-      "source_location": "L12"
-    },
-    {
-      "id": "ref_react",
-      "label": "react",
-      "_origin": "ast",
-      "community": 48,
-      "community_name": "react",
-      "file_type": "concept",
-      "norm_label": "react",
-      "source_file": "apps/web/package.json",
-      "source_location": "L14"
+      "norm_label": "role_badges",
+      "source_file": "apps/web/src/lib/roles.ts",
+      "source_location": "L24"
     },
     {
       "id": "apps_api_src_routes_healthroutes",
       "label": "healthRoutes.ts",
       "_origin": "ast",
       "community": 49,
-      "community_name": "mongoLogger",
+      "community_name": "dataStore.ts",
       "file_type": "code",
       "norm_label": "healthroutes.ts",
       "source_file": "apps/api/src/routes/healthRoutes.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "apps_api_src_services_bugservice",
+      "label": "bugService.ts",
+      "_origin": "ast",
+      "community": 49,
+      "community_name": "dataStore.ts",
+      "file_type": "code",
+      "norm_label": "bugservice.ts",
+      "source_file": "apps/api/src/services/bugService.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "apps_api_src_services_datastore",
+      "label": "dataStore.ts",
+      "_origin": "ast",
+      "community": 49,
+      "community_name": "dataStore.ts",
+      "file_type": "code",
+      "norm_label": "datastore.ts",
+      "source_file": "apps/api/src/services/dataStore.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "apps_api_src_services_datastore_default_password_hash",
+      "label": "DEFAULT_PASSWORD_HASH",
+      "_origin": "ast",
+      "community": 49,
+      "community_name": "dataStore.ts",
+      "file_type": "code",
+      "norm_label": "default_password_hash",
+      "source_file": "apps/api/src/services/dataStore.ts",
+      "source_location": "L18"
+    },
+    {
+      "id": "apps_api_src_services_db",
+      "label": "db.ts",
+      "_origin": "ast",
+      "community": 49,
+      "community_name": "dataStore.ts",
+      "file_type": "code",
+      "norm_label": "db.ts",
+      "source_file": "apps/api/src/services/db.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "apps_api_src_services_db_prisma",
+      "label": "prisma",
+      "_origin": "ast",
+      "community": 49,
+      "community_name": "dataStore.ts",
+      "file_type": "code",
+      "norm_label": "prisma",
+      "source_file": "apps/api/src/services/db.ts",
+      "source_location": "L3"
+    },
+    {
+      "id": "apps_api_src_services_dbseed",
+      "label": "dbSeed.ts",
+      "_origin": "ast",
+      "community": 49,
+      "community_name": "dataStore.ts",
+      "file_type": "code",
+      "norm_label": "dbseed.ts",
+      "source_file": "apps/api/src/services/dbSeed.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "apps_api_src_services_dmservice",
+      "label": "dmService.ts",
+      "_origin": "ast",
+      "community": 49,
+      "community_name": "dataStore.ts",
+      "file_type": "code",
+      "norm_label": "dmservice.ts",
+      "source_file": "apps/api/src/services/dmService.ts",
       "source_location": "L1"
     },
     {
@@ -9751,21 +9619,43 @@
       "label": "fileService.ts",
       "_origin": "ast",
       "community": 49,
-      "community_name": "mongoLogger",
+      "community_name": "dataStore.ts",
       "file_type": "code",
       "norm_label": "fileservice.ts",
       "source_file": "apps/api/src/services/fileService.ts",
       "source_location": "L1"
     },
     {
-      "id": "apps_api_src_services_redisservice",
-      "label": "redisService.ts",
+      "id": "apps_api_src_services_mongologger",
+      "label": "mongoLogger.ts",
       "_origin": "ast",
       "community": 49,
-      "community_name": "mongoLogger",
+      "community_name": "dataStore.ts",
       "file_type": "code",
-      "norm_label": "redisservice.ts",
-      "source_file": "apps/api/src/services/redisService.ts",
+      "norm_label": "mongologger.ts",
+      "source_file": "apps/api/src/services/mongoLogger.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "apps_api_src_services_notificationservice",
+      "label": "notificationService.ts",
+      "_origin": "ast",
+      "community": 49,
+      "community_name": "dataStore.ts",
+      "file_type": "code",
+      "norm_label": "notificationservice.ts",
+      "source_file": "apps/api/src/services/notificationService.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "apps_api_src_services_projectservice",
+      "label": "projectService.ts",
+      "_origin": "ast",
+      "community": 49,
+      "community_name": "dataStore.ts",
+      "file_type": "code",
+      "norm_label": "projectservice.ts",
+      "source_file": "apps/api/src/services/projectService.ts",
       "source_location": "L1"
     },
     {
@@ -9773,10 +9663,32 @@
       "label": "s3Service.ts",
       "_origin": "ast",
       "community": 49,
-      "community_name": "mongoLogger",
+      "community_name": "dataStore.ts",
       "file_type": "code",
       "norm_label": "s3service.ts",
       "source_file": "apps/api/src/services/s3Service.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "apps_api_src_services_taskcommentservice",
+      "label": "taskCommentService.ts",
+      "_origin": "ast",
+      "community": 49,
+      "community_name": "dataStore.ts",
+      "file_type": "code",
+      "norm_label": "taskcommentservice.ts",
+      "source_file": "apps/api/src/services/taskCommentService.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "apps_api_src_services_taskservice",
+      "label": "taskService.ts",
+      "_origin": "ast",
+      "community": 49,
+      "community_name": "dataStore.ts",
+      "file_type": "code",
+      "norm_label": "taskservice.ts",
+      "source_file": "apps/api/src/services/taskService.ts",
       "source_location": "L1"
     },
     {
@@ -9784,7 +9696,7 @@
       "label": "check-errors.ts",
       "_origin": "ast",
       "community": 49,
-      "community_name": "mongoLogger",
+      "community_name": "dataStore.ts",
       "file_type": "code",
       "norm_label": "check-errors.ts",
       "source_file": "scratch/check-errors.ts",
@@ -9795,7 +9707,7 @@
       "label": "test-db-integration.ts",
       "_origin": "ast",
       "community": 49,
-      "community_name": "mongoLogger",
+      "community_name": "dataStore.ts",
       "file_type": "code",
       "norm_label": "test-db-integration.ts",
       "source_file": "scratch/test-db-integration.ts",
@@ -9806,7 +9718,7 @@
       "label": "@aws-sdk/client-s3",
       "_origin": "ast",
       "community": 49,
-      "community_name": "mongoLogger",
+      "community_name": "dataStore.ts",
       "file_type": "concept",
       "norm_label": "@aws-sdk/client-s3",
       "source_file": "apps/api/package.json",
@@ -9817,22 +9729,11 @@
       "label": "dotenv",
       "_origin": "ast",
       "community": 49,
-      "community_name": "mongoLogger",
+      "community_name": "dataStore.ts",
       "file_type": "concept",
       "norm_label": "dotenv",
       "source_file": "apps/api/package.json",
       "source_location": "L21"
-    },
-    {
-      "id": "ref_ioredis",
-      "label": "ioredis",
-      "_origin": "ast",
-      "community": 49,
-      "community_name": "mongoLogger",
-      "file_type": "concept",
-      "norm_label": "ioredis",
-      "source_file": "apps/api/package.json",
-      "source_location": "L23"
     },
     {
       "id": "apps_web_package",
@@ -10009,6 +9910,17 @@
       "norm_label": "@types/react-dom",
       "source_file": "apps/web/package.json",
       "source_location": "L22"
+    },
+    {
+      "id": "apps_api_src_services_automationservice",
+      "label": "automationService.ts",
+      "_origin": "ast",
+      "community": 50,
+      "community_name": "automationService.ts",
+      "file_type": "code",
+      "norm_label": "automationservice.ts",
+      "source_file": "apps/api/src/services/automationService.ts",
+      "source_location": "L1"
     },
     {
       "id": "docs_deployment_native",
@@ -10398,26 +10310,15 @@
       "source_location": "L26"
     },
     {
-      "id": "apps_web_src_app_layout",
-      "label": "layout.tsx",
+      "id": "apps_web_src_components_themetoggle",
+      "label": "ThemeToggle.tsx",
       "_origin": "ast",
       "community": 53,
       "community_name": "ThemeContext.tsx",
       "file_type": "code",
-      "norm_label": "layout.tsx",
-      "source_file": "apps/web/src/app/layout.tsx",
+      "norm_label": "themetoggle.tsx",
+      "source_file": "apps/web/src/components/ThemeToggle.tsx",
       "source_location": "L1"
-    },
-    {
-      "id": "apps_web_src_app_layout_metadata",
-      "label": "metadata",
-      "_origin": "ast",
-      "community": 53,
-      "community_name": "ThemeContext.tsx",
-      "file_type": "code",
-      "norm_label": "metadata",
-      "source_file": "apps/web/src/app/layout.tsx",
-      "source_location": "L5"
     },
     {
       "id": "apps_web_src_context_themecontext",
@@ -10577,6 +10478,61 @@
       "source_location": "L1"
     },
     {
+      "id": "apps_api_src_controllers_webhookcontroller",
+      "label": "webhookController.ts",
+      "_origin": "ast",
+      "community": 58,
+      "community_name": "webhookService.ts",
+      "file_type": "code",
+      "norm_label": "webhookcontroller.ts",
+      "source_file": "apps/api/src/controllers/webhookController.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "apps_api_src_controllers_webhookcontroller_webhookcontroller",
+      "label": "webhookController",
+      "_origin": "ast",
+      "community": 58,
+      "community_name": "webhookService.ts",
+      "file_type": "code",
+      "norm_label": "webhookcontroller",
+      "source_file": "apps/api/src/controllers/webhookController.ts",
+      "source_location": "L6"
+    },
+    {
+      "id": "apps_api_src_services_webhookcryptoservice",
+      "label": "webhookCryptoService.ts",
+      "_origin": "ast",
+      "community": 58,
+      "community_name": "webhookService.ts",
+      "file_type": "code",
+      "norm_label": "webhookcryptoservice.ts",
+      "source_file": "apps/api/src/services/webhookCryptoService.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "apps_api_src_services_webhookcryptoservice_channelkeycache",
+      "label": "channelKeyCache",
+      "_origin": "ast",
+      "community": 58,
+      "community_name": "webhookService.ts",
+      "file_type": "code",
+      "norm_label": "channelkeycache",
+      "source_file": "apps/api/src/services/webhookCryptoService.ts",
+      "source_location": "L3"
+    },
+    {
+      "id": "apps_api_src_services_webhookservice",
+      "label": "webhookService.ts",
+      "_origin": "ast",
+      "community": 58,
+      "community_name": "webhookService.ts",
+      "file_type": "code",
+      "norm_label": "webhookservice.ts",
+      "source_file": "apps/api/src/services/webhookService.ts",
+      "source_location": "L1"
+    },
+    {
       "id": "apps_web_package_dependencies",
       "label": "dependencies",
       "_origin": "ast",
@@ -10696,17 +10652,6 @@
       "norm_label": "dmroutes.ts",
       "source_file": "apps/api/src/routes/dmRoutes.ts",
       "source_location": "L1"
-    },
-    {
-      "id": "apps_api_src_routes_dmroutes_router",
-      "label": "router",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "dmController.ts",
-      "file_type": "code",
-      "norm_label": "router",
-      "source_file": "apps/api/src/routes/dmRoutes.ts",
-      "source_location": "L19"
     },
     {
       "id": "scripts_setup_vps_native",
@@ -10839,7 +10784,7 @@
       "label": "next.config.ts",
       "_origin": "ast",
       "community": 64,
-      "community_name": "next",
+      "community_name": "layout.tsx",
       "file_type": "code",
       "norm_label": "next.config.ts",
       "source_file": "apps/web/next.config.ts",
@@ -10850,10 +10795,32 @@
       "label": "nextConfig",
       "_origin": "ast",
       "community": 64,
-      "community_name": "next",
+      "community_name": "layout.tsx",
       "file_type": "code",
       "norm_label": "nextconfig",
       "source_file": "apps/web/next.config.ts",
+      "source_location": "L5"
+    },
+    {
+      "id": "apps_web_src_app_layout",
+      "label": "layout.tsx",
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "layout.tsx",
+      "file_type": "code",
+      "norm_label": "layout.tsx",
+      "source_file": "apps/web/src/app/layout.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "apps_web_src_app_layout_metadata",
+      "label": "metadata",
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "layout.tsx",
+      "file_type": "code",
+      "norm_label": "metadata",
+      "source_file": "apps/web/src/app/layout.tsx",
       "source_location": "L5"
     },
     {
@@ -10861,7 +10828,7 @@
       "label": "next",
       "_origin": "ast",
       "community": 64,
-      "community_name": "next",
+      "community_name": "layout.tsx",
       "file_type": "concept",
       "norm_label": "next",
       "source_file": "apps/web/package.json",
@@ -11110,6 +11077,28 @@
       "source_location": "L25"
     },
     {
+      "id": "apps_web_src_components_sidebar",
+      "label": "Sidebar.tsx",
+      "_origin": "ast",
+      "community": 70,
+      "community_name": "Sidebar.tsx",
+      "file_type": "code",
+      "norm_label": "sidebar.tsx",
+      "source_file": "apps/web/src/components/Sidebar.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "scratch_test_project_members",
+      "label": "test-project-members.ts",
+      "_origin": "ast",
+      "community": 73,
+      "community_name": "test-project-members.ts",
+      "file_type": "code",
+      "norm_label": "test-project-members.ts",
+      "source_file": "scratch/test-project-members.ts",
+      "source_location": "L1"
+    },
+    {
       "id": "apps_api_tsconfig",
       "label": "api/tsconfig.json",
       "_origin": "ast",
@@ -11285,19 +11274,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/api/src/controllers/authController.ts",
-      "source_location": "L38",
-      "weight": 1.0
-    },
-    {
-      "source": "apps_api_src_controllers_authcontroller_register",
-      "target": "apps_api_src_controllers_authcontroller_register",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "apps/api/src/controllers/authController.ts",
-      "source_location": "L71",
+      "source_location": "L31",
       "weight": 1.0
     },
     {
@@ -11309,7 +11286,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/api/src/controllers/authController.ts",
-      "source_location": "L177",
+      "source_location": "L141",
       "weight": 1.0
     },
     {
@@ -11321,7 +11298,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/api/src/controllers/authController.ts",
-      "source_location": "L271",
+      "source_location": "L235",
       "weight": 1.0
     },
     {
@@ -28751,13 +28728,24 @@
     },
     {
       "source": "apps_api_src_controllers_authcontroller",
-      "target": "apps_api_src_controllers_authcontroller_logout",
+      "target": "apps_api_src_controllers_authcontroller_updateprofileschema",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/controllers/authController.ts",
       "source_location": "L110",
+      "weight": 1.0
+    },
+    {
+      "source": "apps_api_src_controllers_authcontroller",
+      "target": "apps_api_src_controllers_authcontroller_updateprofile",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/api/src/controllers/authController.ts",
+      "source_location": "L119",
       "weight": 1.0
     },
     {
@@ -28773,46 +28761,13 @@
     },
     {
       "source": "apps_api_src_controllers_authcontroller",
-      "target": "apps_api_src_controllers_authcontroller_updateprofileschema",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/api/src/controllers/authController.ts",
-      "source_location": "L146",
-      "weight": 1.0
-    },
-    {
-      "source": "apps_api_src_controllers_authcontroller",
-      "target": "apps_api_src_controllers_authcontroller_updateprofile",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/api/src/controllers/authController.ts",
-      "source_location": "L155",
-      "weight": 1.0
-    },
-    {
-      "source": "apps_api_src_controllers_authcontroller",
-      "target": "apps_api_src_controllers_authcontroller_registerschema",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/api/src/controllers/authController.ts",
-      "source_location": "L17",
-      "weight": 1.0
-    },
-    {
-      "source": "apps_api_src_controllers_authcontroller",
       "target": "apps_api_src_controllers_authcontroller_uploadavatarschema",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/controllers/authController.ts",
-      "source_location": "L194",
+      "source_location": "L158",
       "weight": 1.0
     },
     {
@@ -28823,7 +28778,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/controllers/authController.ts",
-      "source_location": "L198",
+      "source_location": "L162",
       "weight": 1.0
     },
     {
@@ -28834,7 +28789,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/controllers/authController.ts",
-      "source_location": "L24",
+      "source_location": "L17",
       "weight": 1.0
     },
     {
@@ -28845,7 +28800,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/controllers/authController.ts",
-      "source_location": "L56",
+      "source_location": "L49",
       "weight": 1.0
     },
     {
@@ -28856,7 +28811,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/controllers/authController.ts",
-      "source_location": "L93",
+      "source_location": "L57",
+      "weight": 1.0
+    },
+    {
+      "source": "apps_api_src_controllers_authcontroller",
+      "target": "apps_api_src_controllers_authcontroller_logout",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/api/src/controllers/authController.ts",
+      "source_location": "L74",
       "weight": 1.0
     },
     {
@@ -38217,5 +38183,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "e93ca25a9b7087b38ea1cd79b250036d8771a605"
+  "built_at_commit": "aa1fccee45acec08de99d771517c079bd677bebc"
 }

@@ -116,7 +116,7 @@ export function ThreadPanel({
           }
         }
       }
-      return ('content' in parentMessage ? parentMessage.content : '') || '[Encrypted message]';
+      return ('content' in parentMessage ? parentMessage.content : '') || '[Message unavailable]';
     };
 
     decryptRoot().then((text) => {
@@ -144,7 +144,7 @@ export function ThreadPanel({
     } catch (err) {
       console.warn('Failed to decrypt thread reply:', err);
     }
-    return msg.content || '[Encrypted message]';
+    return msg.content || '[Message unavailable]';
   };
 
   // Load and decrypt thread replies when parent message changes
@@ -516,7 +516,7 @@ export function ThreadPanel({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            title="Attach Encrypted File"
+            title="Attach File"
             className="p-1.5 text-slate-500 hover:text-indigo-400 rounded-lg hover:bg-slate-800 transition"
           >
             <Paperclip className="w-4 h-4" />

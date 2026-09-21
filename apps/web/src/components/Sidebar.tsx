@@ -343,9 +343,6 @@ export function Sidebar({
                   <UserPlus className="w-3.5 h-3.5 text-indigo-400" />
                 </button>
               )}
-              <span className="text-[10px] text-emerald-400 font-mono font-semibold bg-emerald-500/10 px-1.5 py-0.2 rounded border border-emerald-500/20">
-                E2EE
-              </span>
             </div>
           </div>
 

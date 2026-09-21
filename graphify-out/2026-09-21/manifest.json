@@ -6,9 +6,9 @@
     "semantic_hash": ""
   },
   "apps/api/src/controllers/authController.ts": {
-    "mtime": 1789699331.2161226,
-    "seen": 1789815948.0884,
-    "ast_hash": "c54f548fac94ca76031b795fccf36e42",
+    "mtime": 1789986221.367977,
+    "seen": 1789986276.437909,
+    "ast_hash": "9a6a6d1dd631bb84b921626c7f261473",
     "semantic_hash": ""
   },
   "apps/api/src/controllers/bugController.ts": {
@@ -228,9 +228,9 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/AuthModal.tsx": {
-    "mtime": 1789981287.7873769,
-    "seen": 1789981536.264296,
-    "ast_hash": "c6d224b5244ca27090b48cb272561e12",
+    "mtime": 1789986207.2380593,
+    "seen": 1789986276.437962,
+    "ast_hash": "0d54d168a7d641dfa2dfb038f6764619",
     "semantic_hash": ""
   },
   "apps/web/src/components/BackendStatus.tsx": {

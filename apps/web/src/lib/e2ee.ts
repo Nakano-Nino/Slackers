@@ -382,7 +382,7 @@ export class E2EEService {
       return new TextDecoder().decode(decrypted);
     } catch (err) {
       console.warn('Decryption failed, ciphertext integrity check failed:', err);
-      return '[🔒 Encrypted Message - Unable to Decrypt]';
+      return '[Message unavailable]';
     }
   }
 

@@ -742,7 +742,7 @@
       "file_type": "code",
       "norm_label": "safetymodalprops",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L2150"
+      "source_location": "L2112"
     },
     {
       "id": "apps_web_src_components_commandpalette_paletteitem",
@@ -833,7 +833,7 @@
       "file_type": "code",
       "norm_label": "props",
       "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L204"
+      "source_location": "L200"
     },
     {
       "id": "apps_web_src_types_index_invitation",
@@ -3269,7 +3269,7 @@
       "file_type": "code",
       "norm_label": "chatarea()",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L334"
+      "source_location": "L332"
     },
     {
       "id": "apps_web_src_components_chatarea_chatarea_handleclickoutside",
@@ -3281,7 +3281,7 @@
       "file_type": "code",
       "norm_label": "handleclickoutside()",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L538"
+      "source_location": "L536"
     },
     {
       "id": "apps_web_src_components_chatarea_chatdatedivider",
@@ -3293,7 +3293,7 @@
       "file_type": "code",
       "norm_label": "chatdatedivider()",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L249"
+      "source_location": "L247"
     },
     {
       "id": "apps_web_src_components_chatarea_encryptedattachmentcard",
@@ -3317,7 +3317,7 @@
       "file_type": "code",
       "norm_label": "extractplaintext()",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L282"
+      "source_location": "L280"
     },
     {
       "id": "apps_web_src_components_chatarea_highlightmatches",
@@ -3329,7 +3329,7 @@
       "file_type": "code",
       "norm_label": "highlightmatches()",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L263"
+      "source_location": "L261"
     },
     {
       "id": "apps_web_src_components_chatarea_renderdecryptedcontent",
@@ -3341,7 +3341,7 @@
       "file_type": "code",
       "norm_label": "renderdecryptedcontent()",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L295"
+      "source_location": "L293"
     },
     {
       "id": "apps_web_src_components_chatarea_safetynumbermatrix",
@@ -3353,7 +3353,7 @@
       "file_type": "code",
       "norm_label": "safetynumbermatrix()",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L2105"
+      "source_location": "L2067"
     },
     {
       "id": "apps_web_src_components_chatarea_safetynumbermodal",
@@ -3365,7 +3365,7 @@
       "file_type": "code",
       "norm_label": "safetynumbermodal()",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L2166"
+      "source_location": "L2128"
     },
     {
       "id": "apps_web_src_components_taskdetailmodal_taskattachmentcard",
@@ -4301,7 +4301,7 @@
       "file_type": "code",
       "norm_label": "formatactivityaction()",
       "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L234"
+      "source_location": "L230"
     },
     {
       "id": "apps_web_src_components_taskdetailmodal_getduedatestatus",
@@ -4313,7 +4313,7 @@
       "file_type": "code",
       "norm_label": "getduedatestatus()",
       "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L164"
+      "source_location": "L160"
     },
     {
       "id": "apps_web_src_components_taskdetailmodal_taskdetailmodal",
@@ -4325,7 +4325,7 @@
       "file_type": "code",
       "norm_label": "taskdetailmodal()",
       "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L292"
+      "source_location": "L288"
     },
     {
       "id": "apps_web_src_lib_roles_formatuserrole",
@@ -6359,7 +6359,7 @@
       "file_type": "code",
       "norm_label": "priority_labels",
       "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L227"
+      "source_location": "L223"
     },
     {
       "id": "apps_web_src_components_taskdetailmodal_status_labels",
@@ -6370,7 +6370,7 @@
       "file_type": "code",
       "norm_label": "status_labels",
       "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L219"
+      "source_location": "L215"
     },
     {
       "id": "apps_web_src_lib_api",
@@ -13254,7 +13254,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L1020",
+      "source_location": "L1018",
       "weight": 1.0
     },
     {
@@ -13266,7 +13266,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L1541",
+      "source_location": "L1523",
       "weight": 1.0
     },
     {
@@ -13278,7 +13278,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L469",
+      "source_location": "L467",
       "weight": 1.0
     },
     {
@@ -13290,7 +13290,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L472",
+      "source_location": "L470",
       "weight": 1.0
     },
     {
@@ -13302,7 +13302,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L499",
+      "source_location": "L497",
       "weight": 1.0
     },
     {
@@ -13314,7 +13314,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L515",
+      "source_location": "L513",
       "weight": 1.0
     },
     {
@@ -13326,7 +13326,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L518",
+      "source_location": "L516",
       "weight": 1.0
     },
     {
@@ -13338,7 +13338,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L656",
+      "source_location": "L654",
       "weight": 1.0
     },
     {
@@ -13350,7 +13350,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L791",
+      "source_location": "L789",
       "weight": 1.0
     },
     {
@@ -13362,7 +13362,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L869",
+      "source_location": "L867",
       "weight": 1.0
     },
     {
@@ -13374,7 +13374,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L919",
+      "source_location": "L917",
       "weight": 1.0
     },
     {
@@ -13386,7 +13386,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L250",
+      "source_location": "L248",
       "weight": 1.0
     },
     {
@@ -13422,7 +13422,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L319",
+      "source_location": "L317",
       "weight": 1.0
     },
     {
@@ -13626,7 +13626,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L1484",
+      "source_location": "L1480",
       "weight": 1.0
     },
     {
@@ -13638,7 +13638,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L1681",
+      "source_location": "L1677",
       "weight": 1.0
     },
     {
@@ -13650,7 +13650,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L1753",
+      "source_location": "L1749",
       "weight": 1.0
     },
     {
@@ -13662,7 +13662,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L360",
+      "source_location": "L356",
       "weight": 1.0
     },
     {
@@ -13674,7 +13674,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L679",
+      "source_location": "L675",
       "weight": 1.0
     },
     {
@@ -14766,7 +14766,7 @@
       "confidence_score": 1.0,
       "context": "field",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L2153",
+      "source_location": "L2115",
       "weight": 1.0
     },
     {
@@ -15150,7 +15150,7 @@
       "confidence_score": 1.0,
       "context": "field",
       "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L207",
+      "source_location": "L203",
       "weight": 1.0
     },
     {
@@ -15162,7 +15162,7 @@
       "confidence_score": 1.0,
       "context": "field",
       "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L208",
+      "source_location": "L204",
       "weight": 1.0
     },
     {
@@ -15174,7 +15174,7 @@
       "confidence_score": 1.0,
       "context": "field",
       "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L211",
+      "source_location": "L207",
       "weight": 1.0
     },
     {
@@ -15582,7 +15582,7 @@
       "confidence_score": 1.0,
       "context": "generic_arg",
       "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L212",
+      "source_location": "L208",
       "weight": 1.0
     },
     {
@@ -31715,7 +31715,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L2105",
+      "source_location": "L2067",
       "weight": 1.0
     },
     {
@@ -31726,7 +31726,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L2150",
+      "source_location": "L2112",
       "weight": 1.0
     },
     {
@@ -31737,7 +31737,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L2166",
+      "source_location": "L2128",
       "weight": 1.0
     },
     {
@@ -31748,7 +31748,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L249",
+      "source_location": "L247",
       "weight": 1.0
     },
     {
@@ -31759,7 +31759,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L263",
+      "source_location": "L261",
       "weight": 1.0
     },
     {
@@ -31770,7 +31770,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L282",
+      "source_location": "L280",
       "weight": 1.0
     },
     {
@@ -31781,7 +31781,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L295",
+      "source_location": "L293",
       "weight": 1.0
     },
     {
@@ -31792,7 +31792,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L334",
+      "source_location": "L332",
       "weight": 1.0
     },
     {
@@ -32166,7 +32166,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L164",
+      "source_location": "L160",
       "weight": 1.0
     },
     {
@@ -32177,7 +32177,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L204",
+      "source_location": "L200",
       "weight": 1.0
     },
     {
@@ -32188,7 +32188,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L219",
+      "source_location": "L215",
       "weight": 1.0
     },
     {
@@ -32199,7 +32199,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L227",
+      "source_location": "L223",
       "weight": 1.0
     },
     {
@@ -32210,7 +32210,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L234",
+      "source_location": "L230",
       "weight": 1.0
     },
     {
@@ -32221,7 +32221,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/web/src/components/TaskDetailModal.tsx",
-      "source_location": "L292",
+      "source_location": "L288",
       "weight": 1.0
     },
     {
@@ -38166,7 +38166,7 @@
       "confidence_score": 0.85,
       "context": "argument",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L547",
+      "source_location": "L545",
       "weight": 1.0
     },
     {
@@ -38183,5 +38183,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "aa1fccee45acec08de99d771517c079bd677bebc"
+  "built_at_commit": "5257a8ef9f21fc0b5cf42d9761bf7defe877da2b"
 }

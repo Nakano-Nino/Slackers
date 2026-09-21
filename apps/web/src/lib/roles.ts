@@ -13,7 +13,7 @@ export const DEVELOPER_ROLES: { id: DeveloperRole; label: string; shortLabel: st
   { id: 'qa_engineer', label: 'QA Engineer', shortLabel: 'QA Engineer', description: 'Test automation, bug triaging, regression testing & quality' },
   { id: 'fullstack_developer', label: 'Full Stack Developer', shortLabel: 'Full Stack', description: 'End-to-end full stack development across client & server' },
   { id: 'devops_engineer', label: 'DevOps / Cloud Engineer', shortLabel: 'DevOps', description: 'CI/CD pipelines, Docker, Kubernetes, cloud infrastructure & uptime' },
-  { id: 'security_engineer', label: 'Security Engineer', shortLabel: 'Security', description: 'End-to-end encryption, cryptographic key exchange & penetration testing' },
+  { id: 'security_engineer', label: 'Security Engineer', shortLabel: 'Security', description: 'Application security, cryptographic protocols & penetration testing' },
   { id: 'ui_ux_designer', label: 'Product / UI/UX Designer', shortLabel: 'Product Design', description: 'User interfaces, design tokens, mockups & user flows' },
   { id: 'mobile_developer', label: 'Mobile Developer', shortLabel: 'Mobile Dev', description: 'iOS and Android client applications & offline sync' },
   { id: 'data_engineer', label: 'Data / AI Engineer', shortLabel: 'Data / AI', description: 'Data pipelines, embeddings, analytics & machine learning models' },

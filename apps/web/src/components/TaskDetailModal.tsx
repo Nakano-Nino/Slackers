@@ -128,12 +128,8 @@ function TaskAttachmentCard({
         )}
         <div className="min-w-0">
           <p className="font-medium text-neutral-200 truncate max-w-xs">{attachment.name}</p>
-          <p className="text-[10px] text-neutral-500 flex items-center gap-1.5 mt-0.5">
-            <span>{formatFileSize(attachment.size)}</span>
-            <span>•</span>
-            <span className="text-emerald-400 font-mono flex items-center gap-0.5">
-              <Lock className="w-2.5 h-2.5" /> E2EE
-            </span>
+          <p className="text-[10px] text-neutral-500 mt-0.5">
+            {formatFileSize(attachment.size)}
           </p>
         </div>
       </div>
@@ -143,7 +139,7 @@ function TaskAttachmentCard({
           onClick={handleDownload}
           disabled={downloading}
           className="p-1.5 text-neutral-400 hover:text-indigo-400 hover:bg-neutral-800 rounded-lg transition"
-          title="Download decrypted file"
+          title="Download file"
         >
           <Download className="w-3.5 h-3.5" />
         </button>
@@ -1080,7 +1076,7 @@ export function TaskDetailModal({
                           type="button"
                           onClick={() => {
                             setNewStepTitle('Verify security & RBAC authorization');
-                            setNewStepDescription('Confirm non-privileged roles cannot tamper with state or bypass E2EE keys.');
+                            setNewStepDescription('Confirm non-privileged roles cannot tamper with state or bypass security controls.');
                           }}
                           className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-800 text-neutral-300 hover:bg-neutral-700"
                         >
@@ -1369,7 +1365,7 @@ export function TaskDetailModal({
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-400 flex items-center gap-1.5">
                     <Paperclip className="w-3.5 h-3.5 text-indigo-400" />
-                    Encrypted Attachments ({(activeTask.attachments || []).length})
+                    Attachments ({(activeTask.attachments || []).length})
                   </h4>
 
                   {canInteract && (
@@ -1387,7 +1383,7 @@ export function TaskDetailModal({
                         className="flex items-center gap-1 text-[11px] px-2 py-1 rounded-lg bg-indigo-600/20 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-600/30 transition disabled:opacity-50 font-medium"
                       >
                         <Paperclip className="w-3 h-3" />
-                        <span>{uploadingAttachment ? 'Encrypting...' : 'Add Attachment'}</span>
+                        <span>{uploadingAttachment ? 'Uploading...' : 'Add Attachment'}</span>
                       </button>
                     </>
                   )}
@@ -1395,7 +1391,7 @@ export function TaskDetailModal({
 
                 {(!activeTask.attachments || activeTask.attachments.length === 0) ? (
                   <p className="text-xs text-neutral-500 italic bg-neutral-950/40 p-3 rounded-xl border border-neutral-800/60">
-                    No attachments uploaded. You can attach encrypted specs, mockups, or logs up to 50MB.
+                    No attachments uploaded. You can attach specs, mockups, or logs up to 50MB.
                   </p>
                 ) : (
                   <div className="space-y-2">

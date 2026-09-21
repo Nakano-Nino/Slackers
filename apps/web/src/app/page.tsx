@@ -250,7 +250,7 @@ export default function Home() {
               const dec = await E2EEService.decrypt(msg.ciphertext, msg.iv, channelKey);
               return { ...msg, decryptedContent: dec };
             } catch {
-              return { ...msg, decryptedContent: msg.content || '[Encrypted message]' };
+              return { ...msg, decryptedContent: msg.content || '[Message unavailable]' };
             }
           }
           return { ...msg, decryptedContent: msg.content };
@@ -280,7 +280,7 @@ export default function Home() {
               const dec = await E2EEService.decrypt(msg.ciphertext, msg.iv, channelKey);
               return { ...msg, decryptedContent: dec };
             } catch {
-              return { ...msg, decryptedContent: msg.content || '[Encrypted message]' };
+              return { ...msg, decryptedContent: msg.content || '[Message unavailable]' };
             }
           }
           return { ...msg, decryptedContent: msg.content };
@@ -531,7 +531,7 @@ export default function Home() {
           const channelKey = await E2EEService.getChannelKey(msg.channelId);
           decryptedContent = await E2EEService.decrypt(msg.ciphertext, msg.iv, channelKey);
         } catch {
-          decryptedContent = msg.content || '[Encrypted message]';
+          decryptedContent = msg.content || '[Message unavailable]';
         }
       }
       setMessages((prev) => {
@@ -579,14 +579,14 @@ export default function Home() {
             }));
           } catch (err) {
             console.error('Failed to decrypt real-time direct message:', err);
-            decrypted = '[Encrypted message]';
+            decrypted = '[Message unavailable]';
             setDecryptedDmMessages((prev) => ({
               ...prev,
               [dm.id]: decrypted,
             }));
           }
         } else if (!decrypted) {
-          decrypted = '[Encrypted message]';
+          decrypted = '[Message unavailable]';
           setDecryptedDmMessages((prev) => ({
             ...prev,
             [dm.id]: decrypted,
@@ -1767,7 +1767,7 @@ export default function Home() {
               senderName: 'Slackers Security',
               type: 'message',
               title: 'Password Changed Successfully',
-              content: 'Your account password has been updated and your E2EE key vault has been secured.',
+              content: 'Your account password has been updated and your account has been secured.',
               isRead: false,
               createdAt: new Date().toISOString(),
             });

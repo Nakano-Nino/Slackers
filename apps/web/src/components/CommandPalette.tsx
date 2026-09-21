@@ -107,7 +107,7 @@ export function CommandPalette({
       id: 'action-settings',
       type: 'action',
       title: 'Open Settings',
-      subtitle: 'Manage devices, profile, encryption keys & notifications',
+      subtitle: 'Manage devices, profile, security & notifications',
       icon: <Settings className="w-4 h-4 text-slate-400" />,
       action: () => {
         onClose();

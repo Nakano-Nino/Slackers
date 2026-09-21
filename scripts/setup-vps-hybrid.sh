@@ -98,13 +98,14 @@ echo -e "${GREEN}✓ Node.js $(node -v) & PM2 $(pm2 -v) ready.${NC}"
 # ------------------------------------------------------------------------------
 echo -e "\n${CYAN}[5/8] Configuring environment and installing workspace packages...${NC}"
 JWT_SECRET_VAL=$(openssl rand -hex 32)
+DOMAIN="${1:-slacker.prasty.web.id}"
 DETECTED_IP=$(curl -s --max-time 3 https://ifconfig.me || curl -s --max-time 3 https://api.ipify.org || echo "localhost")
 
 # Generate API .env connecting to localhost Docker ports
 cat <<EOF > apps/api/.env
 PORT=5001
 NODE_ENV=production
-CLIENT_URL=http://${DETECTED_IP}
+CLIENT_URL=https://${DOMAIN}
 JWT_SECRET=${JWT_SECRET_VAL}
 DATABASE_URL="postgresql://slackers:slackers_secret@127.0.0.1:5432/slackers_db?schema=public"
 MONGODB_URI="mongodb://127.0.0.1:27017/slackers_logs"
@@ -175,12 +176,12 @@ echo -e "\n${GREEN}=============================================================
 echo -e "${GREEN}🎉 Slackers is running in Hybrid Mode!${NC}"
 echo -e "${GREEN}================================================================${NC}"
 
-echo -e "\n🌐 Web Application: ${CYAN}http://${DETECTED_IP}${NC}"
-echo -e "📡 REST API Health: ${CYAN}http://${DETECTED_IP}/api/health${NC}"
+echo -e "\n🌐 Web Application: ${CYAN}https://${DOMAIN}${NC} (or http://${DETECTED_IP})"
+echo -e "📡 REST API Health: ${CYAN}https://${DOMAIN}/api/health${NC}"
 
 echo -e "\n🛡️  Database Status: ${GREEN}Fresh & Empty${NC}"
 echo -e "  The database has been initialized with 0 demo records."
-echo -e "  The first user you register at ${CYAN}http://${DETECTED_IP}${NC} will automatically be granted ${GREEN}ADMIN${NC} privileges."
+echo -e "  The first user you register at ${CYAN}https://${DOMAIN}${NC} will automatically be granted ${GREEN}ADMIN${NC} privileges."
 
 echo -e "\n📊 Monitoring & Control Commands:"
 echo -e "  Node Apps Status:    ${CYAN}pm2 status${NC}"
@@ -188,6 +189,6 @@ echo -e "  Node Apps Logs:      ${CYAN}pm2 logs${NC}"
 echo -e "  Database Status:     ${CYAN}sudo docker compose -f docker-compose.db.yml ps${NC}"
 echo -e "  Database Logs:       ${CYAN}sudo docker compose -f docker-compose.db.yml logs -f${NC}"
 
-echo -e "\n🔒 To Enable Free HTTPS (Let's Encrypt SSL):"
-echo -e "  Point your domain A-Record to ${CYAN}${DETECTED_IP}${NC} and run:"
-echo -e "  ${CYAN}sudo certbot --nginx -d yourdomain.com${NC}\n"
+echo -e "\n🔒 To Complete HTTPS (Let's Encrypt SSL):"
+echo -e "  Run the automated SSL setup script:"
+echo -e "  ${CYAN}sudo ./scripts/setup-ssl.sh ${DOMAIN}${NC}\n"

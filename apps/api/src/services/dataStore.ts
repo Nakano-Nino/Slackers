@@ -1,6 +1,17 @@
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
-import { Channel, ChannelKey, KeyVaultData, Message, User, UserRole } from '../types/index.js';
+import {
+  AutomationRule,
+  Channel,
+  ChannelKey,
+  KeyVaultData,
+  Message,
+  User,
+  UserRole,
+  Webhook,
+  WebhookLog,
+  WebhookType,
+} from '../types/index.js';
 import { prisma } from './db.js';
 
 // Pre-hashed 'password123'
@@ -29,6 +40,8 @@ function generateSeedKeyVault(password: string): KeyVaultData {
 }
 
 class DataStore {
+  private seenIvs = new Map<string, number>();
+
   constructor() {
     // Pre-seed genuine ECDH P-256 keypairs and password-derived KeyVaults for all default demo users
     for (const user of this.users) {
@@ -39,6 +52,38 @@ class DataStore {
         user.keyVaultSalt = vault.keyVaultSalt;
         user.keyVaultIv = vault.keyVaultIv;
       }
+    }
+
+    // Periodically prune expired disappearing messages and old IVs every 30 seconds
+    setInterval(() => {
+      this.purgeExpiredMessages();
+      this.cleanOldIvs();
+    }, 30000);
+  }
+
+  private cleanOldIvs(): void {
+    const oneHourAgo = Date.now() - 3600000;
+    for (const [iv, ts] of this.seenIvs.entries()) {
+      if (ts < oneHourAgo) this.seenIvs.delete(iv);
+    }
+  }
+
+  purgeExpiredMessages(): void {
+    const now = Date.now();
+    const initialLen = this.messages.length;
+    this.messages = this.messages.filter(
+      (m) => !m.expiresAt || new Date(m.expiresAt).getTime() > now
+    );
+    if (this.messages.length < initialLen) {
+      prisma.message
+        .deleteMany({
+          where: {
+            expiresAt: {
+              lte: new Date(),
+            },
+          },
+        })
+        .catch((err) => console.warn('Failed to purge expired channel messages from DB:', err));
     }
   }
 
@@ -87,6 +132,12 @@ class DataStore {
       }
 
       const dbMessages = await prisma.message.findMany({
+        where: {
+          OR: [
+            { expiresAt: null },
+            { expiresAt: { gt: new Date() } },
+          ],
+        },
         include: { user: true },
         orderBy: { createdAt: 'asc' },
       });
@@ -103,6 +154,7 @@ class DataStore {
           taskId: m.taskId || undefined,
           bugId: m.bugId || undefined,
           createdAt: m.createdAt.toISOString(),
+          expiresAt: m.expiresAt ? m.expiresAt.toISOString() : undefined,
           isEdited: m.isEdited,
           isDeleted: m.isDeleted,
           editedAt: m.editedAt ? m.editedAt.toISOString() : undefined,
@@ -112,7 +164,66 @@ class DataStore {
           lastReplyAt: m.lastReplyAt ? m.lastReplyAt.toISOString() : undefined,
         }));
       }
-      console.log(`📦 DataStore synchronized with PostgreSQL: ${this.users.length} users, ${this.channels.length} channels, ${this.messages.length} messages.`);
+
+      try {
+        const dbWebhooks = await prisma.webhook.findMany({
+          include: { channel: true },
+          orderBy: { createdAt: 'desc' },
+        });
+        if (dbWebhooks.length > 0) {
+          this.webhooks = dbWebhooks.map((w) => ({
+            id: w.id,
+            name: w.name,
+            channelId: w.channelId,
+            channelName: w.channel?.name,
+            token: w.token,
+            secret: w.secret || undefined,
+            type: w.type as WebhookType,
+            avatar: w.avatar || undefined,
+            creatorId: w.creatorId,
+            isActive: w.isActive,
+            createdAt: w.createdAt.toISOString(),
+            updatedAt: w.updatedAt.toISOString(),
+          }));
+        }
+
+        const dbRules = await prisma.automationRule.findMany({
+          orderBy: { createdAt: 'desc' },
+        });
+        if (dbRules.length > 0) {
+          this.automationRules = dbRules.map((r) => ({
+            id: r.id,
+            name: r.name,
+            trigger: r.trigger,
+            conditions: (r.conditions as any) || undefined,
+            actions: (r.actions as any) || {},
+            isActive: r.isActive,
+            createdAt: r.createdAt.toISOString(),
+            updatedAt: r.updatedAt.toISOString(),
+          }));
+        }
+
+        const dbLogs = await prisma.webhookLog.findMany({
+          orderBy: { createdAt: 'desc' },
+          take: 100,
+        });
+        if (dbLogs.length > 0) {
+          this.webhookLogs = dbLogs.map((l) => ({
+            id: l.id,
+            webhookId: l.webhookId,
+            event: l.event,
+            status: l.status,
+            payload: l.payload,
+            error: l.error || undefined,
+            durationMs: l.durationMs,
+            createdAt: l.createdAt.toISOString(),
+          }));
+        }
+      } catch (err) {
+        console.warn('⚠️  Webhooks / Automation rules table sync notice:', (err as Error).message);
+      }
+
+      console.log(`📦 DataStore synchronized with PostgreSQL: ${this.users.length} users, ${this.channels.length} channels, ${this.messages.length} messages, ${this.webhooks.length} webhooks.`);
     } catch (err: unknown) {
       console.warn('⚠️  DataStore could not load from PostgreSQL:', err instanceof Error ? err.message : err);
     }
@@ -523,6 +634,72 @@ class DataStore {
     return this.channelKeys.filter((k) => k.channelId === channelId);
   }
 
+  private webhooks: Webhook[] = [
+    {
+      id: 'whk-demo-incoming',
+      name: 'CI/CD Pipeline Alerts',
+      channelId: 'engineering',
+      channelName: 'engineering',
+      token: 'whk_pipeline_ci_cd_engineering_prod',
+      secret: 'whsec_pipeline_secret_token_12345',
+      type: 'GENERIC',
+      avatar: 'https://images.unsplash.com/photo-1618401471353-b98aedd04e11?w=150&auto=format&fit=crop&q=80',
+      creatorId: 'u-1',
+      creatorName: 'Sarah Connor',
+      isActive: true,
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(),
+      updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(),
+    },
+    {
+      id: 'whk-demo-github',
+      name: 'GitHub Repository Sync',
+      channelId: 'general',
+      channelName: 'general',
+      token: 'whk_github_main_repo_push_events',
+      secret: 'whsec_github_hmac_secret_super_key_99',
+      type: 'GITHUB',
+      avatar: 'https://github.githubassets.com/favicons/favicon.png',
+      creatorId: 'u-1',
+      creatorName: 'Sarah Connor',
+      isActive: true,
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
+      updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
+    },
+  ];
+
+  private webhookLogs: WebhookLog[] = [];
+
+  private automationRules: AutomationRule[] = [
+    {
+      id: 'rule-1',
+      name: 'Alert #engineering on Critical Bug',
+      trigger: 'BUG_CREATED',
+      conditions: { severity: 'critical' },
+      actions: {
+        postMessage: {
+          channelId: 'engineering',
+          template: '🚨 **Critical Defect Reported**: {title}\nReported by: {reportedByName} in {environment}',
+        },
+        assignTo: 'u-1',
+      },
+      isActive: true,
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(),
+      updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(),
+    },
+    {
+      id: 'rule-2',
+      name: 'Auto-transition Kanban cards from commit keywords',
+      trigger: 'COMMIT_PUSHED',
+      conditions: {},
+      actions: {
+        updateStatus: 'done',
+      },
+      isActive: true,
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
+      updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
+    },
+  ];
+
   getCurrentUser(): User {
     return this.users[0];
   }
@@ -559,12 +736,53 @@ class DataStore {
     return newChannel;
   }
 
-  getMessagesByChannel(channelId: string): Message[] {
-    return this.messages.filter((m) => m.channelId === channelId && !m.parentId);
+  getMessagesByChannel(
+    channelId: string,
+    options?: { before?: string; limit?: number }
+  ): { messages: Message[]; hasMore: boolean; nextCursor?: string } {
+    const nowTime = Date.now();
+    let all = this.messages
+      .filter(
+        (m) =>
+          m.channelId === channelId &&
+          !m.parentId &&
+          (!m.expiresAt || new Date(m.expiresAt).getTime() > nowTime)
+      )
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+
+    if (options?.before) {
+      const beforeIndex = all.findIndex((m) => m.id === options.before);
+      if (beforeIndex !== -1) {
+        all = all.slice(0, beforeIndex);
+      } else {
+        const beforeTime = new Date(options.before).getTime();
+        if (!isNaN(beforeTime)) {
+          all = all.filter((m) => new Date(m.createdAt).getTime() < beforeTime);
+        }
+      }
+    }
+
+    const limit = options?.limit ? Math.min(Math.max(1, options.limit), 100) : 50;
+    const totalCount = all.length;
+    const startIndex = Math.max(0, totalCount - limit);
+    const paginated = all.slice(startIndex);
+    const hasMore = startIndex > 0;
+    const nextCursor = hasMore && paginated.length > 0 ? paginated[0].id : undefined;
+
+    return {
+      messages: paginated,
+      hasMore,
+      nextCursor,
+    };
   }
 
   getThreadReplies(parentId: string): Message[] {
-    return this.messages.filter((m) => m.parentId === parentId);
+    const nowTime = Date.now();
+    return this.messages.filter(
+      (m) =>
+        m.parentId === parentId &&
+        (!m.expiresAt || new Date(m.expiresAt).getTime() > nowTime)
+    );
   }
 
   getMessageById(id: string): Message | undefined {
@@ -580,15 +798,35 @@ class DataStore {
     taskId?: string;
     bugId?: string;
     parentId?: string;
+    expiresAt?: string;
+    clientTimestamp?: number;
+    botName?: string;
+    botAvatar?: string;
+    isBot?: boolean;
+    botType?: string;
   }): Message {
+    // Replay attack defense
+    if (this.seenIvs.has(data.iv)) {
+      throw new Error('Replay attack detected: duplicate IV/nonce rejected');
+    }
+    this.seenIvs.set(data.iv, Date.now());
+
+    // Timestamp drift defense
+    if (data.clientTimestamp !== undefined) {
+      const drift = Math.abs(Date.now() - data.clientTimestamp);
+      if (drift > 5 * 60 * 1000) {
+        throw new Error('Cryptographic timestamp drift out of bounds (max 5 minutes)');
+      }
+    }
+
     const user = this.users.find((u) => u.id === data.userId) || this.users[0];
     const now = new Date().toISOString();
     const newMessage: Message = {
       id: `m-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
       channelId: data.channelId,
       userId: user.id,
-      userName: user.name,
-      userAvatar: user.avatar,
+      userName: data.botName || user.name,
+      userAvatar: data.botAvatar || user.avatar,
       ciphertext: data.ciphertext,
       iv: data.iv,
       content: data.content,
@@ -596,6 +834,9 @@ class DataStore {
       bugId: data.bugId,
       parentId: data.parentId,
       createdAt: now,
+      expiresAt: data.expiresAt || undefined,
+      isBot: data.isBot ?? (!!data.botName),
+      botType: data.botType,
     };
 
     if (data.parentId) {
@@ -622,6 +863,7 @@ class DataStore {
           replyCount: newMessage.replyCount || 0,
           lastReplyAt: newMessage.lastReplyAt ? new Date(newMessage.lastReplyAt) : null,
           createdAt: new Date(newMessage.createdAt),
+          expiresAt: newMessage.expiresAt ? new Date(newMessage.expiresAt) : null,
         },
       })
       .then(() => {
@@ -721,6 +963,174 @@ class DataStore {
       .catch((err) => console.warn('Failed to persist deleteMessage to PostgreSQL:', err));
 
     return message;
+  }
+
+  // ==========================================
+  // Webhooks & Integrations Methods
+  // ==========================================
+
+  getWebhooks(): Webhook[] {
+    return this.webhooks;
+  }
+
+  getWebhookById(id: string): Webhook | undefined {
+    return this.webhooks.find((w) => w.id === id);
+  }
+
+  getWebhookByToken(token: string): Webhook | undefined {
+    return this.webhooks.find((w) => w.token === token);
+  }
+
+  addWebhook(data: Omit<Webhook, 'id' | 'createdAt' | 'updatedAt'>): Webhook {
+    const channel = this.getChannelById(data.channelId);
+    const creator = this.getUserById(data.creatorId);
+    const now = new Date().toISOString();
+    const newWebhook: Webhook = {
+      id: `whk-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      ...data,
+      channelName: channel?.name || data.channelId,
+      creatorName: creator?.name || 'Developer',
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.webhooks.unshift(newWebhook);
+    prisma.webhook
+      .create({
+        data: {
+          id: newWebhook.id,
+          name: newWebhook.name,
+          channelId: newWebhook.channelId,
+          token: newWebhook.token,
+          secret: newWebhook.secret,
+          type: newWebhook.type as any,
+          avatar: newWebhook.avatar,
+          creatorId: newWebhook.creatorId,
+          isActive: newWebhook.isActive,
+        },
+      })
+      .catch((err) => console.warn('Failed to persist webhook to PostgreSQL:', err));
+    return newWebhook;
+  }
+
+  updateWebhook(id: string, data: Partial<Webhook>): Webhook | undefined {
+    const webhook = this.webhooks.find((w) => w.id === id);
+    if (!webhook) return undefined;
+    Object.assign(webhook, data, { updatedAt: new Date().toISOString() });
+    prisma.webhook
+      .update({
+        where: { id },
+        data: {
+          name: webhook.name,
+          channelId: webhook.channelId,
+          secret: webhook.secret,
+          type: webhook.type as any,
+          avatar: webhook.avatar,
+          isActive: webhook.isActive,
+        },
+      })
+      .catch((err) => console.warn('Failed to update webhook in PostgreSQL:', err));
+    return webhook;
+  }
+
+  deleteWebhook(id: string): boolean {
+    const idx = this.webhooks.findIndex((w) => w.id === id);
+    if (idx === -1) return false;
+    this.webhooks.splice(idx, 1);
+    prisma.webhook
+      .delete({ where: { id } })
+      .catch((err) => console.warn('Failed to delete webhook in PostgreSQL:', err));
+    return true;
+  }
+
+  getWebhookLogs(webhookId: string): WebhookLog[] {
+    return this.webhookLogs.filter((l) => l.webhookId === webhookId);
+  }
+
+  addWebhookLog(log: Omit<WebhookLog, 'id' | 'createdAt'>): WebhookLog {
+    const newLog: WebhookLog = {
+      id: `log-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      ...log,
+      createdAt: new Date().toISOString(),
+    };
+    this.webhookLogs.unshift(newLog);
+    if (this.webhookLogs.length > 500) {
+      this.webhookLogs.pop();
+    }
+    prisma.webhookLog
+      .create({
+        data: {
+          id: newLog.id,
+          webhookId: newLog.webhookId,
+          event: newLog.event,
+          status: newLog.status,
+          payload: newLog.payload,
+          error: newLog.error,
+          durationMs: newLog.durationMs,
+        },
+      })
+      .catch((err) => console.warn('Failed to persist webhook log to PostgreSQL:', err));
+    return newLog;
+  }
+
+  getAutomationRules(): AutomationRule[] {
+    return this.automationRules;
+  }
+
+  getAutomationRuleById(id: string): AutomationRule | undefined {
+    return this.automationRules.find((r) => r.id === id);
+  }
+
+  addAutomationRule(rule: Omit<AutomationRule, 'id' | 'createdAt' | 'updatedAt'>): AutomationRule {
+    const now = new Date().toISOString();
+    const newRule: AutomationRule = {
+      id: `rule-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      ...rule,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.automationRules.unshift(newRule);
+    prisma.automationRule
+      .create({
+        data: {
+          id: newRule.id,
+          name: newRule.name,
+          trigger: newRule.trigger,
+          conditions: newRule.conditions,
+          actions: newRule.actions as any,
+          isActive: newRule.isActive,
+        },
+      })
+      .catch((err) => console.warn('Failed to persist automation rule to PostgreSQL:', err));
+    return newRule;
+  }
+
+  updateAutomationRule(id: string, data: Partial<AutomationRule>): AutomationRule | undefined {
+    const rule = this.automationRules.find((r) => r.id === id);
+    if (!rule) return undefined;
+    Object.assign(rule, data, { updatedAt: new Date().toISOString() });
+    prisma.automationRule
+      .update({
+        where: { id },
+        data: {
+          name: rule.name,
+          trigger: rule.trigger,
+          conditions: rule.conditions,
+          actions: rule.actions as any,
+          isActive: rule.isActive,
+        },
+      })
+      .catch((err) => console.warn('Failed to update automation rule in PostgreSQL:', err));
+    return rule;
+  }
+
+  deleteAutomationRule(id: string): boolean {
+    const idx = this.automationRules.findIndex((r) => r.id === id);
+    if (idx === -1) return false;
+    this.automationRules.splice(idx, 1);
+    prisma.automationRule
+      .delete({ where: { id } })
+      .catch((err) => console.warn('Failed to delete automation rule in PostgreSQL:', err));
+    return true;
   }
 }
 

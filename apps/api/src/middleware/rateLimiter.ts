@@ -115,3 +115,17 @@ export const messagingRateLimiter = createRateLimiter({
   prefix: 'messaging',
   message: 'Message send limit exceeded. Please wait a few seconds before sending more.',
 });
+
+// 60 requests per 60s for public webhook ingestion endpoints
+export const webhookIngestRateLimiter = createRateLimiter({
+  windowMs: 60 * 1000,
+  max: 60,
+  prefix: 'webhook-ingest',
+  message: 'Webhook ingestion rate limit exceeded. Please throttle webhook dispatch.',
+  keyGenerator: (req: Request) => {
+    const token = req.params?.token || 'unknown';
+    const ip = req.ip || req.socket.remoteAddress || 'unknown';
+    return `token:${token}:ip:${ip}`;
+  },
+});
+

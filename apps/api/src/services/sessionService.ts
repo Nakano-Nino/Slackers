@@ -87,13 +87,18 @@ class SessionService {
   }
 
   async isSessionValid(userId: string, sessionId?: string): Promise<boolean> {
-    // If token predates multi-device sessions and doesn't have a sessionId, allow gracefully
-    if (!sessionId) return true;
+    // A valid session must provide a sessionId
+    if (!sessionId) return false;
 
     // 1. Check Redis cache first
     const cached = await redisService.get(`sess:${sessionId}`);
     if (cached) {
-      return true;
+      try {
+        const parsed = JSON.parse(cached) as UserSession;
+        return parsed.userId === userId;
+      } catch {
+        // If unparseable, fall through to memory check
+      }
     }
 
     // 2. Check memory store
@@ -168,6 +173,28 @@ class SessionService {
   }
 
   async revokeSession(userId: string, sessionId: string): Promise<boolean> {
+    // 1. Validate session ownership in memory if present
+    const memSession = this.memorySessions.get(sessionId);
+    if (memSession && memSession.userId !== userId) {
+      return false;
+    }
+
+    // 2. Validate session ownership in Redis if present
+    const cached = await redisService.get(`sess:${sessionId}`);
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached) as UserSession;
+        if (parsed.userId !== userId) {
+          return false;
+        }
+      } catch {}
+    }
+
+    // If session does not exist anywhere, return false
+    if (!memSession && !cached) {
+      return false;
+    }
+
     this.memorySessions.delete(sessionId);
     const userSet = this.userSessionIndex.get(userId);
     if (userSet) {

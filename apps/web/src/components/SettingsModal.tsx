@@ -27,8 +27,25 @@ import {
   Smartphone,
   Trash2,
   Globe,
+  Copy,
+  Check,
+  Download,
+  ShieldCheck,
+  FileKey,
+  RefreshCw,
+  Webhook as WebhookIcon,
+  Cpu,
+  GitBranch,
+  Play,
+  Terminal,
+  Code,
+  Plus,
+  ToggleLeft,
+  ToggleRight,
+  Activity,
+  ArrowRight,
 } from 'lucide-react';
-import { MuteTarget, User, UserSession } from '../types';
+import { AutomationRule, Channel, MuteTarget, User, UserSession, Webhook, WebhookLog, WebhookType } from '../types';
 import { api } from '../lib/api';
 import { DEVELOPER_ROLES, getUserRoleBadge } from '../lib/roles';
 import { E2EEService } from '../lib/e2ee';
@@ -57,7 +74,7 @@ const AVATAR_PRESETS = [
   { id: '12', label: 'Data/AI', url: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=250&auto=format&fit=crop&q=80' },
 ];
 
-type SettingsTab = 'profile' | 'avatar' | 'security' | 'sessions' | 'notifications';
+type SettingsTab = 'profile' | 'avatar' | 'security' | 'sessions' | 'notifications' | 'integrations';
 
 export function SettingsModal({
   isOpen,
@@ -138,6 +155,102 @@ export function SettingsModal({
     }
   }, [activeTab, isOpen]);
 
+  // Security Tab E2EE Extensions
+  const [userFingerprint, setUserFingerprint] = useState<string>('');
+  const [copiedFingerprint, setCopiedFingerprint] = useState(false);
+  const [verifiedPeers, setVerifiedPeers] = useState<Record<string, { fingerprint: string; verifiedAt: string }>>({});
+  const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [generatedRecoveryKey, setGeneratedRecoveryKey] = useState<string>('');
+  const [copiedRecoveryKey, setCopiedRecoveryKey] = useState(false);
+  const [exportingVault, setExportingVault] = useState(false);
+  const [vaultExportSuccess, setVaultExportSuccess] = useState(false);
+  const [importBackupJson, setImportBackupJson] = useState('');
+  const [importRecoveryKey, setImportRecoveryKey] = useState('');
+  const [importingVault, setImportingVault] = useState(false);
+  const [vaultRestoreSuccess, setVaultRestoreSuccess] = useState(false);
+  const [vaultError, setVaultError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (activeTab === 'security' && isOpen && currentUser) {
+      const pubKey =
+        currentUser.publicKey ||
+        (typeof window !== 'undefined' ? localStorage.getItem(`slackers_e2ee_pub_${currentUser.id}`) : '') ||
+        '';
+      if (pubKey) {
+        E2EEService.computeKeyFingerprint(pubKey).then(setUserFingerprint).catch(console.warn);
+      }
+      setVerifiedPeers(E2EEService.getVerifiedPeers(currentUser.id));
+      api.getUsers().then(setAllUsers).catch(console.warn);
+    }
+  }, [activeTab, isOpen, currentUser]);
+
+  const handleGenerateRecoveryKey = () => {
+    const key = E2EEService.generateRecoveryKey();
+    setGeneratedRecoveryKey(key);
+    setVaultExportSuccess(false);
+    setVaultError(null);
+  };
+
+  const handleExportVault = async () => {
+    if (!currentUser || !generatedRecoveryKey) return;
+    setExportingVault(true);
+    setVaultError(null);
+    try {
+      const keypair = await E2EEService.getOrCreateUserKeyPair(currentUser.id);
+      const backupJson = await E2EEService.exportRecoveryVault(
+        keypair.privateKey,
+        keypair.publicKeyJwk,
+        generatedRecoveryKey
+      );
+      // Trigger download of JSON backup file
+      const blob = new Blob([backupJson], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `slackers-e2ee-backup-${currentUser.name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setVaultExportSuccess(true);
+    } catch (err: unknown) {
+      setVaultError(err instanceof Error ? err.message : 'Failed to export key vault');
+    } finally {
+      setExportingVault(false);
+    }
+  };
+
+  const handleImportVault = async () => {
+    if (!currentUser || !importBackupJson.trim() || !importRecoveryKey.trim()) return;
+    setImportingVault(true);
+    setVaultError(null);
+    setVaultRestoreSuccess(false);
+    try {
+      const restored = await E2EEService.importRecoveryVault(
+        importBackupJson.trim(),
+        importRecoveryKey.trim()
+      );
+      // Cache restored keys in local storage
+      const privJwk = await window.crypto.subtle.exportKey('jwk', restored.privateKey);
+      localStorage.setItem(`slackers_e2ee_priv_${currentUser.id}`, JSON.stringify(privJwk));
+      localStorage.setItem(`slackers_e2ee_pub_${currentUser.id}`, restored.publicKeyJwk);
+
+      setVaultRestoreSuccess(true);
+      setImportBackupJson('');
+      setImportRecoveryKey('');
+    } catch (err: unknown) {
+      setVaultError(err instanceof Error ? err.message : 'Failed to restore key vault. Check recovery key.');
+    } finally {
+      setImportingVault(false);
+    }
+  };
+
+  const handleRevokePeer = (peerId: string) => {
+    if (!currentUser) return;
+    E2EEService.markPeerAsUnverified(currentUser.id, peerId);
+    setVerifiedPeers(E2EEService.getVerifiedPeers(currentUser.id));
+  };
+
   const handleRevokeSession = async (sessionId: string) => {
     setRevokingSessionId(sessionId);
     try {
@@ -149,6 +262,132 @@ export function SettingsModal({
       setError(err instanceof Error ? err.message : 'Failed to revoke session');
     } finally {
       setRevokingSessionId(null);
+    }
+  };
+
+  // ==========================================
+  // Integrations & Automation State
+  // ==========================================
+  const [webhooks, setWebhooks] = useState<Webhook[]>([]);
+  const [automationRules, setAutomationRules] = useState<AutomationRule[]>([]);
+  const [channels, setChannels] = useState<Channel[]>([]);
+  const [loadingIntegrations, setLoadingIntegrations] = useState(false);
+  const [selectedLogsWebhookId, setSelectedLogsWebhookId] = useState<string | null>(null);
+  const [webhookLogs, setWebhookLogs] = useState<WebhookLog[]>([]);
+  const [loadingLogs, setLoadingLogs] = useState(false);
+  const [pingingWebhookId, setPingingWebhookId] = useState<string | null>(null);
+  const [pingStatus, setPingStatus] = useState<{ id: string; message: string; isError?: boolean } | null>(null);
+  const [copiedUrlId, setCopiedUrlId] = useState<string | null>(null);
+  const [copiedCurlId, setCopiedCurlId] = useState<string | null>(null);
+
+  // New webhook form modal
+  const [showCreateWebhook, setShowCreateWebhook] = useState(false);
+  const [newWhName, setNewWhName] = useState('');
+  const [newWhChannelId, setNewWhChannelId] = useState('');
+  const [newWhType, setNewWhType] = useState<WebhookType>('GENERIC');
+  const [newWhSecret, setNewWhSecret] = useState('');
+  const [creatingWebhook, setCreatingWebhook] = useState(false);
+
+  // Load integrations data
+  const fetchIntegrations = async () => {
+    setLoadingIntegrations(true);
+    try {
+      const [whList, rulesList, chList] = await Promise.all([
+        api.getWebhooks(),
+        api.getAutomationRules(),
+        api.getChannels(),
+      ]);
+      setWebhooks(whList);
+      setAutomationRules(rulesList);
+      setChannels(chList);
+      if (chList.length > 0 && !newWhChannelId) {
+        setNewWhChannelId(chList[0].id);
+      }
+    } catch (err) {
+      console.warn('Failed to load integrations:', err);
+    } finally {
+      setLoadingIntegrations(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'integrations' && isOpen) {
+      fetchIntegrations();
+    }
+  }, [activeTab, isOpen]);
+
+  const handleCreateWebhook = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newWhName.trim() || !newWhChannelId) return;
+    setCreatingWebhook(true);
+    try {
+      const created = await api.createWebhook({
+        name: newWhName.trim(),
+        channelId: newWhChannelId,
+        type: newWhType,
+        secret: newWhSecret.trim() || undefined,
+      });
+      setWebhooks((prev) => [created, ...prev]);
+      setShowCreateWebhook(false);
+      setNewWhName('');
+      setNewWhSecret('');
+    } catch (err) {
+      console.warn('Failed to create webhook:', err);
+    } finally {
+      setCreatingWebhook(false);
+    }
+  };
+
+  const handleDeleteWebhook = async (id: string) => {
+    try {
+      await api.deleteWebhook(id);
+      setWebhooks((prev) => prev.filter((w) => w.id !== id));
+      if (selectedLogsWebhookId === id) setSelectedLogsWebhookId(null);
+    } catch (err) {
+      console.warn('Failed to delete webhook:', err);
+    }
+  };
+
+  const handleSendTestPing = async (wh: Webhook) => {
+    setPingingWebhookId(wh.id);
+    setPingStatus(null);
+    try {
+      const res = await api.sendTestPing(wh.id);
+      setPingStatus({ id: wh.id, message: res.message || 'Test ping delivered!' });
+    } catch (err: unknown) {
+      setPingStatus({
+        id: wh.id,
+        message: err instanceof Error ? err.message : 'Delivery failed',
+        isError: true,
+      });
+    } finally {
+      setPingingWebhookId(null);
+    }
+  };
+
+  const handleToggleRule = async (rule: AutomationRule) => {
+    try {
+      const updated = await api.updateAutomationRule(rule.id, { isActive: !rule.isActive });
+      setAutomationRules((prev) => prev.map((r) => (r.id === rule.id ? updated : r)));
+    } catch (err) {
+      console.warn('Failed to toggle rule:', err);
+    }
+  };
+
+  const handleViewLogs = async (webhookId: string) => {
+    if (selectedLogsWebhookId === webhookId) {
+      setSelectedLogsWebhookId(null);
+      return;
+    }
+    setSelectedLogsWebhookId(webhookId);
+    setLoadingLogs(true);
+    try {
+      const logs = await api.getWebhookLogs(webhookId);
+      setWebhookLogs(logs);
+    } catch (err) {
+      console.warn('Failed to load logs:', err);
+    } finally {
+      setLoadingLogs(false);
     }
   };
 
@@ -455,6 +694,23 @@ export function SettingsModal({
             {activeMutes.length > 0 && (
               <span className="text-[10px] px-1.5 py-0.2 rounded-full font-bold bg-amber-500/20 text-amber-500 border border-amber-500/30">
                 {activeMutes.length}
+              </span>
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('integrations')}
+            className={`px-4 py-3 text-xs font-semibold border-b-2 transition flex items-center gap-2 ${
+              activeTab === 'integrations'
+                ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
+                : 'border-transparent text-slate-500 dark:text-neutral-400 hover:text-slate-700 dark:hover:text-neutral-200'
+            }`}
+          >
+            <WebhookIcon className="w-4 h-4" />
+            <span>Integrations & Automation</span>
+            {webhooks.length > 0 && (
+              <span className="text-[10px] px-1.5 py-0.2 rounded-full font-bold bg-emerald-500/20 text-emerald-500 border border-emerald-500/30">
+                {webhooks.length}
               </span>
             )}
           </button>
@@ -875,6 +1131,230 @@ export function SettingsModal({
                   </div>
                 </div>
               </div>
+
+              {/* Section 2: Cryptographic Identity & Public Key Fingerprint */}
+              <div className="pt-4 border-t border-slate-200 dark:border-neutral-800 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-800 dark:text-neutral-200">
+                      Cryptographic Identity Fingerprint
+                    </h4>
+                  </div>
+                  {userFingerprint && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(userFingerprint);
+                        setCopiedFingerprint(true);
+                        setTimeout(() => setCopiedFingerprint(false), 2000);
+                      }}
+                      className="flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
+                    >
+                      {copiedFingerprint ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-500" />
+                          <span className="text-emerald-500 font-medium">Copied</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5" />
+                          <span>Copy Fingerprint</span>
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs text-slate-500 dark:text-neutral-400">
+                  Your ECDH P-256 public identity key fingerprint is used by teammates to verify your end-to-end encrypted connection.
+                </p>
+                <div className="p-2.5 bg-slate-100 dark:bg-neutral-950 rounded-lg border border-slate-200 dark:border-neutral-800 font-mono text-xs text-slate-800 dark:text-neutral-200 break-all select-all">
+                  {userFingerprint || 'Calculating identity fingerprint...'}
+                </div>
+              </div>
+
+              {/* Section 3: Cross-Signed Verified Teammates */}
+              <div className="pt-4 border-t border-slate-200 dark:border-neutral-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-indigo-500 shrink-0" />
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-800 dark:text-neutral-200">
+                      Cross-Signed Verified Contacts
+                    </h4>
+                  </div>
+                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400">
+                    {Object.keys(verifiedPeers).length} Verified
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-neutral-400">
+                  Contacts whose 60-digit safety numbers you have verified out-of-band. You will be warned immediately if their keys ever change.
+                </p>
+
+                {Object.keys(verifiedPeers).length === 0 ? (
+                  <div className="p-4 text-center rounded-xl border border-dashed border-slate-200 dark:border-neutral-800 text-xs text-slate-500 dark:text-neutral-400">
+                    No verified contacts yet. Open a direct message and click the shield badge to compare safety numbers.
+                  </div>
+                ) : (
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {Object.entries(verifiedPeers).map(([peerId, data]) => {
+                      const peerUser = allUsers.find((u) => u.id === peerId);
+                      return (
+                        <div
+                          key={peerId}
+                          className="flex items-center justify-between p-2.5 bg-slate-50 dark:bg-neutral-950 rounded-xl border border-slate-200/80 dark:border-neutral-800/80 text-xs"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <img
+                              src={peerUser?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'}
+                              alt={peerUser?.name || 'Contact'}
+                              className="w-7 h-7 rounded-full object-cover shrink-0"
+                            />
+                            <div className="min-w-0">
+                              <p className="font-semibold text-slate-900 dark:text-neutral-100 truncate">
+                                {peerUser?.name || peerId}
+                              </p>
+                              <code className="font-mono text-[10px] text-slate-500 dark:text-neutral-400 truncate block">
+                                {data.fingerprint}
+                              </code>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-medium border border-emerald-500/20">
+                              <CheckCircle2 className="w-3 h-3" />
+                              Verified
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleRevokePeer(peerId)}
+                              className="p-1 rounded text-slate-400 hover:text-rose-500 transition cursor-pointer"
+                              title="Revoke verification"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Section 4: Emergency Key Backup & Recovery Vault */}
+              <div className="pt-4 border-t border-slate-200 dark:border-neutral-800 space-y-3">
+                <div className="flex items-center gap-2">
+                  <FileKey className="w-4 h-4 text-amber-500 shrink-0" />
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-800 dark:text-neutral-200">
+                    Emergency Vault Backup & Recovery (Megolm / PIN Standard)
+                  </h4>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-neutral-400">
+                  Generate an independent 128-bit emergency recovery key to export a cryptographically sealed backup of your private key vault. You can use this to recover your conversation history even if your password is reset.
+                </p>
+
+                {vaultError && (
+                  <div className="p-3 bg-rose-500/10 border border-rose-500/20 text-rose-700 dark:text-rose-300 rounded-xl text-xs flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+                    <span>{vaultError}</span>
+                  </div>
+                )}
+
+                {vaultExportSuccess && (
+                  <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 rounded-xl text-xs flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
+                    <span>Vault backup exported successfully! Store your recovery key in a secure location.</span>
+                  </div>
+                )}
+
+                {vaultRestoreSuccess && (
+                  <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 rounded-xl text-xs flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
+                    <span>Key vault restored and activated on this device!</span>
+                  </div>
+                )}
+
+                {/* Sub-panel: Export */}
+                <div className="p-3.5 bg-slate-50 dark:bg-neutral-950 rounded-xl border border-slate-200/80 dark:border-neutral-800/80 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-800 dark:text-neutral-200">
+                      Export Encrypted Key Vault
+                    </span>
+                    {!generatedRecoveryKey ? (
+                      <button
+                        type="button"
+                        onClick={handleGenerateRecoveryKey}
+                        className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition cursor-pointer"
+                      >
+                        Generate Recovery Key
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={handleExportVault}
+                        disabled={exportingVault}
+                        className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1.5 transition cursor-pointer"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        <span>{exportingVault ? 'Exporting...' : 'Download Vault (.json)'}</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {generatedRecoveryKey && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] text-slate-500 dark:text-neutral-400">Emergency Recovery Key:</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(generatedRecoveryKey);
+                            setCopiedRecoveryKey(true);
+                            setTimeout(() => setCopiedRecoveryKey(false), 2000);
+                          }}
+                          className="text-[11px] text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 cursor-pointer"
+                        >
+                          {copiedRecoveryKey ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
+                          <span>{copiedRecoveryKey ? 'Copied' : 'Copy Key'}</span>
+                        </button>
+                      </div>
+                      <div className="p-2 bg-amber-500/10 border border-amber-500/30 rounded-lg font-mono text-xs font-bold text-amber-900 dark:text-amber-200 text-center tracking-widest select-all">
+                        {generatedRecoveryKey}
+                      </div>
+                      <p className="text-[10px] text-slate-500 dark:text-neutral-500 italic">
+                        ⚠️ Write down or securely store this recovery key. It is required to decrypt the exported backup.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Sub-panel: Restore */}
+                <div className="p-3.5 bg-slate-50 dark:bg-neutral-950 rounded-xl border border-slate-200/80 dark:border-neutral-800/80 space-y-2.5">
+                  <span className="text-xs font-semibold text-slate-800 dark:text-neutral-200 block">
+                    Restore Vault from Emergency Backup
+                  </span>
+                  <input
+                    type="text"
+                    value={importRecoveryKey}
+                    onChange={(e) => setImportRecoveryKey(e.target.value)}
+                    placeholder="Enter Recovery Key (SLK-XXXX-...)"
+                    className="w-full bg-white dark:bg-neutral-900 border border-slate-300 dark:border-neutral-800 rounded-lg px-3 py-1.5 text-xs text-slate-900 dark:text-neutral-100 placeholder-slate-400 focus:outline-none focus:border-indigo-500 font-mono"
+                  />
+                  <textarea
+                    value={importBackupJson}
+                    onChange={(e) => setImportBackupJson(e.target.value)}
+                    placeholder="Paste exported backup JSON bundle here..."
+                    rows={2}
+                    className="w-full bg-white dark:bg-neutral-900 border border-slate-300 dark:border-neutral-800 rounded-lg px-3 py-1.5 text-xs text-slate-900 dark:text-neutral-100 placeholder-slate-400 focus:outline-none focus:border-indigo-500 font-mono resize-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleImportVault}
+                    disabled={importingVault || !importRecoveryKey.trim() || !importBackupJson.trim()}
+                    className="w-full py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-white disabled:opacity-40 transition cursor-pointer"
+                  >
+                    {importingVault ? 'Restoring Vault...' : 'Restore & Activate Vault'}
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
@@ -1075,6 +1555,450 @@ export function SettingsModal({
             </div>
           )}
 
+          {/* Developer Integrations & Automation Tab */}
+          {activeTab === 'integrations' && (
+            <div className="space-y-6 animate-in fade-in duration-150">
+              {/* Header section with Create Button */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200 dark:border-neutral-800">
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-neutral-100 flex items-center gap-2">
+                    <WebhookIcon className="w-4 h-4 text-emerald-500" />
+                    <span>Developer Integrations & Automation</span>
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-neutral-400 mt-0.5">
+                    Trigger CI/CD pipelines, connect GitHub & GitLab webhooks, and automate Kanban workflows.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowCreateWebhook(true)}
+                  className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition shadow-sm self-start sm:self-auto"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>New Webhook</span>
+                </button>
+              </div>
+
+              {/* Status Alert from Ping */}
+              {pingStatus && (
+                <div
+                  className={`p-3 rounded-xl text-xs flex items-center justify-between gap-2 border ${
+                    pingStatus.isError
+                      ? 'bg-rose-500/10 border-rose-500/30 text-rose-600 dark:text-rose-400'
+                      : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    {pingStatus.isError ? (
+                      <AlertCircle className="w-4 h-4 shrink-0" />
+                    ) : (
+                      <CheckCircle2 className="w-4 h-4 shrink-0" />
+                    )}
+                    <span>{pingStatus.message}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setPingStatus(null)}
+                    className="text-slate-400 hover:text-slate-600 dark:hover:text-neutral-200"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+
+              {/* Create Webhook Inline Form / Modal */}
+              {showCreateWebhook && (
+                <div className="p-4 bg-slate-50 dark:bg-neutral-900 border border-emerald-500/30 rounded-xl space-y-4 shadow-sm">
+                  <div className="flex items-center justify-between border-b border-slate-200 dark:border-neutral-800 pb-2">
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-neutral-100 flex items-center gap-2">
+                      <Plus className="w-3.5 h-3.5 text-emerald-500" />
+                      <span>Configure New Webhook Endpoint</span>
+                    </h4>
+                    <button
+                      type="button"
+                      onClick={() => setShowCreateWebhook(false)}
+                      className="text-slate-400 hover:text-slate-600 dark:hover:text-neutral-200"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                    <div>
+                      <label className="block font-semibold text-slate-700 dark:text-neutral-300 mb-1">
+                        Webhook Name
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. GitHub Actions CI, Sentry Alerts"
+                        value={newWhName}
+                        onChange={(e) => setNewWhName(e.target.value)}
+                        className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-lg text-slate-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-semibold text-slate-700 dark:text-neutral-300 mb-1">
+                        Post into Channel
+                      </label>
+                      <select
+                        value={newWhChannelId}
+                        onChange={(e) => setNewWhChannelId(e.target.value)}
+                        className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-lg text-slate-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                      >
+                        {channels.map((c) => (
+                          <option key={c.id} value={c.id}>
+                            #{c.name} {c.isPrivate ? '(Private)' : ''}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block font-semibold text-slate-700 dark:text-neutral-300 mb-1">
+                        Integration Type
+                      </label>
+                      <select
+                        value={newWhType}
+                        onChange={(e) => setNewWhType(e.target.value as WebhookType)}
+                        className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-lg text-slate-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                      >
+                        <option value="GENERIC">Generic Incoming (Slack & Discord compatible)</option>
+                        <option value="GITHUB">GitHub Webhook (push, pull_request, HMAC)</option>
+                        <option value="GITLAB">GitLab Webhook (push, merge_request, pipeline)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block font-semibold text-slate-700 dark:text-neutral-300 mb-1">
+                        HMAC Secret Key (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Auto-generated if left blank"
+                        value={newWhSecret}
+                        onChange={(e) => setNewWhSecret(e.target.value)}
+                        className="w-full px-3 py-2 bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-lg text-slate-900 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono text-[11px]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200 dark:border-neutral-800">
+                    <button
+                      type="button"
+                      onClick={() => setShowCreateWebhook(false)}
+                      className="px-3 py-1.5 text-xs text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-neutral-100"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCreateWebhook}
+                      disabled={creatingWebhook || !newWhName.trim()}
+                      className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition disabled:opacity-50"
+                    >
+                      <Save className="w-3.5 h-3.5" />
+                      <span>{creatingWebhook ? 'Generating...' : 'Save & Generate Token'}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Active Incoming Webhooks */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-neutral-400 flex items-center gap-1.5">
+                    <Terminal className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Configured Webhooks ({webhooks.length})</span>
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={fetchIntegrations}
+                    className="text-[11px] text-indigo-500 hover:underline flex items-center gap-1"
+                  >
+                    <RefreshCw className="w-3 h-3" />
+                    <span>Refresh</span>
+                  </button>
+                </div>
+
+                {loadingIntegrations ? (
+                  <div className="p-8 text-center text-xs text-slate-500 dark:text-neutral-400 animate-pulse">
+                    Loading integrations & automation rules...
+                  </div>
+                ) : webhooks.length === 0 ? (
+                  <div className="p-8 border border-dashed border-slate-200 dark:border-neutral-800 rounded-xl text-center">
+                    <WebhookIcon className="w-8 h-8 mx-auto text-slate-400 dark:text-neutral-600 mb-2" />
+                    <p className="text-xs font-semibold text-slate-700 dark:text-neutral-300">
+                      No webhooks configured yet
+                    </p>
+                    <p className="text-[11px] text-slate-500 dark:text-neutral-400 mt-1">
+                      Create an incoming webhook to receive CI/CD alerts and code updates.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {webhooks.map((wh) => {
+                      const endpointPath =
+                        wh.type === 'GITHUB'
+                          ? `/api/webhooks/github/${wh.token}`
+                          : wh.type === 'GITLAB'
+                          ? `/api/webhooks/gitlab/${wh.token}`
+                          : `/api/webhooks/incoming/${wh.token}`;
+                      const fullUrl = `http://localhost:5001${endpointPath}`;
+                      const curlCmd = `curl -X POST "${fullUrl}" \\\n  -H "Content-Type: application/json" \\\n  -d '{"text": "🚀 Hello from ${wh.name}!"}'`;
+
+                      return (
+                        <div
+                          key={wh.id}
+                          className="p-4 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl space-y-3"
+                        >
+                          {/* Top row */}
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div className="flex items-center gap-2.5">
+                              {wh.avatar ? (
+                                <img
+                                  src={wh.avatar}
+                                  alt={wh.name}
+                                  className="w-7 h-7 rounded-lg object-cover border border-slate-200 dark:border-neutral-700"
+                                />
+                              ) : (
+                                <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-500 border border-emerald-500/30 flex items-center justify-center font-bold text-xs">
+                                  {wh.name.charAt(0)}
+                                </div>
+                              )}
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs font-bold text-slate-900 dark:text-neutral-100">
+                                    {wh.name}
+                                  </span>
+                                  <span className="text-[10px] px-1.5 py-0.2 rounded-full font-bold bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                                    {wh.type}
+                                  </span>
+                                  <span className="text-[10px] px-1.5 py-0.2 rounded-full font-medium bg-slate-200 dark:bg-neutral-800 text-slate-600 dark:text-neutral-300">
+                                    #{wh.channelName || wh.channelId}
+                                  </span>
+                                </div>
+                                <span className="text-[10px] text-slate-400">
+                                  Created {new Date(wh.createdAt).toLocaleDateString()} by {wh.creatorName}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="flex items-center gap-1.5 self-end sm:self-auto">
+                              <button
+                                type="button"
+                                onClick={() => handleSendTestPing(wh)}
+                                disabled={pingingWebhookId === wh.id}
+                                className="px-2.5 py-1 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 rounded-lg text-[11px] font-semibold flex items-center gap-1 transition"
+                              >
+                                <Play className="w-3 h-3 fill-current" />
+                                <span>{pingingWebhookId === wh.id ? 'Sending...' : 'Test Ping'}</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleViewLogs(wh.id)}
+                                className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition flex items-center gap-1 ${
+                                  selectedLogsWebhookId === wh.id
+                                    ? 'bg-slate-700 text-white border-slate-600'
+                                    : 'bg-white dark:bg-neutral-800 text-slate-600 dark:text-neutral-300 border-slate-200 dark:border-neutral-700 hover:bg-slate-100 dark:hover:bg-neutral-750'
+                                }`}
+                              >
+                                <Activity className="w-3 h-3" />
+                                <span>Logs</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteWebhook(wh.id)}
+                                className="p-1 text-slate-400 hover:text-rose-500 transition"
+                                title="Delete Webhook"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* URL Field */}
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between text-[11px]">
+                              <span className="font-semibold text-slate-600 dark:text-neutral-400">
+                                Webhook Ingest URL
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(fullUrl);
+                                  setCopiedUrlId(wh.id);
+                                  setTimeout(() => setCopiedUrlId(null), 2000);
+                                }}
+                                className="text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
+                              >
+                                {copiedUrlId === wh.id ? (
+                                  <>
+                                    <Check className="w-3 h-3" />
+                                    <span>Copied URL!</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Copy className="w-3 h-3" />
+                                    <span>Copy URL</span>
+                                  </>
+                                )}
+                              </button>
+                            </div>
+                            <div className="px-2.5 py-1.5 bg-slate-900 text-slate-200 rounded-lg font-mono text-[10px] break-all select-all flex items-center justify-between gap-2 border border-slate-800">
+                              <span>{fullUrl}</span>
+                            </div>
+                          </div>
+
+                          {/* Copy Curl Snippet */}
+                          <div className="flex items-center justify-between pt-1">
+                            <span className="text-[10px] text-slate-500 dark:text-neutral-400">
+                              {wh.secret ? `HMAC Secret: ${wh.secret.substring(0, 10)}...` : 'No secret required (token-authenticated)'}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigator.clipboard.writeText(curlCmd);
+                                setCopiedCurlId(wh.id);
+                                setTimeout(() => setCopiedCurlId(null), 2000);
+                              }}
+                              className="text-[11px] text-indigo-500 hover:underline flex items-center gap-1"
+                            >
+                              {copiedCurlId === wh.id ? (
+                                <>
+                                  <Check className="w-3 h-3" />
+                                  <span>Copied Curl!</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Code className="w-3 h-3" />
+                                  <span>Copy Sample curl</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+
+                          {/* Collapsible Delivery Logs */}
+                          {selectedLogsWebhookId === wh.id && (
+                            <div className="pt-3 border-t border-slate-200 dark:border-neutral-800 space-y-2">
+                              <div className="flex items-center justify-between">
+                                <span className="text-[11px] font-bold text-slate-700 dark:text-neutral-300">
+                                  Recent Delivery Audit Logs
+                                </span>
+                                <span className="text-[10px] text-slate-400">
+                                  Showing last {webhookLogs.length} attempts
+                                </span>
+                              </div>
+
+                              {loadingLogs ? (
+                                <div className="text-[11px] text-slate-400 py-2">Loading logs...</div>
+                              ) : webhookLogs.length === 0 ? (
+                                <div className="text-[11px] text-slate-400 py-2 italic">
+                                  No delivery attempts logged yet. Send a test ping!
+                                </div>
+                              ) : (
+                                <div className="space-y-1.5 max-h-40 overflow-y-auto">
+                                  {webhookLogs.map((log) => (
+                                    <div
+                                      key={log.id}
+                                      className="p-2 bg-white dark:bg-neutral-800 rounded-lg border border-slate-200 dark:border-neutral-750 text-[10px] flex items-center justify-between gap-2"
+                                    >
+                                      <div className="flex items-center gap-2">
+                                        <span
+                                          className={`px-1.5 py-0.2 rounded font-bold ${
+                                            log.status === 200
+                                              ? 'bg-emerald-500/20 text-emerald-600'
+                                              : 'bg-rose-500/20 text-rose-600'
+                                          }`}
+                                        >
+                                          {log.status}
+                                        </span>
+                                        <span className="font-mono text-slate-700 dark:text-neutral-300">
+                                          {log.event}
+                                        </span>
+                                        {log.error && (
+                                          <span className="text-rose-500 font-mono">
+                                            ({log.error})
+                                          </span>
+                                        )}
+                                      </div>
+                                      <div className="flex items-center gap-3 text-slate-400">
+                                        <span>{log.durationMs}ms</span>
+                                        <span>{new Date(log.createdAt).toLocaleTimeString()}</span>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Automation Rules Section */}
+              <div className="space-y-3 pt-4 border-t border-slate-200 dark:border-neutral-800">
+                <div>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-neutral-400 flex items-center gap-1.5">
+                    <Cpu className="w-3.5 h-3.5 text-indigo-500" />
+                    <span>Workflow Automation Rules Engine ({automationRules.length})</span>
+                  </h4>
+                  <p className="text-[11px] text-slate-500 dark:text-neutral-400 mt-0.5">
+                    Event-driven rules triggering encrypted channel alerts and Kanban card status transitions.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  {automationRules.map((rule) => (
+                    <div
+                      key={rule.id}
+                      className="p-3 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl flex items-center justify-between gap-3"
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-slate-900 dark:text-neutral-100">
+                            {rule.name}
+                          </span>
+                          <span className="text-[10px] px-1.5 py-0.2 rounded font-mono font-semibold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+                            {rule.trigger}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 dark:text-neutral-400">
+                          {rule.actions.postMessage ? `Posts alert to #${rule.actions.postMessage.channelId || 'general'}` : ''}
+                          {rule.actions.assignTo ? ` • Auto-assigns to ${rule.actions.assignTo}` : ''}
+                          {rule.actions.updateStatus ? ` • Moves card to ${rule.actions.updateStatus}` : ''}
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleToggleRule(rule)}
+                        className={`p-1 transition ${
+                          rule.isActive
+                            ? 'text-emerald-600 dark:text-emerald-400'
+                            : 'text-slate-400 dark:text-neutral-600'
+                        }`}
+                        title={rule.isActive ? 'Disable rule' : 'Enable rule'}
+                      >
+                        {rule.isActive ? (
+                          <ToggleRight className="w-6 h-6" />
+                        ) : (
+                          <ToggleLeft className="w-6 h-6" />
+                        )}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Footer Controls */}
           <div className="pt-4 border-t border-slate-200 dark:border-neutral-800 flex items-center justify-between">
             <button
@@ -1085,7 +2009,7 @@ export function SettingsModal({
               Cancel
             </button>
 
-            {activeTab !== 'notifications' && activeTab !== 'sessions' ? (
+            {activeTab !== 'notifications' && activeTab !== 'sessions' && activeTab !== 'integrations' ? (
               <button
                 type="submit"
                 disabled={loading}

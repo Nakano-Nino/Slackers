@@ -16,6 +16,8 @@ const CreateMessageSchema = z.object({
   taskId: z.string().optional(),
   bugId: z.string().optional(),
   parentId: z.string().optional(),
+  expiresAt: z.string().datetime({ offset: true }).optional().or(z.string().optional()),
+  clientTimestamp: z.number().optional(),
 });
 
 export const getMessagesByChannel = (req: AuthenticatedRequest, res: Response<ApiResponse<Message[]>>) => {
@@ -37,10 +39,28 @@ export const getMessagesByChannel = (req: AuthenticatedRequest, res: Response<Ap
     });
   }
 
-  const messages = dataStore.getMessagesByChannel(channelId);
+  // Private channel authorization: Admin, Manager, or user with an assigned channel key
+  if (channel.isPrivate && req.user.role !== 'admin' && req.user.role !== 'manager') {
+    const key = dataStore.getChannelKey(channelId, req.user.id);
+    if (!key) {
+      return res.status(403).json({
+        success: false,
+        error: `Access denied to private channel #${channel.name}`,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }
+
+  const before = typeof req.query.before === 'string' ? req.query.before : undefined;
+  const limitParam = typeof req.query.limit === 'string' ? parseInt(req.query.limit, 10) : undefined;
+  const limit = limitParam && !isNaN(limitParam) ? limitParam : 50;
+
+  const result = dataStore.getMessagesByChannel(channelId, { before, limit });
   res.json({
     success: true,
-    data: messages,
+    data: result.messages,
+    hasMore: result.hasMore,
+    nextCursor: result.nextCursor,
     timestamp: new Date().toISOString(),
   });
 };
@@ -55,6 +75,20 @@ export const getThreadReplies = (req: AuthenticatedRequest, res: Response<ApiRes
   }
 
   const parentId = Array.isArray(req.params.parentId) ? req.params.parentId[0] : req.params.parentId;
+  const parentMessage = dataStore.getMessageById(parentId);
+  if (parentMessage) {
+    const parentChannel = dataStore.getChannelById(parentMessage.channelId);
+    if (parentChannel && parentChannel.isPrivate && req.user.role !== 'admin' && req.user.role !== 'manager') {
+      const key = dataStore.getChannelKey(parentChannel.id, req.user.id);
+      if (!key) {
+        return res.status(403).json({
+          success: false,
+          error: `Access denied to thread in private channel #${parentChannel.name}`,
+          timestamp: new Date().toISOString(),
+        });
+      }
+    }
+  }
   const replies = dataStore.getThreadReplies(parentId);
   res.json({
     success: true,
@@ -88,6 +122,18 @@ export const createMessage = async (req: AuthenticatedRequest, res: Response<Api
       error: `Channel "${parseResult.data.channelId}" does not exist`,
       timestamp: new Date().toISOString(),
     });
+  }
+
+  // Private channel authorization: Admin, Manager, or user with an assigned channel key
+  if (channel.isPrivate && req.user.role !== 'admin' && req.user.role !== 'manager') {
+    const key = dataStore.getChannelKey(channel.id, req.user.id);
+    if (!key) {
+      return res.status(403).json({
+        success: false,
+        error: `Access denied to post in private channel #${channel.name}`,
+        timestamp: new Date().toISOString(),
+      });
+    }
   }
 
   // Security: strictly enforce sender identity from authenticated session
@@ -152,10 +198,17 @@ export const createMessage = async (req: AuthenticatedRequest, res: Response<Api
   });
 };
 
-export const toggleReaction = async (req: Request, res: Response<ApiResponse<Message>>) => {
+export const toggleReaction = async (req: AuthenticatedRequest, res: Response<ApiResponse<Message>>) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: 'Authentication required to react to messages',
+      timestamp: new Date().toISOString(),
+    });
+  }
+
   const messageId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const { emoji } = req.body;
-  const user = (req as any).user;
 
   if (!emoji || typeof emoji !== 'string') {
     return res.status(400).json({
@@ -165,7 +218,7 @@ export const toggleReaction = async (req: Request, res: Response<ApiResponse<Mes
     });
   }
 
-  const updated = dataStore.toggleMessageReaction(messageId, emoji, user?.id || 'u-1');
+  const updated = dataStore.toggleMessageReaction(messageId, emoji, req.user.id);
   if (!updated) {
     return res.status(404).json({
       success: false,
@@ -183,10 +236,17 @@ export const toggleReaction = async (req: Request, res: Response<ApiResponse<Mes
   });
 };
 
-export const editMessage = async (req: Request, res: Response<ApiResponse<Message>>) => {
+export const editMessage = async (req: AuthenticatedRequest, res: Response<ApiResponse<Message>>) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: 'Authentication required to edit messages',
+      timestamp: new Date().toISOString(),
+    });
+  }
+
   const messageId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const { ciphertext, iv } = req.body;
-  const user = (req as any).user;
 
   if (!ciphertext || !iv) {
     return res.status(400).json({
@@ -201,7 +261,7 @@ export const editMessage = async (req: Request, res: Response<ApiResponse<Messag
       messageId,
       ciphertext,
       iv,
-      user?.id || 'u-1'
+      req.user.id
     );
     if (!updated) {
       return res.status(404).json({
@@ -227,12 +287,19 @@ export const editMessage = async (req: Request, res: Response<ApiResponse<Messag
   }
 };
 
-export const deleteMessage = async (req: Request, res: Response<ApiResponse<{ messageId: string }>>) => {
+export const deleteMessage = async (req: AuthenticatedRequest, res: Response<ApiResponse<{ messageId: string }>>) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: 'Authentication required to delete messages',
+      timestamp: new Date().toISOString(),
+    });
+  }
+
   const messageId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-  const user = (req as any).user;
 
   try {
-    const updated = dataStore.deleteMessage(messageId, user?.id || 'u-1', user?.role === 'admin');
+    const updated = dataStore.deleteMessage(messageId, req.user.id, req.user.role === 'admin');
     if (!updated) {
       return res.status(404).json({
         success: false,

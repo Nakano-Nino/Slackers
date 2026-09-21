@@ -7,13 +7,13 @@ import {
   getProjectStats,
   updateProject,
 } from '../controllers/projectController.js';
-import { authenticate, optionalAuth, requireRole } from '../middleware/authMiddleware.js';
+import { authenticate, requireRole } from '../middleware/authMiddleware.js';
 
 const router = Router();
 
-router.get('/', optionalAuth, getProjects);
-router.get('/:id', optionalAuth, getProjectById);
-router.get('/:id/stats', optionalAuth, getProjectStats);
+router.get('/', authenticate, getProjects);
+router.get('/:id', authenticate, getProjectById);
+router.get('/:id/stats', authenticate, getProjectStats);
 router.post('/', authenticate, requireRole(['admin', 'manager']), createProject);
 router.patch('/:id', authenticate, updateProject);
 router.delete('/:id', authenticate, requireRole(['admin']), deleteProject);

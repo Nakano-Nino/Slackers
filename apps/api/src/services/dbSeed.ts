@@ -67,7 +67,7 @@ export async function seedPostgres(): Promise<{
   const existingProjectsCount = await prisma.project.count();
   if (existingProjectsCount === 0) {
     console.log('  → Seeding projects into PostgreSQL...');
-    const seedProjects = projectService.getProjects();
+    const seedProjects = projectService.getProjectsRaw();
     for (const p of seedProjects) {
       await prisma.project.create({
         data: {
@@ -150,7 +150,7 @@ export async function seedPostgres(): Promise<{
     console.log('  → Seeding messages into PostgreSQL...');
     const seedChannels = dataStore.getChannels();
     for (const c of seedChannels) {
-      const msgs = dataStore.getMessagesByChannel(c.id);
+      const { messages: msgs } = dataStore.getMessagesByChannel(c.id, { limit: 1000 });
       for (const m of msgs) {
         await prisma.message.create({
           data: {

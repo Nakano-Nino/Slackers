@@ -32,20 +32,26 @@ export const authenticate = async (req: AuthenticatedRequest, res: Response, nex
     });
   }
 
-  // Check if session has been explicitly revoked
-  if (payload.sessionId) {
-    const isValid = await sessionService.isSessionValid(payload.id, payload.sessionId);
-    if (!isValid) {
-      return res.status(401).json({
-        success: false,
-        error: 'Session has been revoked or expired. Please log in again.',
-        timestamp: new Date().toISOString(),
-      });
-    }
-    // Touch session last active time
-    sessionService.touchSession(payload.sessionId).catch(() => {});
-    req.sessionId = payload.sessionId;
+  // Require sessionId in token to ensure session revocation cannot be bypassed
+  if (!payload.sessionId) {
+    return res.status(401).json({
+      success: false,
+      error: 'Token missing session identifier. Please log in again.',
+      timestamp: new Date().toISOString(),
+    });
   }
+
+  const isValid = await sessionService.isSessionValid(payload.id, payload.sessionId);
+  if (!isValid) {
+    return res.status(401).json({
+      success: false,
+      error: 'Session has been revoked or expired. Please log in again.',
+      timestamp: new Date().toISOString(),
+    });
+  }
+  // Touch session last active time
+  sessionService.touchSession(payload.sessionId).catch(() => {});
+  req.sessionId = payload.sessionId;
 
   const user = dataStore.getUserById(payload.id);
   if (!user) {

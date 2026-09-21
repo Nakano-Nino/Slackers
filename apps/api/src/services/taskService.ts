@@ -1,4 +1,4 @@
-import { ProjectStats, QAReviewStep, QAStepStatus, Task, TaskPriority, TaskStatus, User } from '../types/index.js';
+import { ProjectStats, QAReviewStep, QAStepStatus, Task, TaskPriority, TaskStatus, TaskSubtask, User } from '../types/index.js';
 import { dataStore } from './dataStore.js';
 import { mongoLogger } from './mongoLogger.js';
 import { projectService } from './projectService.js';
@@ -28,6 +28,7 @@ class TaskService {
           creatorId: t.creatorId || undefined,
           qaSteps: (t.qaSteps as any) || undefined,
           qaVerdict: (t.qaVerdict as any) || undefined,
+          subtasks: (t.subtasks as any) || undefined,
           attachments: (t.attachments as any) || undefined,
           createdAt: t.createdAt.toISOString(),
           updatedAt: t.updatedAt.toISOString(),
@@ -103,6 +104,11 @@ class TaskService {
         },
       ],
       qaVerdict: 'failed',
+      subtasks: [
+        { id: 'sub-3-1', title: 'Setup column drop targets and drag sensors', isCompleted: true, createdAt: new Date(Date.now() - 1000 * 60 * 60 * 20).toISOString(), completedAt: new Date(Date.now() - 1000 * 60 * 60 * 18).toISOString() },
+        { id: 'sub-3-2', title: 'Implement optimistic card position updates', isCompleted: true, createdAt: new Date(Date.now() - 1000 * 60 * 60 * 20).toISOString(), completedAt: new Date(Date.now() - 1000 * 60 * 60 * 14).toISOString() },
+        { id: 'sub-3-3', title: 'Connect Socket.IO task:updated broadcast', isCompleted: false, createdAt: new Date(Date.now() - 1000 * 60 * 60 * 20).toISOString() },
+      ],
       createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
       updatedAt: new Date().toISOString(),
     },
@@ -366,7 +372,7 @@ class TaskService {
   getTaskById(id: string, user?: User): Task | undefined {
     const task = this.tasks.find((t) => t.id === id);
     if (!task) return undefined;
-    if (user && !projectService.getProjectById(task.projectId, user)) {
+    if (!user || !projectService.getProjectById(task.projectId, user)) {
       return undefined;
     }
     return this.enrichTask(task);
@@ -863,6 +869,175 @@ class TaskService {
         stepId: removed.id,
         stepTitle: removed.title,
         action: 'step_deleted',
+      },
+      actor
+    );
+
+    const enriched = this.enrichTask(task);
+    socketService.emitTaskUpdated(task.projectId, enriched);
+    return enriched;
+  }
+
+  async addSubtask(
+    taskId: string,
+    title: string,
+    actor: User
+  ): Promise<Task> {
+    const task = this.tasks.find((t) => t.id === taskId);
+    if (!task) {
+      throw new Error(`Task "${taskId}" not found`);
+    }
+
+    const project = projectService.getProjectById(task.projectId, actor);
+    if (!project) {
+      throw new Error(`Project "${task.projectId}" not found or permission denied.`);
+    }
+
+    const newSubtask: TaskSubtask = {
+      id: `sub-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      title: title.trim(),
+      isCompleted: false,
+      createdAt: new Date().toISOString(),
+    };
+
+    if (!task.subtasks) {
+      task.subtasks = [];
+    }
+    task.subtasks.push(newSubtask);
+    task.updatedAt = new Date().toISOString();
+
+    await prisma.task
+      .update({
+        where: { id: task.id },
+        data: {
+          subtasks: task.subtasks as any,
+          updatedAt: new Date(task.updatedAt),
+        },
+      })
+      .catch((err) => console.warn('Failed to persist subtask added in PostgreSQL:', err));
+
+    await mongoLogger.log(
+      'TASK_UPDATED',
+      {
+        taskId: task.id,
+        subtaskId: newSubtask.id,
+        subtaskTitle: newSubtask.title,
+        action: 'subtask_added',
+      },
+      actor
+    );
+
+    const enriched = this.enrichTask(task);
+    socketService.emitTaskUpdated(task.projectId, enriched);
+    return enriched;
+  }
+
+  async updateSubtask(
+    taskId: string,
+    subtaskId: string,
+    updates: { title?: string; isCompleted?: boolean },
+    actor: User
+  ): Promise<Task> {
+    const task = this.tasks.find((t) => t.id === taskId);
+    if (!task) {
+      throw new Error(`Task "${taskId}" not found`);
+    }
+
+    const project = projectService.getProjectById(task.projectId, actor);
+    if (!project) {
+      throw new Error(`Project "${task.projectId}" not found or permission denied.`);
+    }
+
+    if (!task.subtasks) {
+      task.subtasks = [];
+    }
+
+    const subtask = task.subtasks.find((s) => s.id === subtaskId);
+    if (!subtask) {
+      throw new Error(`Subtask "${subtaskId}" not found`);
+    }
+
+    if (updates.title !== undefined) {
+      subtask.title = updates.title.trim();
+    }
+    if (updates.isCompleted !== undefined) {
+      subtask.isCompleted = updates.isCompleted;
+      subtask.completedAt = updates.isCompleted ? new Date().toISOString() : undefined;
+    }
+
+    task.updatedAt = new Date().toISOString();
+
+    await prisma.task
+      .update({
+        where: { id: task.id },
+        data: {
+          subtasks: task.subtasks as any,
+          updatedAt: new Date(task.updatedAt),
+        },
+      })
+      .catch((err) => console.warn('Failed to persist subtask updated in PostgreSQL:', err));
+
+    await mongoLogger.log(
+      'TASK_UPDATED',
+      {
+        taskId: task.id,
+        subtaskId: subtask.id,
+        subtaskTitle: subtask.title,
+        isCompleted: subtask.isCompleted,
+        action: 'subtask_updated',
+      },
+      actor
+    );
+
+    const enriched = this.enrichTask(task);
+    socketService.emitTaskUpdated(task.projectId, enriched);
+    return enriched;
+  }
+
+  async deleteSubtask(
+    taskId: string,
+    subtaskId: string,
+    actor: User
+  ): Promise<Task> {
+    const task = this.tasks.find((t) => t.id === taskId);
+    if (!task) {
+      throw new Error(`Task "${taskId}" not found`);
+    }
+
+    const project = projectService.getProjectById(task.projectId, actor);
+    if (!project) {
+      throw new Error(`Project "${task.projectId}" not found or permission denied.`);
+    }
+
+    if (!task.subtasks) {
+      task.subtasks = [];
+    }
+
+    const index = task.subtasks.findIndex((s) => s.id === subtaskId);
+    if (index === -1) {
+      throw new Error(`Subtask "${subtaskId}" not found`);
+    }
+
+    const removed = task.subtasks.splice(index, 1)[0];
+    task.updatedAt = new Date().toISOString();
+
+    await prisma.task
+      .update({
+        where: { id: task.id },
+        data: {
+          subtasks: task.subtasks as any,
+          updatedAt: new Date(task.updatedAt),
+        },
+      })
+      .catch((err) => console.warn('Failed to persist subtask deleted in PostgreSQL:', err));
+
+    await mongoLogger.log(
+      'TASK_UPDATED',
+      {
+        taskId: task.id,
+        subtaskId: removed.id,
+        subtaskTitle: removed.title,
+        action: 'subtask_deleted',
       },
       actor
     );

@@ -80,6 +80,14 @@ export interface QAReviewStep {
   createdAt: string;
 }
 
+export interface TaskSubtask {
+  id: string;
+  title: string;
+  isCompleted: boolean;
+  createdAt: string;
+  completedAt?: string;
+}
+
 export interface Task {
   id: string;
   projectId: string;
@@ -99,6 +107,7 @@ export interface Task {
   attachments?: TaskAttachment[];
   qaSteps?: QAReviewStep[];
   qaVerdict?: 'pending' | 'passed' | 'failed';
+  subtasks?: TaskSubtask[];
   createdAt: string;
   updatedAt: string;
 }
@@ -157,6 +166,7 @@ export interface Message {
   taskId?: string;
   bugId?: string;
   createdAt: string;
+  expiresAt?: string;
   updatedAt?: string;
   isEdited?: boolean;
   isDeleted?: boolean;
@@ -165,6 +175,8 @@ export interface Message {
   parentId?: string;
   replyCount?: number;
   lastReplyAt?: string;
+  isBot?: boolean;
+  botType?: string;
 }
 
 export interface ChannelKey {
@@ -202,6 +214,7 @@ export interface DirectMessage {
   isRead?: boolean;
   readAt?: string | null;
   createdAt: string;
+  expiresAt?: string;
   updatedAt?: string;
   isEdited?: boolean;
   isDeleted?: boolean;
@@ -312,6 +325,8 @@ export interface ApiResponse<T> {
   data?: T;
   error?: string;
   timestamp: string;
+  hasMore?: boolean;
+  nextCursor?: string;
 }
 
 export interface HealthStatus {
@@ -329,4 +344,73 @@ export interface HealthStatus {
     memoryUsage?: string;
     keysCount?: number;
   };
+}
+
+export type WebhookType = 'GENERIC' | 'GITHUB' | 'GITLAB';
+
+export interface Webhook {
+  id: string;
+  name: string;
+  channelId: string;
+  channelName?: string;
+  token: string;
+  secret?: string;
+  type: WebhookType;
+  avatar?: string;
+  creatorId: string;
+  creatorName?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WebhookLog {
+  id: string;
+  webhookId: string;
+  event: string;
+  status: number;
+  payload?: any;
+  error?: string;
+  durationMs: number;
+  createdAt: string;
+}
+
+export type AutomationTrigger =
+  | 'BUG_CREATED'
+  | 'TASK_STATUS_CHANGED'
+  | 'CI_FAILED'
+  | 'QA_VERDICT_SUBMITTED'
+  | 'COMMIT_PUSHED'
+  | 'PR_OPENED'
+  | 'PR_MERGED';
+
+export interface AutomationRule {
+  id: string;
+  name: string;
+  trigger: AutomationTrigger | string;
+  conditions?: Record<string, any>;
+  actions: {
+    postMessage?: {
+      channelId?: string;
+      template: string;
+    };
+    assignTo?: string;
+    updateStatus?: string;
+    notifyUsers?: string[];
+  };
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface IncomingWebhookPayload {
+  text?: string;
+  content?: string;
+  username?: string;
+  botName?: string;
+  icon_url?: string;
+  avatar_url?: string;
+  attachments?: any[];
+  embeds?: any[];
+  [key: string]: any;
 }

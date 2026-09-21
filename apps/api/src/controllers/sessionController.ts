@@ -59,13 +59,20 @@ export const revokeSession = async (
 
   try {
     const revoked = await sessionService.revokeSession(req.user.id, sessionId);
+    if (!revoked) {
+      return res.status(403).json({
+        success: false,
+        error: 'Permission denied: Cannot revoke a session that does not belong to your account',
+        timestamp: new Date().toISOString(),
+      });
+    }
 
     // Notify connected sockets in real time to force logout
     socketService.emitSessionRevoked(req.user.id, sessionId);
 
     res.json({
       success: true,
-      data: { revoked, sessionId },
+      data: { revoked: true, sessionId },
       timestamp: new Date().toISOString(),
     });
   } catch (err: unknown) {

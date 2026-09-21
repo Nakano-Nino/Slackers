@@ -3,6 +3,7 @@ import { Server, Socket } from 'socket.io';
 import { authService } from './authService.js';
 import { dataStore } from './dataStore.js';
 import { sessionService } from './sessionService.js';
+import { projectService } from './projectService.js';
 import { DirectMessage, Message, Notification, Task, User } from '../types/index.js';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { Redis } from 'ioredis';
@@ -57,12 +58,14 @@ class SocketService {
         return next(new Error('Authentication error: Invalid or expired token'));
       }
 
-      // Check if session has been explicitly revoked
-      if (payload.sessionId) {
-        const isValid = await sessionService.isSessionValid(payload.id, payload.sessionId);
-        if (!isValid) {
-          return next(new Error('Authentication error: Session has been revoked'));
-        }
+      // Enforce sessionId presence in WebSocket handshake (prevent session revocation bypass)
+      if (!payload.sessionId) {
+        return next(new Error('Authentication error: Token missing session identifier'));
+      }
+
+      const isValid = await sessionService.isSessionValid(payload.id, payload.sessionId);
+      if (!isValid) {
+        return next(new Error('Authentication error: Session has been revoked'));
       }
 
       const user = dataStore.getUserById(payload.id);
@@ -117,11 +120,17 @@ class SocketService {
         }
       });
 
-      // Project rooms (for Kanban card sync)
+      // Project rooms (for Kanban card sync) - strictly authorized
       socket.on('project:join', (projectId: string) => {
-        if (projectId) {
-          socket.join(`project:${projectId}`);
+        if (!projectId || typeof projectId !== 'string') return;
+
+        const project = projectService.getProjectById(projectId, user);
+        if (!project) {
+          socket.emit('error', { message: `Access denied to project "${projectId}"` });
+          return;
         }
+
+        socket.join(`project:${projectId}`);
       });
 
       socket.on('project:leave', (projectId: string) => {

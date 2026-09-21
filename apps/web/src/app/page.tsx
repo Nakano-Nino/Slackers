@@ -96,6 +96,8 @@ export default function Home() {
   const [threadDecryptedContent, setThreadDecryptedContent] = useState<string>('');
 
   const [loadingMessages, setLoadingMessages] = useState(false);
+  const [hasMoreMessages, setHasMoreMessages] = useState(false);
+  const [loadingOlderMessages, setLoadingOlderMessages] = useState(false);
 
   // Check URL for invite token on mount
   useEffect(() => {
@@ -237,7 +239,9 @@ export default function Home() {
     if (!channelId || !currentUser) return;
     setLoadingMessages(true);
     try {
-      const fetchedMessages = await api.getMessages(channelId);
+      const res = await api.getMessages(channelId, { limit: 50 });
+      const fetchedMessages = res.messages;
+      setHasMoreMessages(res.hasMore);
       const channelKey = await E2EEService.getChannelKey(channelId);
       const decryptedMessages = await Promise.all(
         fetchedMessages.map(async (msg) => {
@@ -259,6 +263,41 @@ export default function Home() {
       setLoadingMessages(false);
     }
   }, [currentUser]);
+
+  const loadOlderMessages = useCallback(async () => {
+    if (!selectedChannelId || !currentUser || loadingOlderMessages || !hasMoreMessages) return;
+    const oldest = messages[0];
+    if (!oldest) return;
+
+    setLoadingOlderMessages(true);
+    try {
+      const res = await api.getMessages(selectedChannelId, { before: oldest.id, limit: 30 });
+      const channelKey = await E2EEService.getChannelKey(selectedChannelId);
+      const decryptedOlder = await Promise.all(
+        res.messages.map(async (msg) => {
+          if (msg.ciphertext && msg.iv) {
+            try {
+              const dec = await E2EEService.decrypt(msg.ciphertext, msg.iv, channelKey);
+              return { ...msg, decryptedContent: dec };
+            } catch {
+              return { ...msg, decryptedContent: msg.content || '[Encrypted message]' };
+            }
+          }
+          return { ...msg, decryptedContent: msg.content };
+        })
+      );
+      setMessages((prev) => {
+        const existingIds = new Set(prev.map((m) => m.id));
+        const filtered = decryptedOlder.filter((m) => !existingIds.has(m.id));
+        return [...filtered, ...prev];
+      });
+      setHasMoreMessages(res.hasMore);
+    } catch (err) {
+      console.error('Failed to load older channel messages:', err);
+    } finally {
+      setLoadingOlderMessages(false);
+    }
+  }, [selectedChannelId, currentUser, loadingOlderMessages, hasMoreMessages, messages]);
 
   useEffect(() => {
     if (selectedChannelId && activeView === 'chat' && !selectedDmUser && currentUser) {
@@ -302,8 +341,10 @@ export default function Home() {
       if (!currentUser || !myKeyPair) return;
       setLoadingMessages(true);
       try {
-        const dms = await api.getDirectMessages(peerUser.id);
+        const res = await api.getDirectMessages(peerUser.id, { limit: 50 });
+        const dms = res.messages;
         setDirectMessages(dms);
+        setHasMoreMessages(res.hasMore);
 
         // Fetch legitimate peer public key
         const peerPubKeyStr = await E2EEService.getPeerPublicKey(peerUser.id, peerUser);
@@ -329,13 +370,51 @@ export default function Home() {
     [currentUser, myKeyPair]
   );
 
+  const loadOlderDirectMessages = useCallback(async () => {
+    if (!selectedDmUser || !currentUser || !myKeyPair || loadingOlderMessages || !hasMoreMessages) return;
+    const oldest = directMessages[0];
+    if (!oldest) return;
+
+    setLoadingOlderMessages(true);
+    try {
+      const res = await api.getDirectMessages(selectedDmUser.id, { before: oldest.id, limit: 30 });
+      const peerPubKeyStr = await E2EEService.getPeerPublicKey(selectedDmUser.id, selectedDmUser);
+      const peerCryptoKey = await E2EEService.importPeerPublicKey(peerPubKeyStr);
+      const sharedKey = await E2EEService.getSharedKey(
+        currentUser.id,
+        selectedDmUser.id,
+        myKeyPair.privateKey,
+        peerCryptoKey
+      );
+
+      const decryptedMap: Record<string, string> = {};
+      for (const dm of res.messages) {
+        decryptedMap[dm.id] = await E2EEService.decrypt(dm.ciphertext, dm.iv, sharedKey);
+      }
+      setDecryptedDmMessages((prev) => ({ ...prev, ...decryptedMap }));
+      setDirectMessages((prev) => {
+        const existingIds = new Set(prev.map((d) => d.id));
+        const filtered = res.messages.filter((d) => !existingIds.has(d.id));
+        return [...filtered, ...prev];
+      });
+      setHasMoreMessages(res.hasMore);
+    } catch (err) {
+      console.error('Failed to load older direct messages:', err);
+    } finally {
+      setLoadingOlderMessages(false);
+    }
+  }, [selectedDmUser, currentUser, myKeyPair, loadingOlderMessages, hasMoreMessages, directMessages]);
+
   useEffect(() => {
     if (selectedDmUser && activeView === 'chat' && currentUser && myKeyPair) {
       loadDirectMessages(selectedDmUser);
     }
   }, [selectedDmUser, activeView, currentUser, myKeyPair, loadDirectMessages]);
 
-  const handleSendDirectMessage = async (content: string) => {
+  const handleSendDirectMessage = async (
+    content: string,
+    options?: { expiresAt?: string }
+  ) => {
     if (!currentUser || !selectedDmUser || !myKeyPair) return;
 
     try {
@@ -353,6 +432,8 @@ export default function Home() {
         receiverId: selectedDmUser.id,
         ciphertext,
         iv,
+        expiresAt: options?.expiresAt,
+        clientTimestamp: Date.now(),
       });
 
       setDecryptedDmMessages((prev) => ({
@@ -964,7 +1045,10 @@ export default function Home() {
     setProjects((prev) => prev.map((p) => (p.id === projectId ? { ...p, ...updated } : p)));
   };
 
-  const handleSendMessage = async (content: string) => {
+  const handleSendMessage = async (
+    content: string,
+    options?: { expiresAt?: string }
+  ) => {
     if (!selectedChannelId) return;
     try {
       const channelKey = await E2EEService.getChannelKey(selectedChannelId);
@@ -974,6 +1058,8 @@ export default function Home() {
         ciphertext,
         iv,
         userId: currentUser?.id,
+        expiresAt: options?.expiresAt,
+        clientTimestamp: Date.now(),
       });
       setMessages((prev) => {
         if (prev.some((m) => m.id === newMessage.id)) {
@@ -1482,6 +1568,9 @@ export default function Home() {
             onToggleReaction={handleToggleReaction}
             onEditMessage={handleEditMessage}
             onDeleteMessage={handleDeleteMessage}
+            hasMoreMessages={hasMoreMessages}
+            loadingOlderMessages={loadingOlderMessages}
+            onLoadOlderMessages={selectedDmUser ? loadOlderDirectMessages : loadOlderMessages}
           />
         ) : activeView === 'kanban' ? (
           <div className="flex-1 flex flex-col h-full p-6 overflow-hidden">
@@ -1524,6 +1613,17 @@ export default function Home() {
               onDeleteTask={handleDeleteTask}
               onDiscussInChat={handleDiscussInChat}
               onSelectTask={(task) => setSelectedTaskForDetail(task)}
+              onCreateTask={handleCreateTask}
+              selectedProjectId={selectedProjectId}
+              onToggleSubtask={async (taskId, subtaskId, currentCompleted) => {
+                const updated = await api.updateSubtask(taskId, subtaskId, {
+                  isCompleted: !currentCompleted,
+                });
+                setTasks((prev) => prev.map((t) => (t.id === taskId ? updated : t)));
+                if (selectedTaskForDetail?.id === taskId) {
+                  setSelectedTaskForDetail(updated);
+                }
+              }}
             />
           </div>
         ) : (

@@ -27,9 +27,11 @@ import {
   Check,
   RotateCcw,
   FileEdit,
+  History,
 } from 'lucide-react';
 import { api } from '../lib/api';
 import {
+  ActivityLog,
   Project,
   QAReviewStep,
   QAStepStatus,
@@ -229,6 +231,64 @@ const PRIORITY_LABELS: Record<TaskPriority, { label: string; badge: string }> = 
   urgent: { label: 'Urgent', badge: 'bg-rose-950/60 text-rose-400 border-rose-800' },
 };
 
+function formatActivityAction(log: ActivityLog): {
+  title: string;
+  badgeColor: string;
+  icon: React.ReactNode;
+  detail?: string;
+} {
+  const details = (log.details || {}) as Record<string, any>;
+  switch (log.action) {
+    case 'TASK_CREATED':
+      return {
+        title: 'created this task',
+        badgeColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+        icon: <Plus className="w-3.5 h-3.5 text-emerald-400" />,
+        detail: `Status: ${details.status || 'todo'}, Story Points: ${details.storyPoints ?? 1}`,
+      };
+    case 'TASK_STATUS_CHANGED':
+      return {
+        title: `changed status from ${details.fromStatus || 'unknown'} to ${details.toStatus || 'unknown'}`,
+        badgeColor: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
+        icon: <RotateCcw className="w-3.5 h-3.5 text-indigo-400" />,
+        detail: details.taskTitle ? `Task: ${details.taskTitle}` : undefined,
+      };
+    case 'TASK_UPDATED':
+      const changeKeys = details.changes ? Object.keys(details.changes).join(', ') : 'details';
+      return {
+        title: `updated task (${changeKeys})`,
+        badgeColor: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+        icon: <FileEdit className="w-3.5 h-3.5 text-amber-400" />,
+      };
+    case 'TASK_QA_STEP_UPDATED':
+      const qaAction = details.action || 'updated step';
+      return {
+        title: `QA Step: ${details.stepTitle || 'Step'} (${qaAction})`,
+        badgeColor: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+        icon: <ShieldCheck className="w-3.5 h-3.5 text-purple-400" />,
+      };
+    case 'TASK_COMMENT_ADDED':
+      return {
+        title: 'posted a comment',
+        badgeColor: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+        icon: <MessageSquare className="w-3.5 h-3.5 text-blue-400" />,
+        detail: details.commentSnippet ? `"${details.commentSnippet}"` : undefined,
+      };
+    case 'TASK_COMMENT_DELETED':
+      return {
+        title: 'deleted a comment',
+        badgeColor: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
+        icon: <Trash2 className="w-3.5 h-3.5 text-rose-400" />,
+      };
+    default:
+      return {
+        title: log.action.replace(/_/g, ' ').toLowerCase(),
+        badgeColor: 'bg-neutral-800 text-neutral-300 border-neutral-700',
+        icon: <Clock className="w-3.5 h-3.5 text-neutral-400" />,
+      };
+  }
+}
+
 export function TaskDetailModal({
   isOpen,
   task,
@@ -252,6 +312,11 @@ export function TaskDetailModal({
   const [uploadingAttachment, setUploadingAttachment] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Activity & Changelog Tab State
+  const [activeBottomTab, setActiveBottomTab] = useState<'comments' | 'activity'>('comments');
+  const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
+  const [loadingActivity, setLoadingActivity] = useState(false);
+
   // QA Steps state
   const [showAddStepForm, setShowAddStepForm] = useState(false);
   const [newStepTitle, setNewStepTitle] = useState('');
@@ -261,6 +326,14 @@ export function TaskDetailModal({
   const [stepNoteText, setStepNoteText] = useState('');
   const [updatingStepId, setUpdatingStepId] = useState<string | null>(null);
   const [qaError, setQaError] = useState<string | null>(null);
+
+  // Subtasks state (Linear & Jira Depth)
+  const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
+  const [addingSubtask, setAddingSubtask] = useState(false);
+  const [subtaskFilter, setSubtaskFilter] = useState<'all' | 'pending' | 'completed'>('all');
+  const [editingSubtaskId, setEditingSubtaskId] = useState<string | null>(null);
+  const [editingSubtaskTitle, setEditingSubtaskTitle] = useState('');
+  const [subtaskError, setSubtaskError] = useState<string | null>(null);
 
   useEffect(() => {
     setCurrentTask(task);
@@ -336,6 +409,25 @@ export function TaskDetailModal({
 
     loadComments();
   }, [isOpen, task]);
+
+  // Load activity logs whenever modal opens or tab changes to activity
+  const loadTaskActivity = React.useCallback(async (taskId: string) => {
+    setLoadingActivity(true);
+    try {
+      const logs = await api.getTaskActivity(taskId);
+      setActivityLogs(logs);
+    } catch (err) {
+      console.error('Failed to load task activity logs:', err);
+    } finally {
+      setLoadingActivity(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isOpen && task && activeBottomTab === 'activity') {
+      loadTaskActivity(task.id);
+    }
+  }, [isOpen, task?.id, activeBottomTab, loadTaskActivity]);
 
   if (!isOpen || !activeTask) return null;
 
@@ -462,6 +554,74 @@ export function TaskDetailModal({
       setQaError(err instanceof Error ? err.message : 'Failed to delete QA review step');
     } finally {
       setUpdatingStepId(null);
+    }
+  };
+
+  const handleAddSubtask = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!newSubtaskTitle.trim() || !activeTask || addingSubtask) return;
+    setAddingSubtask(true);
+    setSubtaskError(null);
+    try {
+      const updated = await api.addSubtask(activeTask.id, newSubtaskTitle.trim());
+      setCurrentTask(updated);
+      onTaskUpdated?.(updated);
+      setNewSubtaskTitle('');
+    } catch (err) {
+      setSubtaskError(err instanceof Error ? err.message : 'Failed to add subtask');
+    } finally {
+      setAddingSubtask(false);
+    }
+  };
+
+  const handleToggleSubtask = async (subtaskId: string, currentCompleted: boolean) => {
+    if (!activeTask) return;
+    const prevSubtasks = activeTask.subtasks || [];
+    const optimistic = prevSubtasks.map((s) =>
+      s.id === subtaskId
+        ? { ...s, isCompleted: !currentCompleted, completedAt: !currentCompleted ? new Date().toISOString() : undefined }
+        : s
+    );
+    setCurrentTask((prev) => (prev ? { ...prev, subtasks: optimistic } : prev));
+
+    try {
+      const updated = await api.updateSubtask(activeTask.id, subtaskId, {
+        isCompleted: !currentCompleted,
+      });
+      setCurrentTask(updated);
+      onTaskUpdated?.(updated);
+    } catch (err) {
+      setSubtaskError(err instanceof Error ? err.message : 'Failed to toggle subtask');
+      setCurrentTask((prev) => (prev ? { ...prev, subtasks: prevSubtasks } : prev));
+    }
+  };
+
+  const handleSaveSubtaskTitle = async (subtaskId: string) => {
+    if (!activeTask || !editingSubtaskTitle.trim()) {
+      setEditingSubtaskId(null);
+      return;
+    }
+    try {
+      const updated = await api.updateSubtask(activeTask.id, subtaskId, {
+        title: editingSubtaskTitle.trim(),
+      });
+      setCurrentTask(updated);
+      onTaskUpdated?.(updated);
+      setEditingSubtaskId(null);
+      setEditingSubtaskTitle('');
+    } catch (err) {
+      setSubtaskError(err instanceof Error ? err.message : 'Failed to rename subtask');
+    }
+  };
+
+  const handleDeleteSubtask = async (subtaskId: string) => {
+    if (!activeTask) return;
+    try {
+      const updated = await api.deleteSubtask(activeTask.id, subtaskId);
+      setCurrentTask(updated);
+      onTaskUpdated?.(updated);
+    } catch (err) {
+      setSubtaskError(err instanceof Error ? err.message : 'Failed to delete subtask');
     }
   };
 
@@ -610,6 +770,238 @@ export function TaskDetailModal({
                   </div>
                 </div>
               )}
+
+              {/* Subtasks & Checklist (Linear & Jira Depth) */}
+              <div className="bg-neutral-950/70 border border-neutral-800 rounded-xl p-4 space-y-3.5">
+                <div className="flex items-center justify-between border-b border-neutral-800/80 pb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      <CheckSquare className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-200">
+                          Subtasks & Checklist
+                        </h4>
+                        <span className="text-[10px] font-semibold font-mono text-neutral-400 bg-neutral-800 px-1.5 py-0.5 rounded">
+                          {((activeTask.subtasks || []).filter((s) => s.isCompleted)).length}/
+                          {(activeTask.subtasks || []).length} completed
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-neutral-400">
+                        Linear-style itemized sub-deliverables and implementation checklists.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Filter tabs */}
+                  <div className="flex items-center gap-1 bg-neutral-900 p-0.5 rounded-lg border border-neutral-800 text-[10px]">
+                    <button
+                      type="button"
+                      onClick={() => setSubtaskFilter('all')}
+                      className={`px-2 py-0.5 rounded font-medium transition ${
+                        subtaskFilter === 'all'
+                          ? 'bg-neutral-800 text-neutral-200'
+                          : 'text-neutral-500 hover:text-neutral-300'
+                      }`}
+                    >
+                      All
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSubtaskFilter('pending')}
+                      className={`px-2 py-0.5 rounded font-medium transition ${
+                        subtaskFilter === 'pending'
+                          ? 'bg-neutral-800 text-amber-400'
+                          : 'text-neutral-500 hover:text-neutral-300'
+                      }`}
+                    >
+                      Pending
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSubtaskFilter('completed')}
+                      className={`px-2 py-0.5 rounded font-medium transition ${
+                        subtaskFilter === 'completed'
+                          ? 'bg-neutral-800 text-emerald-400'
+                          : 'text-neutral-500 hover:text-neutral-300'
+                      }`}
+                    >
+                      Completed
+                    </button>
+                  </div>
+                </div>
+
+                {/* Progress bar */}
+                {(activeTask.subtasks || []).length > 0 && (() => {
+                  const total = activeTask.subtasks!.length;
+                  const completed = activeTask.subtasks!.filter((s) => s.isCompleted).length;
+                  const percent = Math.round((completed / total) * 100);
+                  return (
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-[11px] text-neutral-400">
+                        <span>Checklist Completion</span>
+                        <span className="font-mono font-semibold text-neutral-300">{percent}%</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-neutral-900 rounded-full overflow-hidden border border-neutral-800/80">
+                        <div
+                          className={`h-full transition-all duration-300 rounded-full ${
+                            percent === 100
+                              ? 'bg-gradient-to-r from-emerald-500 to-teal-400'
+                              : 'bg-gradient-to-r from-indigo-500 to-emerald-500'
+                          }`}
+                          style={{ width: `${percent}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {subtaskError && (
+                  <div className="p-2 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    <span>{subtaskError}</span>
+                  </div>
+                )}
+
+                {/* Inline Add Subtask Input */}
+                {canInteract && (
+                  <form onSubmit={handleAddSubtask} className="flex items-center gap-2">
+                    <div className="relative flex-1">
+                      <input
+                        type="text"
+                        value={newSubtaskTitle}
+                        onChange={(e) => setNewSubtaskTitle(e.target.value)}
+                        placeholder="Add a subtask or checklist item... (Press Enter)"
+                        className="w-full bg-neutral-900 border border-neutral-800 rounded-lg pl-3 pr-8 py-1.5 text-xs text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-indigo-500 transition"
+                      />
+                      {newSubtaskTitle.trim() && (
+                        <button
+                          type="submit"
+                          disabled={addingSubtask}
+                          className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1 text-indigo-400 hover:text-indigo-300 rounded"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </form>
+                )}
+
+                {/* Subtask Items List */}
+                {(!activeTask.subtasks || activeTask.subtasks.length === 0) ? (
+                  <div className="p-3.5 rounded-lg border border-dashed border-neutral-800 text-center">
+                    <CheckSquare className="w-5 h-5 text-neutral-600 mx-auto mb-1" />
+                    <p className="text-xs text-neutral-400 font-medium">No subtasks yet</p>
+                    <p className="text-[11px] text-neutral-600 mt-0.5">
+                      Break down this task into smaller steps for faster execution.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-1.5 max-h-60 overflow-y-auto pr-1">
+                    {activeTask.subtasks
+                      .filter((s) => {
+                        if (subtaskFilter === 'pending') return !s.isCompleted;
+                        if (subtaskFilter === 'completed') return s.isCompleted;
+                        return true;
+                      })
+                      .map((subtask) => (
+                        <div
+                          key={subtask.id}
+                          className={`group flex items-center justify-between gap-2.5 p-2 rounded-lg border transition ${
+                            subtask.isCompleted
+                              ? 'bg-neutral-950/40 border-neutral-800/60 opacity-80'
+                              : 'bg-neutral-900/60 border-neutral-800 hover:border-neutral-700'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleSubtask(subtask.id, subtask.isCompleted)}
+                              className={`w-4 h-4 rounded border flex items-center justify-center transition shrink-0 ${
+                                subtask.isCompleted
+                                  ? 'bg-emerald-500 border-emerald-500 text-white'
+                                  : 'border-neutral-600 hover:border-neutral-400 bg-neutral-950'
+                              }`}
+                            >
+                              {subtask.isCompleted && <Check className="w-3 h-3 stroke-[3]" />}
+                            </button>
+
+                            {editingSubtaskId === subtask.id ? (
+                              <div className="flex items-center gap-1.5 flex-1">
+                                <input
+                                  type="text"
+                                  value={editingSubtaskTitle}
+                                  onChange={(e) => setEditingSubtaskTitle(e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') handleSaveSubtaskTitle(subtask.id);
+                                    if (e.key === 'Escape') setEditingSubtaskId(null);
+                                  }}
+                                  autoFocus
+                                  className="flex-1 bg-neutral-950 border border-indigo-500 rounded px-2 py-0.5 text-xs text-neutral-100 focus:outline-none"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => handleSaveSubtaskTitle(subtask.id)}
+                                  className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-600 text-white font-medium"
+                                >
+                                  Save
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setEditingSubtaskId(null)}
+                                  className="text-[10px] px-1.5 py-0.5 text-neutral-400 hover:text-neutral-200"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            ) : (
+                              <span
+                                onDoubleClick={() => {
+                                  if (canInteract) {
+                                    setEditingSubtaskId(subtask.id);
+                                    setEditingSubtaskTitle(subtask.title);
+                                  }
+                                }}
+                                className={`text-xs text-neutral-200 truncate cursor-text ${
+                                  subtask.isCompleted ? 'line-through text-neutral-500' : ''
+                                }`}
+                              >
+                                {subtask.title}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition shrink-0">
+                            {editingSubtaskId !== subtask.id && canInteract && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setEditingSubtaskId(subtask.id);
+                                  setEditingSubtaskTitle(subtask.title);
+                                }}
+                                title="Rename subtask"
+                                className="p-1 text-neutral-500 hover:text-neutral-300 rounded hover:bg-neutral-800"
+                              >
+                                <FileEdit className="w-3 h-3" />
+                              </button>
+                            )}
+                            {canInteract && (
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteSubtask(subtask.id)}
+                                title="Delete subtask"
+                                className="p-1 text-neutral-500 hover:text-rose-400 rounded hover:bg-neutral-800"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
 
               {/* QA Review & Verification Steps */}
               <div className="bg-neutral-950/70 border border-neutral-800 rounded-xl p-4 space-y-3.5">
@@ -1223,102 +1615,193 @@ export function TaskDetailModal({
             </div>
           </div>
 
-          {/* Task Comments Section */}
+          {/* Comments & Activity Section with Tab Navigation */}
           <div className="pt-4 border-t border-neutral-800">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-400 flex items-center gap-2">
-                <MessageSquare className="w-4 h-4 text-indigo-400" />
+            <div className="flex items-center gap-4 mb-4 border-b border-neutral-800 pb-2">
+              <button
+                type="button"
+                onClick={() => setActiveBottomTab('comments')}
+                className={`flex items-center gap-2 pb-1.5 text-xs font-semibold uppercase tracking-wider transition ${
+                  activeBottomTab === 'comments'
+                    ? 'text-indigo-400 border-b-2 border-indigo-500'
+                    : 'text-neutral-400 hover:text-neutral-200'
+                }`}
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
                 <span>Comments & Discussion ({comments.length})</span>
-              </h3>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveBottomTab('activity')}
+                className={`flex items-center gap-2 pb-1.5 text-xs font-semibold uppercase tracking-wider transition ${
+                  activeBottomTab === 'activity'
+                    ? 'text-indigo-400 border-b-2 border-indigo-500'
+                    : 'text-neutral-400 hover:text-neutral-200'
+                }`}
+              >
+                <History className="w-3.5 h-3.5" />
+                <span>Activity & Changelog ({activityLogs.length})</span>
+              </button>
             </div>
 
-            {/* Comments List */}
-            <div className="space-y-3 mb-4">
-              {loadingComments ? (
-                <div className="py-6 text-center text-xs text-neutral-500">Loading comments...</div>
-              ) : comments.length === 0 ? (
-                <div className="p-4 rounded-xl bg-neutral-950/60 border border-neutral-800 text-center text-xs text-neutral-500">
-                  No comments yet. Leave a note or feedback below!
-                </div>
-              ) : (
-                comments.map((comment) => {
-                  const isAuthor = currentUser?.id === comment.userId;
-                  const canDelete = isAuthor || canManage;
-
-                  return (
-                    <div
-                      key={comment.id}
-                      className="p-3 rounded-xl bg-neutral-950/70 border border-neutral-800/90 text-xs group"
-                    >
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div className="flex items-center gap-2">
-                          <img
-                            src={
-                              comment.user?.avatar ||
-                              'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'
-                            }
-                            alt={comment.user?.name || 'User'}
-                            className="w-5 h-5 rounded-full object-cover"
-                          />
-                          <span className="font-semibold text-neutral-200">
-                            {comment.user?.name || 'Team Member'}
-                          </span>
-                          {comment.user && (
-                            <span className={`text-[8px] uppercase font-bold px-1 py-0.2 rounded border ${getUserRoleBadge(comment.user).class}`}>
-                              {getUserRoleBadge(comment.user).shortLabel}
-                            </span>
-                          )}
-                          <span className="text-[10px] text-neutral-500">
-                            {new Date(comment.createdAt).toLocaleTimeString([], {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </span>
-                        </div>
-
-                        {canDelete && (
-                          <button
-                            onClick={() => handleDeleteComment(comment.id)}
-                            title="Delete comment"
-                            className="opacity-0 group-hover:opacity-100 text-neutral-500 hover:text-rose-400 transition p-1"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        )}
-                      </div>
-
-                      <p className="text-neutral-300 leading-relaxed whitespace-pre-wrap pl-7">
-                        {comment.content}
-                      </p>
+            {activeBottomTab === 'comments' ? (
+              <>
+                {/* Comments List */}
+                <div className="space-y-3 mb-4">
+                  {loadingComments ? (
+                    <div className="py-6 text-center text-xs text-neutral-500">Loading comments...</div>
+                  ) : comments.length === 0 ? (
+                    <div className="p-4 rounded-xl bg-neutral-950/60 border border-neutral-800 text-center text-xs text-neutral-500">
+                      No comments yet. Leave a note or feedback below!
                     </div>
-                  );
-                })
-              )}
-            </div>
+                  ) : (
+                    comments.map((comment) => {
+                      const isAuthor = currentUser?.id === comment.userId;
+                      const canDelete = isAuthor || canManage;
 
-            {/* Post Comment Input */}
-            {canInteract ? (
-              <form onSubmit={handlePostComment} className="flex gap-2">
-                <input
-                  type="text"
-                  value={commentInput}
-                  onChange={(e) => setCommentInput(e.target.value)}
-                  placeholder="Write a comment or note on this task..."
-                  className="flex-1 bg-neutral-950 border border-neutral-800 rounded-xl px-3.5 py-2 text-xs text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-indigo-500"
-                />
-                <button
-                  type="submit"
-                  disabled={submittingComment || !commentInput.trim()}
-                  className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 transition shadow-sm shrink-0"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>Post</span>
-                </button>
-              </form>
+                      return (
+                        <div
+                          key={comment.id}
+                          className="p-3 rounded-xl bg-neutral-950/70 border border-neutral-800/90 text-xs group"
+                        >
+                          <div className="flex items-center justify-between mb-1.5">
+                            <div className="flex items-center gap-2">
+                              <img
+                                src={
+                                  comment.user?.avatar ||
+                                  'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80'
+                                }
+                                alt={comment.user?.name || 'User'}
+                                className="w-5 h-5 rounded-full object-cover"
+                              />
+                              <span className="font-semibold text-neutral-200">
+                                {comment.user?.name || 'Team Member'}
+                              </span>
+                              {comment.user && (
+                                <span className={`text-[8px] uppercase font-bold px-1 py-0.2 rounded border ${getUserRoleBadge(comment.user).class}`}>
+                                  {getUserRoleBadge(comment.user).shortLabel}
+                                </span>
+                              )}
+                              <span className="text-[10px] text-neutral-500">
+                                {new Date(comment.createdAt).toLocaleTimeString([], {
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })}
+                              </span>
+                            </div>
+
+                            {canDelete && (
+                              <button
+                                onClick={() => handleDeleteComment(comment.id)}
+                                title="Delete comment"
+                                className="opacity-0 group-hover:opacity-100 text-neutral-500 hover:text-rose-400 transition p-1"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
+
+                          <p className="text-neutral-300 leading-relaxed whitespace-pre-wrap pl-7">
+                            {comment.content}
+                          </p>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+
+                {/* Post Comment Input */}
+                {canInteract ? (
+                  <form onSubmit={handlePostComment} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={commentInput}
+                      onChange={(e) => setCommentInput(e.target.value)}
+                      placeholder="Write a comment or note on this task..."
+                      className="flex-1 bg-neutral-950 border border-neutral-800 rounded-xl px-3.5 py-2 text-xs text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-indigo-500"
+                    />
+                    <button
+                      type="submit"
+                      disabled={submittingComment || !commentInput.trim()}
+                      className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 transition shadow-sm shrink-0"
+                    >
+                      <Send className="w-3.5 h-3.5" />
+                      <span>Post</span>
+                    </button>
+                  </form>
+                ) : (
+                  <p className="text-xs text-neutral-500 italic text-center py-2">
+                    Viewer accounts have read-only access and cannot post comments.
+                  </p>
+                )}
+              </>
             ) : (
-              <p className="text-xs text-neutral-500 italic text-center py-2">
-                Viewer accounts have read-only access and cannot post comments.
-              </p>
+              /* Activity & Changelog Timeline */
+              <div className="space-y-3 mb-2">
+                {loadingActivity ? (
+                  <div className="py-8 text-center text-xs text-neutral-500 flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                    <span>Loading task activity trail...</span>
+                  </div>
+                ) : activityLogs.length === 0 ? (
+                  <div className="p-6 rounded-xl bg-neutral-950/60 border border-neutral-800 text-center text-xs text-neutral-500">
+                    No activity recorded for this task yet.
+                  </div>
+                ) : (
+                  <div className="relative pl-6 space-y-4 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-neutral-800">
+                    {activityLogs.map((log, idx) => {
+                      const actionInfo = formatActivityAction(log);
+                      const actor = users.find((u) => u.id === log.userId);
+                      const actorName = log.userName || actor?.name || 'System';
+                      const actorAvatar =
+                        actor?.avatar ||
+                        'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80';
+                      const timeString = new Date(log.timestamp).toLocaleString([], {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      });
+
+                      return (
+                        <div key={idx} className="relative group text-xs">
+                          {/* Timeline dot */}
+                          <div className="absolute -left-6 top-1 w-5 h-5 rounded-full bg-neutral-900 border border-neutral-700 flex items-center justify-center">
+                            {actionInfo.icon}
+                          </div>
+
+                          <div className="p-3 rounded-xl bg-neutral-950/70 border border-neutral-800/80 hover:border-neutral-700 transition">
+                            <div className="flex items-center justify-between gap-2 mb-1">
+                              <div className="flex items-center gap-2">
+                                <img
+                                  src={actorAvatar}
+                                  alt={actorName}
+                                  className="w-4 h-4 rounded-full object-cover"
+                                />
+                                <span className="font-semibold text-neutral-200">
+                                  {actorName}
+                                </span>
+                                <span className="text-neutral-400 font-normal">
+                                  {actionInfo.title}
+                                </span>
+                              </div>
+                              <span className="text-[10px] text-neutral-500 shrink-0">
+                                {timeString}
+                              </span>
+                            </div>
+
+                            {actionInfo.detail && (
+                              <p className="text-[11px] text-neutral-400 bg-neutral-900/60 rounded-md px-2.5 py-1 mt-1.5 border border-neutral-800/50">
+                                {actionInfo.detail}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>

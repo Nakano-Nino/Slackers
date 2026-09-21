@@ -13,6 +13,8 @@ const SendMessageSchema = z.object({
   ciphertext: z.string().min(1, 'ciphertext is required'),
   iv: z.string().min(1, 'iv is required'),
   senderCopy: z.string().optional(),
+  expiresAt: z.string().datetime({ offset: true }).optional().or(z.string().optional()),
+  clientTimestamp: z.number().optional(),
 });
 
 const PublicKeySchema = z.object({
@@ -32,11 +34,17 @@ export const getConversation = (
   }
 
   const partnerId = Array.isArray(req.params.partnerId) ? req.params.partnerId[0] : req.params.partnerId;
-  const messages = dmService.getConversation(req.user.id, partnerId);
+  const before = typeof req.query.before === 'string' ? req.query.before : undefined;
+  const limitParam = typeof req.query.limit === 'string' ? parseInt(req.query.limit, 10) : undefined;
+  const limit = limitParam && !isNaN(limitParam) ? limitParam : 50;
+
+  const result = dmService.getConversation(req.user.id, partnerId, { before, limit });
 
   res.json({
     success: true,
-    data: messages,
+    data: result.messages,
+    hasMore: result.hasMore,
+    nextCursor: result.nextCursor,
     timestamp: new Date().toISOString(),
   });
 };
@@ -68,7 +76,9 @@ export const sendDirectMessage = async (
       parseResult.data.receiverId,
       parseResult.data.ciphertext,
       parseResult.data.iv,
-      parseResult.data.senderCopy
+      parseResult.data.senderCopy,
+      parseResult.data.expiresAt,
+      parseResult.data.clientTimestamp
     );
 
     // Trigger notification for recipient

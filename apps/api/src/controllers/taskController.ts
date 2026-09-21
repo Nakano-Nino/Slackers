@@ -1,7 +1,8 @@
 import { Response } from 'express';
 import { z } from 'zod';
 import { taskService } from '../services/taskService.js';
-import { ApiResponse, ProjectStats, Task, TaskPriority, TaskStatus } from '../types/index.js';
+import { mongoLogger } from '../services/mongoLogger.js';
+import { ActivityLog, ApiResponse, ProjectStats, Task, TaskPriority, TaskStatus } from '../types/index.js';
 import { AuthenticatedRequest } from '../middleware/authMiddleware.js';
 
 const CreateTaskSchema = z.object({
@@ -48,6 +49,15 @@ const UpdateQAStepSchema = z.object({
   description: z.string().max(1000).optional(),
 });
 
+const AddSubtaskSchema = z.object({
+  title: z.string().min(1, 'Subtask title is required').max(300),
+});
+
+const UpdateSubtaskSchema = z.object({
+  title: z.string().min(1).max(300).optional(),
+  isCompleted: z.boolean().optional(),
+});
+
 export const getTasks = (req: AuthenticatedRequest, res: Response<ApiResponse<Task[]>>) => {
   const projectId = req.query.projectId as string | undefined;
   const status = req.query.status as TaskStatus | undefined;
@@ -75,6 +85,28 @@ export const getTaskById = (req: AuthenticatedRequest, res: Response<ApiResponse
   res.json({
     success: true,
     data: task,
+    timestamp: new Date().toISOString(),
+  });
+};
+
+export const getTaskActivity = async (req: AuthenticatedRequest, res: Response<ApiResponse<ActivityLog[]>>) => {
+  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const task = taskService.getTaskById(id, req.user);
+  if (!task) {
+    return res.status(404).json({
+      success: false,
+      error: `Task "${id}" not found or permission denied`,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  const limitParam = typeof req.query.limit === 'string' ? parseInt(req.query.limit, 10) : 50;
+  const limit = !isNaN(limitParam) ? limitParam : 50;
+  const logs = await mongoLogger.getTaskActivityLogs(id, limit);
+
+  res.json({
+    success: true,
+    data: logs,
     timestamp: new Date().toISOString(),
   });
 };
@@ -299,3 +331,104 @@ export const deleteQAStep = async (req: AuthenticatedRequest, res: Response<ApiR
     });
   }
 };
+
+export const addSubtask = async (req: AuthenticatedRequest, res: Response<ApiResponse<Task>>) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: 'Authentication required to add subtasks',
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  const taskId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const parseResult = AddSubtaskSchema.safeParse(req.body);
+  if (!parseResult.success) {
+    return res.status(400).json({
+      success: false,
+      error: parseResult.error.errors.map((e) => e.message).join(', '),
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  try {
+    const task = await taskService.addSubtask(taskId, parseResult.data.title, req.user);
+    res.status(201).json({
+      success: true,
+      data: task,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err: unknown) {
+    res.status(403).json({
+      success: false,
+      error: err instanceof Error ? err.message : 'Permission denied',
+      timestamp: new Date().toISOString(),
+    });
+  }
+};
+
+export const updateSubtask = async (req: AuthenticatedRequest, res: Response<ApiResponse<Task>>) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: 'Authentication required to update subtasks',
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  const taskId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const subtaskId = Array.isArray(req.params.subtaskId) ? req.params.subtaskId[0] : req.params.subtaskId;
+
+  const parseResult = UpdateSubtaskSchema.safeParse(req.body);
+  if (!parseResult.success) {
+    return res.status(400).json({
+      success: false,
+      error: parseResult.error.errors.map((e) => e.message).join(', '),
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  try {
+    const task = await taskService.updateSubtask(taskId, subtaskId, parseResult.data, req.user);
+    res.json({
+      success: true,
+      data: task,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err: unknown) {
+    res.status(403).json({
+      success: false,
+      error: err instanceof Error ? err.message : 'Permission denied',
+      timestamp: new Date().toISOString(),
+    });
+  }
+};
+
+export const deleteSubtask = async (req: AuthenticatedRequest, res: Response<ApiResponse<Task>>) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      error: 'Authentication required to delete subtasks',
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  const taskId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const subtaskId = Array.isArray(req.params.subtaskId) ? req.params.subtaskId[0] : req.params.subtaskId;
+
+  try {
+    const task = await taskService.deleteSubtask(taskId, subtaskId, req.user);
+    res.json({
+      success: true,
+      data: task,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err: unknown) {
+    res.status(403).json({
+      success: false,
+      error: err instanceof Error ? err.message : 'Permission denied',
+      timestamp: new Date().toISOString(),
+    });
+  }
+};
+

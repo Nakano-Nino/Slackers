@@ -25,6 +25,15 @@ class MongoLogger {
       this.collection = this.db.collection<ActivityLog>('activity_logs');
       this.isConnected = true;
       console.log('🍃 MongoDB Logger connected to slackers_logs/activity_logs');
+
+      // Create compound and lookup indexes for query optimization
+      await Promise.allSettled([
+        this.collection.createIndex({ timestamp: -1 }),
+        this.collection.createIndex({ 'details.taskId': 1, timestamp: -1 }),
+        this.collection.createIndex({ 'details.link.id': 1, timestamp: -1 }),
+        this.collection.createIndex({ action: 1, timestamp: -1 }),
+        this.collection.createIndex({ userId: 1, timestamp: -1 }),
+      ]);
     } catch {
       this.isConnected = false;
       console.log('ℹ️  MongoDB not reachable, activity logs falling back to in-memory/console logging.');
@@ -75,6 +84,32 @@ class MongoLogger {
       }
     }
     return this.memoryFallbackLogs.slice(0, limit);
+  }
+
+  async getTaskActivityLogs(taskId: string, limit = 50): Promise<ActivityLog[]> {
+    if (this.isConnected && this.collection) {
+      try {
+        return await this.collection
+          .find({
+            $or: [
+              { 'details.taskId': taskId },
+              { 'details.link.id': taskId },
+            ],
+          } as any)
+          .sort({ timestamp: -1 })
+          .limit(limit)
+          .toArray();
+      } catch (err) {
+        console.warn('Failed reading task activity logs from MongoDB collection:', err);
+      }
+    }
+    return this.memoryFallbackLogs
+      .filter((log) => {
+        const details = log.details as Record<string, unknown> | undefined;
+        const link = details?.link as { id?: string } | undefined;
+        return details?.taskId === taskId || link?.id === taskId;
+      })
+      .slice(0, limit);
   }
 
   isMongoConnected(): boolean {

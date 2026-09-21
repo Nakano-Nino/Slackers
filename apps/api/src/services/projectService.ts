@@ -115,8 +115,8 @@ class ProjectService {
   ];
 
   hasProjectAccess(project: Project, user?: User): boolean {
-    if (!project.isPrivate) return true;
     if (!user) return false;
+    if (!project.isPrivate) return true;
     const isAdminOrManager = user.role === 'admin' || user.role === 'manager';
     if (isAdminOrManager) return true;
     if (project.ownerId === user.id) return true;
@@ -143,6 +143,10 @@ class ProjectService {
 
   getProjectRaw(id: string): Project | undefined {
     return this.projects.find((p) => p.id === id);
+  }
+
+  getProjectsRaw(): Project[] {
+    return this.projects;
   }
 
   private enrichProject(project: Project): Project {

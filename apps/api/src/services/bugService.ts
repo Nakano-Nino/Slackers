@@ -165,7 +165,7 @@ class BugService {
   getBugById(id: string, user?: User): Bug | undefined {
     const bug = this.bugs.find((b) => b.id === id);
     if (!bug) return undefined;
-    if (user && !projectService.getProjectById(bug.projectId, user)) {
+    if (!user || !projectService.getProjectById(bug.projectId, user)) {
       return undefined;
     }
     return this.enrichBug(bug);
@@ -242,6 +242,23 @@ class BugService {
       },
       reporter
     );
+
+    // Trigger workflow automation rules non-blockingly
+    setTimeout(async () => {
+      try {
+        const { automationService } = await import('./automationService.js');
+        await automationService.trigger('BUG_CREATED', {
+          bug: newBug,
+          bugId: newBug.id,
+          title: newBug.title,
+          severity: newBug.severity,
+          environment: newBug.environment,
+          reportedByName: reporter.name,
+        });
+      } catch (err) {
+        console.warn('⚠️  Automation rule trigger error:', err);
+      }
+    }, 0);
 
     return this.enrichBug(newBug);
   }

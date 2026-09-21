@@ -18,6 +18,7 @@ import notificationRoutes from './routes/notificationRoutes.js';
 import sessionRoutes from './routes/sessionRoutes.js';
 import fileRoutes from './routes/fileRoutes.js';
 import memberRoutes from './routes/memberRoutes.js';
+import webhookRoutes from './routes/webhookRoutes.js';
 import { dataStore } from './services/dataStore.js';
 import { socketService } from './services/socketService.js';
 import { connectPostgres } from './services/db.js';
@@ -60,7 +61,14 @@ app.use(
 );
 // Raw binary body parser for zero-knowledge encrypted file uploads
 app.use(express.raw({ type: 'application/octet-stream', limit: '50mb' }));
-app.use(express.json({ limit: '10mb' }));
+app.use(
+  express.json({
+    limit: '10mb',
+    verify: (req: any, _res, buf) => {
+      req.rawBody = buf;
+    },
+  })
+);
 app.use(morgan('dev'));
 
 // Static files for uploads (avatars, attachments)
@@ -93,6 +101,7 @@ app.use('/api/logs', logRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/files', fileRoutes);
 app.use('/api/members', memberRoutes);
+app.use('/api/webhooks', webhookRoutes);
 
 // Users route (authenticated, cryptographic secrets stripped)
 app.get('/api/users', authenticate, (_req: Request, res: Response) => {
@@ -105,9 +114,18 @@ app.get('/api/users', authenticate, (_req: Request, res: Response) => {
 });
 
 app.get('/api/users/me', authenticate, (req: Request, res: Response) => {
+  const rawUser = (req as any).user || dataStore.getCurrentUser();
+  const {
+    passwordHash: _,
+    encryptedPrivateKey: __,
+    keyVaultSalt: ___,
+    keyVaultIv: ____,
+    ...safeUser
+  } = rawUser;
+
   res.json({
     success: true,
-    data: (req as any).user || dataStore.getCurrentUser(),
+    data: safeUser,
     timestamp: new Date().toISOString(),
   });
 });

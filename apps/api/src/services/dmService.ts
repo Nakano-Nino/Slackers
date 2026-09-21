@@ -4,9 +4,51 @@ import { mongoLogger } from './mongoLogger.js';
 import { prisma } from './db.js';
 
 class DmService {
+  private seenIvs = new Map<string, number>();
+
+  constructor() {
+    // Periodically clean up expired disappearing messages and old IVs every 30 seconds
+    setInterval(() => {
+      this.purgeExpiredMessages();
+      this.cleanOldIvs();
+    }, 30000);
+  }
+
+  private cleanOldIvs(): void {
+    const oneHourAgo = Date.now() - 3600000;
+    for (const [iv, ts] of this.seenIvs.entries()) {
+      if (ts < oneHourAgo) this.seenIvs.delete(iv);
+    }
+  }
+
+  purgeExpiredMessages(): void {
+    const now = Date.now();
+    const initialLen = this.messages.length;
+    this.messages = this.messages.filter(
+      (m) => !m.expiresAt || new Date(m.expiresAt).getTime() > now
+    );
+    if (this.messages.length < initialLen) {
+      prisma.directMessage
+        .deleteMany({
+          where: {
+            expiresAt: {
+              lte: new Date(),
+            },
+          },
+        })
+        .catch((err) => console.warn('Failed to purge expired direct messages from DB:', err));
+    }
+  }
+
   async initFromDb(): Promise<void> {
     try {
       const dbDMs = await prisma.directMessage.findMany({
+        where: {
+          OR: [
+            { expiresAt: null },
+            { expiresAt: { gt: new Date() } },
+          ],
+        },
         orderBy: { createdAt: 'asc' },
       });
       if (dbDMs.length > 0) {
@@ -24,6 +66,7 @@ class DmService {
           editedAt: m.editedAt ? m.editedAt.toISOString() : undefined,
           reactions: (m.reactions as any) || undefined,
           createdAt: m.createdAt.toISOString(),
+          expiresAt: m.expiresAt ? m.expiresAt.toISOString() : undefined,
         }));
       }
       console.log(`📦 DmService synchronized with PostgreSQL: ${this.messages.length} direct messages.`);
@@ -125,15 +168,45 @@ class DmService {
     };
   }
 
-  getConversation(userAId: string, userBId: string): DirectMessage[] {
-    return this.messages
+  getConversation(
+    userAId: string,
+    userBId: string,
+    options?: { before?: string; limit?: number }
+  ): { messages: DirectMessage[]; hasMore: boolean; nextCursor?: string } {
+    const nowTime = Date.now();
+    let all = this.messages
       .filter(
         (m) =>
-          (m.senderId === userAId && m.receiverId === userBId) ||
-          (m.senderId === userBId && m.receiverId === userAId)
+          (!m.expiresAt || new Date(m.expiresAt).getTime() > nowTime) &&
+          ((m.senderId === userAId && m.receiverId === userBId) ||
+            (m.senderId === userBId && m.receiverId === userAId))
       )
-      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
-      .map((m) => this.enrichMessage(m));
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+
+    if (options?.before) {
+      const beforeIndex = all.findIndex((m) => m.id === options.before);
+      if (beforeIndex !== -1) {
+        all = all.slice(0, beforeIndex);
+      } else {
+        const beforeTime = new Date(options.before).getTime();
+        if (!isNaN(beforeTime)) {
+          all = all.filter((m) => new Date(m.createdAt).getTime() < beforeTime);
+        }
+      }
+    }
+
+    const limit = options?.limit ? Math.min(Math.max(1, options.limit), 100) : 50;
+    const totalCount = all.length;
+    const startIndex = Math.max(0, totalCount - limit);
+    const paginated = all.slice(startIndex).map((m) => this.enrichMessage(m));
+    const hasMore = startIndex > 0;
+    const nextCursor = hasMore && paginated.length > 0 ? paginated[0].id : undefined;
+
+    return {
+      messages: paginated,
+      hasMore,
+      nextCursor,
+    };
   }
 
   async sendEncryptedMessage(
@@ -141,8 +214,24 @@ class DmService {
     receiverId: string,
     ciphertext: string,
     iv: string,
-    senderCopy?: string
+    senderCopy?: string,
+    expiresAt?: string,
+    clientTimestamp?: number
   ): Promise<DirectMessage> {
+    // Replay attack defense: reject duplicate IVs within the key session
+    if (this.seenIvs.has(iv)) {
+      throw new Error('Replay attack detected: duplicate IV/nonce rejected');
+    }
+    this.seenIvs.set(iv, Date.now());
+
+    // Timestamp drift defense: verify drift is within 5 minutes
+    if (clientTimestamp !== undefined) {
+      const drift = Math.abs(Date.now() - clientTimestamp);
+      if (drift > 5 * 60 * 1000) {
+        throw new Error('Cryptographic timestamp drift out of bounds (max 5 minutes)');
+      }
+    }
+
     const sender = dataStore.getUserById(senderId);
     const receiver = dataStore.getUserById(receiverId);
 
@@ -157,6 +246,7 @@ class DmService {
       ciphertext,
       iv,
       senderCopy,
+      expiresAt: expiresAt || undefined,
       isRead: false,
       readAt: null,
       createdAt: new Date().toISOString(),
@@ -173,6 +263,7 @@ class DmService {
           ciphertext: newMsg.ciphertext,
           iv: newMsg.iv,
           senderCopy: newMsg.senderCopy || null,
+          expiresAt: newMsg.expiresAt ? new Date(newMsg.expiresAt) : null,
           isRead: false,
           createdAt: new Date(newMsg.createdAt),
         },

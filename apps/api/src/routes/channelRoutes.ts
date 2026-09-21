@@ -6,12 +6,12 @@ import {
   getChannels,
   saveChannelKey,
 } from '../controllers/channelController.js';
-import { authenticate, optionalAuth, requireRole } from '../middleware/authMiddleware.js';
+import { authenticate, requireRole } from '../middleware/authMiddleware.js';
 
 const router = Router();
 
-router.get('/', optionalAuth, getChannels);
-router.get('/:id', optionalAuth, getChannelById);
+router.get('/', authenticate, getChannels);
+router.get('/:id', authenticate, getChannelById);
 
 // Channel E2EE Keys
 router.post('/:channelId/keys', authenticate, saveChannelKey);

@@ -134,6 +134,7 @@ model Channel {
   messages    Message[]
   members     ChannelMember[]
   keys        ChannelKey[]
+  webhooks    Webhook[]
 
   @@map("channels")
 }
@@ -183,13 +184,16 @@ model Message {
   isDeleted  Boolean  @default(false)
   editedAt   DateTime?
   reactions  Json?
-  createdAt  DateTime @default(now())
+  createdAt  DateTime  @default(now())
+  expiresAt  DateTime?
 
   channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([channelId])
+  @@index([channelId, createdAt])
   @@index([parentId])
+  @@index([expiresAt])
   @@map("messages")
 }
 
@@ -213,6 +217,7 @@ model Task {
 
   qaSteps     Json?
   qaVerdict   String?
+  subtasks    Json?
   attachments Json?
 
   comments    TaskComment[]
@@ -223,6 +228,7 @@ model Task {
 
   @@index([projectId])
   @@index([status])
+  @@index([projectId, status])
   @@index([assigneeId])
   @@map("tasks")
 }
@@ -272,11 +278,15 @@ model DirectMessage {
   editedAt   DateTime?
   reactions  Json?
   createdAt  DateTime  @default(now())
+  expiresAt  DateTime?
 
   sender     User      @relation("SentDMs", fields: [senderId], references: [id], onDelete: Cascade)
   receiver   User      @relation("ReceivedDMs", fields: [receiverId], references: [id], onDelete: Cascade)
 
   @@index([senderId, receiverId])
+  @@index([senderId, receiverId, createdAt])
+  @@index([receiverId, senderId, createdAt])
+  @@index([expiresAt])
   @@map("direct_messages")
 }
 
@@ -292,6 +302,7 @@ model TaskComment {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([taskId])
+  @@index([taskId, createdAt])
   @@map("task_comments")
 }
 
@@ -325,5 +336,63 @@ model Notification {
 
   @@index([recipientId])
   @@map("notifications")
+}
+
+enum WebhookType {
+  GENERIC
+  GITHUB
+  GITLAB
+}
+
+model Webhook {
+  id          String       @id @default(cuid())
+  name        String
+  channelId   String
+  token       String       @unique
+  secret      String?
+  type        WebhookType  @default(GENERIC)
+  avatar      String?
+  creatorId   String
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  channel     Channel      @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  logs        WebhookLog[]
+
+  @@index([token])
+  @@index([channelId])
+  @@map("webhooks")
+}
+
+model WebhookLog {
+  id          String   @id @default(cuid())
+  webhookId   String
+  event       String
+  status      Int
+  payload     Json?
+  error       String?  @db.Text
+  durationMs  Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  webhook     Webhook  @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+
+  @@index([webhookId])
+  @@index([createdAt])
+  @@map("webhook_logs")
+}
+
+model AutomationRule {
+  id          String   @id @default(cuid())
+  name        String
+  trigger     String
+  conditions  Json?
+  actions     Json
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([trigger])
+  @@map("automation_rules")
 }
 

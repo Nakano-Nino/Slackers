@@ -12,7 +12,13 @@ const CreateChannelSchema = z.object({
 });
 
 export const getChannels = (req: AuthRequest, res: Response<ApiResponse<Channel[]>>) => {
-  const channels = dataStore.getChannels();
+  const user = req.user;
+  let channels = dataStore.getChannels();
+
+  if (user && user.role !== 'admin' && user.role !== 'manager') {
+    channels = channels.filter((c) => !c.isPrivate || !!dataStore.getChannelKey(c.id, user.id));
+  }
+
   res.json({
     success: true,
     data: channels,
@@ -21,6 +27,7 @@ export const getChannels = (req: AuthRequest, res: Response<ApiResponse<Channel[
 };
 
 export const getChannelById = (req: AuthRequest, res: Response<ApiResponse<Channel>>) => {
+  const user = req.user;
   const channelId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const channel = dataStore.getChannelById(channelId);
   if (!channel) {
@@ -29,6 +36,17 @@ export const getChannelById = (req: AuthRequest, res: Response<ApiResponse<Chann
       error: `Channel with id "${channelId}" not found`,
       timestamp: new Date().toISOString(),
     });
+  }
+
+  if (channel.isPrivate && user && user.role !== 'admin' && user.role !== 'manager') {
+    const key = dataStore.getChannelKey(channelId, user.id);
+    if (!key) {
+      return res.status(403).json({
+        success: false,
+        error: `Access denied to private channel #${channel.name}`,
+        timestamp: new Date().toISOString(),
+      });
+    }
   }
 
   res.json({

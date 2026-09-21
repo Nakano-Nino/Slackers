@@ -23,9 +23,13 @@ import {
   User,
   UserRole,
   UserSession,
+  Webhook,
+  WebhookLog,
+  WebhookType,
+  AutomationRule,
 } from '../types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL !== undefined ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5001';
 
 const TOKEN_KEY = 'slackers_auth_token';
 
@@ -237,9 +241,20 @@ export const api = {
   },
 
   // Messages
-  getMessages: async (channelId: string): Promise<Message[]> => {
-    const res = await fetchJson<ApiResponse<Message[]>>(`/api/messages/channel/${channelId}`);
-    return res.data || [];
+  getMessages: async (
+    channelId: string,
+    options?: { before?: string; limit?: number }
+  ): Promise<{ messages: Message[]; hasMore: boolean; nextCursor?: string }> => {
+    const params = new URLSearchParams();
+    if (options?.before) params.append('before', options.before);
+    if (options?.limit) params.append('limit', String(options.limit));
+    const qs = params.toString() ? `?${params.toString()}` : '';
+    const res = await fetchJson<ApiResponse<Message[]>>(`/api/messages/channel/${channelId}${qs}`);
+    return {
+      messages: res.data || [],
+      hasMore: Boolean(res.hasMore),
+      nextCursor: res.nextCursor,
+    };
   },
 
   sendMessage: async (data: {
@@ -251,6 +266,8 @@ export const api = {
     taskId?: string;
     bugId?: string;
     parentId?: string;
+    expiresAt?: string;
+    clientTimestamp?: number;
   }): Promise<Message> => {
     const res = await fetchJson<ApiResponse<Message>>('/api/messages', {
       method: 'POST',
@@ -377,6 +394,42 @@ export const api = {
     return res.data;
   },
 
+  // Subtasks & Checklists
+  addSubtask: async (taskId: string, title: string): Promise<Task> => {
+    const res = await fetchJson<ApiResponse<Task>>(`/api/tasks/${taskId}/subtasks`, {
+      method: 'POST',
+      body: JSON.stringify({ title }),
+    });
+    if (!res.data) throw new Error('Failed to add subtask');
+    return res.data;
+  },
+
+  updateSubtask: async (
+    taskId: string,
+    subtaskId: string,
+    data: { title?: string; isCompleted?: boolean }
+  ): Promise<Task> => {
+    const res = await fetchJson<ApiResponse<Task>>(`/api/tasks/${taskId}/subtasks/${subtaskId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    if (!res.data) throw new Error('Failed to update subtask');
+    return res.data;
+  },
+
+  deleteSubtask: async (taskId: string, subtaskId: string): Promise<Task> => {
+    const res = await fetchJson<ApiResponse<Task>>(`/api/tasks/${taskId}/subtasks/${subtaskId}`, {
+      method: 'DELETE',
+    });
+    if (!res.data) throw new Error('Failed to delete subtask');
+    return res.data;
+  },
+
+  getTaskActivity: async (taskId: string, limit = 50): Promise<ActivityLog[]> => {
+    const res = await fetchJson<ApiResponse<ActivityLog[]>>(`/api/tasks/${taskId}/activity?limit=${limit}`);
+    return res.data || [];
+  },
+
   // Bugs & Defect Tracking
   getBugs: async (filter?: {
     projectId?: string;
@@ -450,9 +503,20 @@ export const api = {
   },
 
   // Direct Messages (End-to-End Encrypted)
-  getDirectMessages: async (partnerId: string): Promise<DirectMessage[]> => {
-    const res = await fetchJson<ApiResponse<DirectMessage[]>>(`/api/direct-messages/${partnerId}`);
-    return res.data || [];
+  getDirectMessages: async (
+    partnerId: string,
+    options?: { before?: string; limit?: number }
+  ): Promise<{ messages: DirectMessage[]; hasMore: boolean; nextCursor?: string }> => {
+    const params = new URLSearchParams();
+    if (options?.before) params.append('before', options.before);
+    if (options?.limit) params.append('limit', String(options.limit));
+    const qs = params.toString() ? `?${params.toString()}` : '';
+    const res = await fetchJson<ApiResponse<DirectMessage[]>>(`/api/direct-messages/${partnerId}${qs}`);
+    return {
+      messages: res.data || [],
+      hasMore: Boolean(res.hasMore),
+      nextCursor: res.nextCursor,
+    };
   },
 
   getDmUnreadCounts: async (): Promise<Record<string, number>> => {
@@ -472,6 +536,8 @@ export const api = {
     ciphertext: string;
     iv: string;
     senderCopy?: string;
+    expiresAt?: string;
+    clientTimestamp?: number;
   }): Promise<DirectMessage> => {
     const res = await fetchJson<ApiResponse<DirectMessage>>('/api/direct-messages', {
       method: 'POST',
@@ -758,6 +824,94 @@ export const api = {
     });
     if (!res.data) throw new Error(res.error || 'Failed to update member role');
     return res.data;
+  },
+
+  // ==========================================
+  // Webhooks & Integrations API
+  // ==========================================
+
+  getWebhooks: async (): Promise<Webhook[]> => {
+    const res = await fetchJson<ApiResponse<Webhook[]>>('/api/webhooks');
+    return res.data || [];
+  },
+
+  createWebhook: async (data: {
+    name: string;
+    channelId: string;
+    type?: string;
+    avatar?: string;
+    secret?: string;
+  }): Promise<Webhook> => {
+    const res = await fetchJson<ApiResponse<Webhook>>('/api/webhooks', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (!res.data) throw new Error(res.error || 'Failed to create webhook');
+    return res.data;
+  },
+
+  updateWebhook: async (id: string, data: Partial<Webhook>): Promise<Webhook> => {
+    const res = await fetchJson<ApiResponse<Webhook>>(`/api/webhooks/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    if (!res.data) throw new Error(res.error || 'Failed to update webhook');
+    return res.data;
+  },
+
+  deleteWebhook: async (id: string): Promise<void> => {
+    const res = await fetchJson<ApiResponse<unknown>>(`/api/webhooks/${id}`, {
+      method: 'DELETE',
+    });
+    if (!res.success) throw new Error(res.error || 'Failed to delete webhook');
+  },
+
+  getWebhookLogs: async (id: string): Promise<WebhookLog[]> => {
+    const res = await fetchJson<ApiResponse<WebhookLog[]>>(`/api/webhooks/${id}/logs`);
+    return res.data || [];
+  },
+
+  sendTestPing: async (id: string): Promise<{ message: string }> => {
+    const res = await fetchJson<ApiResponse<{ message: string }>>(`/api/webhooks/${id}/test`, {
+      method: 'POST',
+    });
+    if (!res.success) throw new Error(res.error || 'Failed to deliver test ping');
+    return { message: res.data?.message || 'Test ping delivered successfully' };
+  },
+
+  getAutomationRules: async (): Promise<AutomationRule[]> => {
+    const res = await fetchJson<ApiResponse<AutomationRule[]>>('/api/webhooks/rules/all');
+    return res.data || [];
+  },
+
+  createAutomationRule: async (data: {
+    name: string;
+    trigger: string;
+    conditions?: Record<string, any>;
+    actions: any;
+  }): Promise<AutomationRule> => {
+    const res = await fetchJson<ApiResponse<AutomationRule>>('/api/webhooks/rules/create', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (!res.data) throw new Error(res.error || 'Failed to create automation rule');
+    return res.data;
+  },
+
+  updateAutomationRule: async (id: string, data: Partial<AutomationRule>): Promise<AutomationRule> => {
+    const res = await fetchJson<ApiResponse<AutomationRule>>(`/api/webhooks/rules/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    if (!res.data) throw new Error(res.error || 'Failed to update automation rule');
+    return res.data;
+  },
+
+  deleteAutomationRule: async (id: string): Promise<void> => {
+    const res = await fetchJson<ApiResponse<unknown>>(`/api/webhooks/rules/${id}`, {
+      method: 'DELETE',
+    });
+    if (!res.success) throw new Error(res.error || 'Failed to delete automation rule');
   },
 };
 

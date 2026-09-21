@@ -18,6 +18,8 @@ class RedisService {
   private memoryStore: Map<string, { value: string; expiresAt?: number }> = new Map();
   private memoryHashes: Map<string, Map<string, string>> = new Map();
 
+  private hasLoggedWarning: boolean = false;
+
   constructor() {
     this.url = process.env.REDIS_URL;
     this.initClient();
@@ -31,11 +33,15 @@ class RedisService {
 
     try {
       const options: RedisOptions = {
-        maxRetriesPerRequest: 3,
+        maxRetriesPerRequest: 1,
         lazyConnect: false,
-        retryStrategy(times) {
-          const delay = Math.min(times * 200, 3000);
-          return delay;
+        enableOfflineQueue: false,
+        retryStrategy: (times) => {
+          if (times > 3) {
+            // Stop retrying to avoid keeping the event loop alive and flooding logs
+            return null;
+          }
+          return Math.min(times * 200, 1000);
         },
       };
 
@@ -47,13 +53,17 @@ class RedisService {
 
       this.client.on('ready', () => {
         this.isReady = true;
+        this.hasLoggedWarning = false;
         console.log(`⚡ Redis connected and ready at ${this.url}`);
       });
 
       this.client.on('error', (err) => {
         this.isReady = false;
-        // Suppress repetitive noisy error logs if Redis drops
-        console.warn(`⚠️  Redis warning: ${err.message}. Operating in memory fallback.`);
+        // Suppress repetitive noisy error logs if Redis drops or is unreachable
+        if (!this.hasLoggedWarning) {
+          console.warn(`⚠️  Redis warning: ${err.message}. Operating in memory fallback.`);
+          this.hasLoggedWarning = true;
+        }
       });
 
       this.client.on('close', () => {
@@ -61,7 +71,20 @@ class RedisService {
       });
     } catch (err) {
       this.isReady = false;
-      console.warn('⚠️  Could not initialize Redis client, using in-memory fallback:', (err as Error).message);
+      if (!this.hasLoggedWarning) {
+        console.warn('⚠️  Could not initialize Redis client, using in-memory fallback:', (err as Error).message);
+        this.hasLoggedWarning = true;
+      }
+    }
+  }
+
+  disconnect(): void {
+    if (this.client) {
+      try {
+        this.client.disconnect();
+      } catch {}
+      this.client = null;
+      this.isReady = false;
     }
   }
 

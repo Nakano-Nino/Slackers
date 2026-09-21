@@ -993,7 +993,7 @@ export function ChatArea({
   return (
     <div className="flex-1 flex flex-col h-full bg-slate-50 dark:bg-neutral-900 transition-colors">
       {/* Header */}
-      <header className="h-14 px-6 border-b border-slate-200 dark:border-neutral-800 flex items-center justify-between bg-white/80 dark:bg-neutral-950/60 backdrop-blur-sm shrink-0">
+      <header className="h-14 px-6 border-b border-slate-200 dark:border-neutral-800 flex items-center justify-between bg-white/80 dark:bg-neutral-950/60 backdrop-blur-sm shrink-0 relative z-30">
         {isDmMode ? (
           <div className="flex items-center gap-3">
             <div className="relative">

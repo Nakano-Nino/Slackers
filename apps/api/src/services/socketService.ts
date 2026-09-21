@@ -19,7 +19,10 @@ class SocketService {
   async init(httpServer: HttpServer, clientUrl: string = 'http://localhost:3000') {
     this.io = new Server(httpServer, {
       cors: {
-        origin: [clientUrl, 'http://localhost:3000', 'http://127.0.0.1:3000'],
+        origin: (_origin, callback) => {
+          // Allow dynamic origin mirroring behind reverse proxies; auth is strictly enforced by JWT handshake
+          callback(null, true);
+        },
         credentials: true,
       },
       pingTimeout: 30000,

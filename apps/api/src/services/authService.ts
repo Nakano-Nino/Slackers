@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { User, UserRole, AuthResponse } from '../types/index.js';
 import { dataStore } from './dataStore.js';
 import { mongoLogger } from './mongoLogger.js';
-import { sessionService, UserSession, parseDeviceName } from './sessionService.js';
+import { sessionService, UserSession } from './sessionService.js';
 import { notificationService } from './notificationService.js';
 import { socketService } from './socketService.js';
 
@@ -89,21 +89,6 @@ export class AuthService {
     const isValid = await this.comparePassword(password, user.passwordHash || this.defaultPasswordHash);
     if (!isValid) {
       throw new Error('Invalid email or password');
-    }
-
-    // Clean up any existing stale sessions on the same device for this user
-    if (reqContext?.userAgent) {
-      try {
-        const existingSessions = await sessionService.getUserSessions(user.id);
-        const currentDeviceName = parseDeviceName(reqContext.userAgent);
-        for (const s of existingSessions) {
-          if (s.deviceName === currentDeviceName || (s.userAgent && s.userAgent === reqContext.userAgent)) {
-            await sessionService.revokeSession(user.id, s.id);
-          }
-        }
-      } catch (err) {
-        console.warn('Failed to clean up old device sessions:', err);
-      }
     }
 
     // Create session record for multi-device management

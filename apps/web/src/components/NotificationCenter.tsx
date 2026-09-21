@@ -134,7 +134,7 @@ export function NotificationCenter({
   };
 
   return (
-    <div className="relative inline-block" ref={dropdownRef}>
+    <div className={`relative inline-block ${isOpen ? 'z-50' : ''}`} ref={dropdownRef}>
       {/* Bell Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}

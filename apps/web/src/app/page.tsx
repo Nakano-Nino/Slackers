@@ -559,10 +559,10 @@ export default function Home() {
         ((dm.senderId === activeDm.id && dm.receiverId === curr.id) ||
           (dm.senderId === curr.id && dm.receiverId === activeDm.id));
 
-      if (isWithActiveDm && keyPair) {
-        try {
-          let decrypted = decryptedDmMessagesRef.current[dm.id];
-          if (!decrypted) {
+      if (isWithActiveDm) {
+        let decrypted = decryptedDmMessagesRef.current[dm.id];
+        if (!decrypted && keyPair) {
+          try {
             const peerPubKeyStr = await E2EEService.getPeerPublicKey(activeDm.id, activeDm);
             const peerCryptoKey = await E2EEService.importPeerPublicKey(peerPubKeyStr);
             const sharedKey = await E2EEService.getSharedKey(
@@ -577,20 +577,31 @@ export default function Home() {
               ...prev,
               [dm.id]: decrypted,
             }));
+          } catch (err) {
+            console.error('Failed to decrypt real-time direct message:', err);
+            decrypted = '[Encrypted message]';
+            setDecryptedDmMessages((prev) => ({
+              ...prev,
+              [dm.id]: decrypted,
+            }));
           }
+        } else if (!decrypted) {
+          decrypted = '[Encrypted message]';
+          setDecryptedDmMessages((prev) => ({
+            ...prev,
+            [dm.id]: decrypted,
+          }));
+        }
 
-          setDirectMessages((prev) => {
-            if (prev.some((d) => d.id === dm.id)) {
-              return prev.map((d) => (d.id === dm.id ? { ...d, ...dm } : d));
-            }
-            return [...prev, dm];
-          });
-
-          if (dm.senderId === activeDm.id) {
-            handleMarkDmAsRead(activeDm.id);
+        setDirectMessages((prev) => {
+          if (prev.some((d) => d.id === dm.id)) {
+            return prev.map((d) => (d.id === dm.id ? { ...d, ...dm } : d));
           }
-        } catch (err) {
-          console.error('Failed to decrypt real-time direct message:', err);
+          return [...prev, dm];
+        });
+
+        if (dm.senderId === activeDm.id) {
+          handleMarkDmAsRead(activeDm.id);
         }
       } else if (dm.receiverId === curr.id) {
         setUnreadDms((prev) => ({
@@ -844,6 +855,40 @@ export default function Home() {
     []
   );
 
+  const handleLogout = useCallback(async () => {
+    disconnectSocket();
+    await api.logout();
+    setCurrentUser(null);
+    setMyKeyPair(null);
+    setSelectedDmUser(null);
+    setDirectMessages([]);
+    setDecryptedDmMessages({});
+    setUnreadDms({});
+    setNotifications([]);
+    setUnreadNotificationCount(0);
+    setToastNotification(null);
+    setMutedTargets([]);
+    setSelectedTaskForDetail(null);
+    setProjects([]);
+    setTasks([]);
+    setBugs([]);
+    setMessages([]);
+  }, []);
+
+  const handleIncomingSessionRevoked = useCallback(
+    (data?: { sessionId?: string }) => {
+      const currentSessionId = authStorage.getSessionId();
+      // Only destroy current session if event targets this session or 'all-others'
+      if (!data?.sessionId || data.sessionId === 'all-others' || data.sessionId === currentSessionId) {
+        console.warn('🔒 Current session revoked by server, logging out...');
+        handleLogout();
+      } else {
+        console.log('ℹ️ Remote session revoked, current session unaffected:', data.sessionId);
+      }
+    },
+    [handleLogout]
+  );
+
   // Connect socket and bind real-time event listeners
   useEffect(() => {
     if (!currentUser) {
@@ -853,6 +898,23 @@ export default function Home() {
 
     const socket = connectSocket();
     if (!socket) return;
+
+    // Room subscription handler on connect/reconnect
+    const handleConnect = () => {
+      console.log('⚡ WebSocket connected/reconnected: Joining active channel and project rooms');
+      if (selectedChannelIdRef.current) {
+        socket.emit('channel:join', selectedChannelIdRef.current);
+      }
+      if (selectedProjectIdRef.current) {
+        socket.emit('project:join', selectedProjectIdRef.current);
+      }
+    };
+
+    socket.on('connect', handleConnect);
+    // If socket connected synchronously
+    if (socket.connected) {
+      handleConnect();
+    }
 
     socket.on('message:new', handleIncomingMessage);
     socket.on('message:reaction', handleIncomingMessageReaction);
@@ -872,9 +934,11 @@ export default function Home() {
     socket.on('task:deleted', handleIncomingTaskDeleted);
     socket.on('presence:update', handleIncomingPresence);
     socket.on('user:created', handleIncomingUserCreated);
-    socket.on('session:revoked', handleLogout);
+    socket.on('session:revoked', handleIncomingSessionRevoked);
 
     return () => {
+      socket.off('connect', handleConnect);
+
       socket.off('message:new', handleIncomingMessage);
       socket.off('message:reaction', handleIncomingMessageReaction);
       socket.off('message:edited', handleIncomingMessageEdited);
@@ -893,7 +957,7 @@ export default function Home() {
       socket.off('task:deleted', handleIncomingTaskDeleted);
       socket.off('presence:update', handleIncomingPresence);
       socket.off('user:created', handleIncomingUserCreated);
-      socket.off('session:revoked', handleLogout);
+      socket.off('session:revoked', handleIncomingSessionRevoked);
     };
   }, [
     currentUser,
@@ -913,6 +977,7 @@ export default function Home() {
     handleIncomingTaskDeleted,
     handleIncomingPresence,
     handleIncomingUserCreated,
+    handleIncomingSessionRevoked,
   ]);
 
   // Manage Channel room subscription
@@ -924,7 +989,7 @@ export default function Home() {
     return () => {
       socket.emit('channel:leave', selectedChannelId);
     };
-  }, [selectedChannelId]);
+  }, [selectedChannelId, currentUser]);
 
   // Manage Project room subscription
   useEffect(() => {
@@ -935,27 +1000,7 @@ export default function Home() {
     return () => {
       socket.emit('project:leave', selectedProjectId);
     };
-  }, [selectedProjectId]);
-
-  // Re-join active rooms on socket reconnection
-  useEffect(() => {
-    const socket = getSocket();
-    if (!socket) return;
-
-    const handleConnect = () => {
-      if (selectedChannelIdRef.current) {
-        socket.emit('channel:join', selectedChannelIdRef.current);
-      }
-      if (selectedProjectIdRef.current) {
-        socket.emit('project:join', selectedProjectIdRef.current);
-      }
-    };
-
-    socket.on('connect', handleConnect);
-    return () => {
-      socket.off('connect', handleConnect);
-    };
-  }, []);
+  }, [selectedProjectId, currentUser]);
 
   // Auto-dismiss floating toast notification after 6 seconds
   useEffect(() => {
@@ -966,25 +1011,6 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [toastNotification]);
 
-  const handleLogout = async () => {
-    disconnectSocket();
-    await api.logout();
-    setCurrentUser(null);
-    setMyKeyPair(null);
-    setSelectedDmUser(null);
-    setDirectMessages([]);
-    setDecryptedDmMessages({});
-    setUnreadDms({});
-    setNotifications([]);
-    setUnreadNotificationCount(0);
-    setToastNotification(null);
-    setMutedTargets([]);
-    setSelectedTaskForDetail(null);
-    setProjects([]);
-    setTasks([]);
-    setBugs([]);
-    setMessages([]);
-  };
 
   const handleMuteTarget = async (
     targetType: 'channel' | 'dm',
@@ -1575,7 +1601,7 @@ export default function Home() {
         ) : activeView === 'kanban' ? (
           <div className="flex-1 flex flex-col h-full p-6 overflow-hidden">
             {/* Header with Title & Backend Status */}
-            <div className="flex items-center justify-between mb-4 shrink-0">
+            <div className="flex items-center justify-between mb-4 shrink-0 relative z-30">
               <div>
                 <h2 className="text-xl font-bold text-slate-900 dark:text-neutral-100 flex items-center gap-2">
                   Project Kanban Board
@@ -1629,7 +1655,7 @@ export default function Home() {
         ) : (
           <div className="flex-1 flex flex-col h-full p-6 overflow-hidden">
             {/* Bug Tracker View Header */}
-            <div className="flex items-center justify-between mb-4 shrink-0">
+            <div className="flex items-center justify-between mb-4 shrink-0 relative z-30">
               <div>
                 <h2 className="text-xl font-bold text-slate-900 dark:text-neutral-100 flex items-center gap-2">
                   Bug & Defect Tracker

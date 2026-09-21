@@ -1,7 +1,16 @@
 import { io, Socket } from 'socket.io-client';
 import { authStorage } from './api';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL !== undefined ? process.env.NEXT_PUBLIC_API_URL : 'http://localhost:5001';
+function getSocketUrl(): string {
+  const envUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (envUrl && envUrl.trim() !== '') {
+    return envUrl;
+  }
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    return window.location.origin;
+  }
+  return 'http://localhost:5001';
+}
 
 let socket: Socket | null = null;
 let currentToken: string | null = null;
@@ -52,7 +61,7 @@ export function connectSocket(overrideToken?: string): Socket | null {
   currentToken = token;
   setupVisibilityHandler();
 
-  socket = io(API_URL, {
+  socket = io(getSocketUrl(), {
     auth: { token },
     transports: ['polling', 'websocket'], // Start with HTTP polling handshake for stability, upgrade to WebSocket
     reconnection: true,

@@ -48,6 +48,26 @@ export const authStorage = {
       localStorage.removeItem(TOKEN_KEY);
     }
   },
+  getSessionId: (): string | null => {
+    if (typeof window === 'undefined') return null;
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (!token) return null;
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) return null;
+      const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      const parsed = JSON.parse(jsonPayload);
+      return parsed.sessionId || null;
+    } catch {
+      return null;
+    }
+  },
 };
 
 async function fetchJson<T>(endpoint: string, options?: RequestInit): Promise<T> {

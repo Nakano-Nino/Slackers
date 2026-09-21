@@ -204,9 +204,9 @@
     "semantic_hash": ""
   },
   "apps/web/package.json": {
-    "mtime": 1789534227.8744786,
-    "seen": 1789535390.895927,
-    "ast_hash": "9f17af49b67b86561ff6124f9e7b1409",
+    "mtime": 1789978779.0897849,
+    "seen": 1789979536.581183,
+    "ast_hash": "57690b883bc96a14ac4a7d1fc0ac9f3b",
     "semantic_hash": ""
   },
   "apps/web/postcss.config.mjs": {
@@ -228,9 +228,9 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/AuthModal.tsx": {
-    "mtime": 1789654560.6693108,
-    "seen": 1789654649.7111309,
-    "ast_hash": "63ba31ea13b76641d69f5ac1425b1cfc",
+    "mtime": 1789981287.7873769,
+    "seen": 1789981536.264296,
+    "ast_hash": "c6d224b5244ca27090b48cb272561e12",
     "semantic_hash": ""
   },
   "apps/web/src/components/BackendStatus.tsx": {
@@ -690,33 +690,33 @@
     "semantic_hash": ""
   },
   "scripts/setup-vps-native.sh": {
-    "mtime": 1789977626.6913414,
-    "seen": 1789977635.427549,
-    "ast_hash": "ab058130c913612108124ea5176517f6",
+    "mtime": 1789978944.8405921,
+    "seen": 1789979536.5812201,
+    "ast_hash": "63398cdbbbe5633c93a43133bb36d8dd",
     "semantic_hash": ""
   },
   "scripts/update-native.sh": {
-    "mtime": 1789971493.7319942,
-    "seen": 1789971566.026183,
-    "ast_hash": "06db741a4797dfbc2415127d4bbb69ff",
+    "mtime": 1789978962.266431,
+    "seen": 1789979536.581221,
+    "ast_hash": "bec6206f35cf0fda8956348704b52208",
     "semantic_hash": ""
   },
   "docs/DEPLOYMENT_NATIVE.md": {
-    "mtime": 1789971507.1414874,
-    "seen": 1789971566.02619,
-    "ast_hash": "d9ddb8fb9e1a1e081bf7f70804dd009a",
+    "mtime": 1789978014.34212,
+    "seen": 1789978038.391951,
+    "ast_hash": "76c3911b378f54ef4fe1f98d14464ff9",
     "semantic_hash": ""
   },
   "scripts/setup-vps-hybrid.sh": {
-    "mtime": 1789975011.8697522,
-    "seen": 1789975418.724332,
-    "ast_hash": "d2feed0019055ffce5cc1b147ff77d6b",
+    "mtime": 1789979786.8567622,
+    "seen": 1789980061.28367,
+    "ast_hash": "7ee52cc3fc266dd4403f1c084b37b581",
     "semantic_hash": ""
   },
   "scripts/update-hybrid.sh": {
-    "mtime": 1789972440.8319957,
-    "seen": 1789972470.1298292,
-    "ast_hash": "40307a07d34598f9f7ff80121d4cc14f",
+    "mtime": 1789978953.9608574,
+    "seen": 1789979536.581221,
+    "ast_hash": "bb865b5c7a10fc7a2a01e0d8af83a553",
     "semantic_hash": ""
   },
   "docker-compose.db.yml": {
@@ -726,9 +726,15 @@
     "semantic_hash": ""
   },
   "docs/DEPLOYMENT_HYBRID.md": {
-    "mtime": 1789972445.0097485,
-    "seen": 1789972470.1298392,
-    "ast_hash": "7457a7e6976352061a334b1ec854bb04",
+    "mtime": 1789977983.2148683,
+    "seen": 1789978038.3919501,
+    "ast_hash": "74b513c441b72e03b863caa0eb0b7487",
+    "semantic_hash": ""
+  },
+  "scripts/setup-ssl.sh": {
+    "mtime": 1789979771.2726617,
+    "seen": 1789980061.283668,
+    "ast_hash": "b2ff1fc261f52bbdb7757048ca98714b",
     "semantic_hash": ""
   }
 }

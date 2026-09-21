@@ -1,6 +1,6 @@
 # 🚀 Slackers — Native Ubuntu VPS Deployment Guide (No Docker)
 
-This guide provides complete instructions to run **Slackers** directly on bare-metal Ubuntu (20.04 / 22.04 / 24.04 LTS) using **Node.js 20**, **PM2 process manager**, native **PostgreSQL**, **MongoDB**, **Redis**, and **Nginx** reverse proxy with **Let's Encrypt SSL**.
+This guide provides complete instructions to run **Slackers** directly on bare-metal Ubuntu (20.04 / 22.04 / 24.04 LTS) using **Node.js 24**, **PM2 process manager**, native **PostgreSQL**, **MongoDB**, **Redis**, and **Nginx** reverse proxy with **Let's Encrypt SSL**.
 
 ---
 
@@ -18,7 +18,7 @@ sudo ./scripts/setup-vps-native.sh
 ```
 
 **The script automatically**:
-1. Installs Node.js 20 LTS, npm, PM2, PostgreSQL, MongoDB, Redis, Nginx, and Certbot.
+1. Installs Node.js 24, npm, PM2, PostgreSQL, MongoDB, Redis, Nginx, and Certbot.
 2. Creates the PostgreSQL `slackers` database and `axial` user with a secure random password.
 3. Enables and boots all systemd database services.
 4. Generates `.env` files for both backend and frontend.
@@ -72,10 +72,10 @@ Your app is now securely running at `https://chat.yourdomain.com` with an offici
 
 If you prefer to configure each component manually:
 
-### Step 1: Install Node.js 20 & PM2
+### Step 1: Install Node.js 24 & PM2
 ```bash
 sudo apt update && sudo apt upgrade -y
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo bash -
+curl -fsSL https://deb.nodesource.com/setup_24.x | sudo bash -
 sudo apt install -y nodejs build-essential git nginx certbot python3-certbot-nginx
 sudo npm install -g pm2
 ```

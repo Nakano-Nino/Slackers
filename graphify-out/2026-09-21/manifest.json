@@ -54,9 +54,9 @@
     "semantic_hash": ""
   },
   "apps/api/src/index.ts": {
-    "mtime": 1789881787.766072,
-    "seen": 1789881815.0463748,
-    "ast_hash": "4c93c222647f673d8a8dc7822cd3fd02",
+    "mtime": 1789974917.3600588,
+    "seen": 1789975418.724215,
+    "ast_hash": "6cef59d46925fc0d6d85877e11325d42",
     "semantic_hash": ""
   },
   "apps/api/src/middleware/authMiddleware.ts": {
@@ -126,21 +126,21 @@
     "semantic_hash": ""
   },
   "apps/api/src/services/authService.ts": {
-    "mtime": 1789699317.9937418,
-    "seen": 1789815948.088428,
-    "ast_hash": "a8ae7e49a204fccd2037545ab7ba6172",
+    "mtime": 1789974999.8228946,
+    "seen": 1789975418.724267,
+    "ast_hash": "feaed0853c691e78ffd2157c305194c9",
     "semantic_hash": ""
   },
   "apps/api/src/services/bugService.ts": {
-    "mtime": 1789880397.5622091,
-    "seen": 1789880637.545387,
-    "ast_hash": "1c819eb405fc1dac483c02eb50ca2727",
+    "mtime": 1789974959.265996,
+    "seen": 1789975418.724272,
+    "ast_hash": "886b530ebe6ec46063b487ac50593350",
     "semantic_hash": ""
   },
   "apps/api/src/services/dataStore.ts": {
-    "mtime": 1789818222.6126714,
-    "seen": 1789818725.658719,
-    "ast_hash": "80c8fe1dddb7776a3c5a33813f352c91",
+    "mtime": 1789974932.3533845,
+    "seen": 1789975418.724273,
+    "ast_hash": "5256ae82550b5810a016d3b4eb6fa4a1",
     "semantic_hash": ""
   },
   "apps/api/src/services/db.ts": {
@@ -150,9 +150,9 @@
     "semantic_hash": ""
   },
   "apps/api/src/services/dmService.ts": {
-    "mtime": 1789817374.5183063,
-    "seen": 1789817795.311418,
-    "ast_hash": "fe70e4cfe6e4b975237253d373bd54fd",
+    "mtime": 1789974978.852139,
+    "seen": 1789975418.724276,
+    "ast_hash": "0b5897d3429fe49845e369d831f98186",
     "semantic_hash": ""
   },
   "apps/api/src/services/mongoLogger.ts": {
@@ -162,21 +162,21 @@
     "semantic_hash": ""
   },
   "apps/api/src/services/projectService.ts": {
-    "mtime": 1789880388.3108816,
-    "seen": 1789880637.545394,
-    "ast_hash": "99afcf9b0f950f04979c4c17f55a58a3",
+    "mtime": 1789974944.5048494,
+    "seen": 1789975418.724281,
+    "ast_hash": "c97c2781b69532f1827298af6e8067dc",
     "semantic_hash": ""
   },
   "apps/api/src/services/taskCommentService.ts": {
-    "mtime": 1789653907.704521,
-    "seen": 1789654083.88346,
-    "ast_hash": "1fc3393181cc201d99d5b8a84ef5a93c",
+    "mtime": 1789974969.3785636,
+    "seen": 1789975418.724285,
+    "ast_hash": "d3f11708fefa6fd2db11a863b062d0e7",
     "semantic_hash": ""
   },
   "apps/api/src/services/taskService.ts": {
-    "mtime": 1789880399.3748333,
-    "seen": 1789880637.545399,
-    "ast_hash": "893e6c0ba03d27d00bf2e0bd0f24cfb1",
+    "mtime": 1789974949.6832676,
+    "seen": 1789975418.7242858,
+    "ast_hash": "386d7118d5aece09625ed795fbf87245",
     "semantic_hash": ""
   },
   "apps/api/src/types/index.ts": {
@@ -438,9 +438,9 @@
     "semantic_hash": ""
   },
   "apps/api/src/services/notificationService.ts": {
-    "mtime": 1789653649.5815291,
-    "seen": 1789654083.883456,
-    "ast_hash": "24802cb91c16ccdfc153c076610c1fa2",
+    "mtime": 1789974985.7223878,
+    "seen": 1789975418.72428,
+    "ast_hash": "661f767909c7bff1249466eb2d466608",
     "semantic_hash": ""
   },
   "apps/web/src/components/NotificationCenter.tsx": {
@@ -558,9 +558,9 @@
     "semantic_hash": ""
   },
   "apps/api/src/services/memberService.ts": {
-    "mtime": 1789653922.680574,
-    "seen": 1789654083.8834538,
-    "ast_hash": "dc8892d3c79cb48f6bb640bebec6b553",
+    "mtime": 1789974993.544329,
+    "seen": 1789975418.724278,
+    "ast_hash": "fa586c366c69da5a7d6d3260d75a0b0e",
     "semantic_hash": ""
   },
   "apps/web/src/components/InviteMemberModal.tsx": {
@@ -570,9 +570,9 @@
     "semantic_hash": ""
   },
   "apps/api/src/services/dbSeed.ts": {
-    "mtime": 1789880391.6332958,
-    "seen": 1789880637.545389,
-    "ast_hash": "ba39ee7a2055ef13b33cb8eb7be41309",
+    "mtime": 1789974911.8895786,
+    "seen": 1789975418.7242749,
+    "ast_hash": "6f34ca617446bbdf9f9f7f2de3b252ab",
     "semantic_hash": ""
   },
   "scratch/test-db-integration.ts": {
@@ -690,9 +690,9 @@
     "semantic_hash": ""
   },
   "scripts/setup-vps-native.sh": {
-    "mtime": 1789971486.5952475,
-    "seen": 1789971566.026182,
-    "ast_hash": "1d052bc9bceae8722b34ec437647ebd2",
+    "mtime": 1789977626.6913414,
+    "seen": 1789977635.427549,
+    "ast_hash": "ab058130c913612108124ea5176517f6",
     "semantic_hash": ""
   },
   "scripts/update-native.sh": {
@@ -708,9 +708,9 @@
     "semantic_hash": ""
   },
   "scripts/setup-vps-hybrid.sh": {
-    "mtime": 1789972437.3688662,
-    "seen": 1789972470.129827,
-    "ast_hash": "517dfcb8f51263978b9cc0824ddc8383",
+    "mtime": 1789975011.8697522,
+    "seen": 1789975418.724332,
+    "ast_hash": "d2feed0019055ffce5cc1b147ff77d6b",
     "semantic_hash": ""
   },
   "scripts/update-hybrid.sh": {

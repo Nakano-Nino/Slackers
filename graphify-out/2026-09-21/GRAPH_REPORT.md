@@ -1,9 +1,9 @@
 # Graph Report - slackers  (2026-09-21)
 
 ## Corpus Check
-- 111 files · ~99,437 words
+- 111 files · ~99,394 words
 - Verdict: corpus is large enough that graph structure adds value.
-- Unclassified: 15 file(s) not represented in the graph (top: (none) 5, .example 3, .conf 3)
+- Unclassified: 16 file(s) not represented in the graph (top: (none) 5, .example 4, .conf 3)
 
 ## Summary
 - 942 nodes · 2304 edges · 49 communities (32 shown, 15 thin omitted)

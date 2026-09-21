@@ -34,7 +34,7 @@ PROJECT_DIR=$(pwd)
 # ------------------------------------------------------------------------------
 echo -e "${CYAN}[1/8] Updating system packages & installing core utilities...${NC}"
 apt-get update -y
-apt-get install -y curl wget gnupg git build-essential openssl ufw ufw-default nginx certbot python3-certbot-nginx
+apt-get install -y curl wget gnupg git build-essential openssl ufw nginx certbot python3-certbot-nginx
 
 # Configure 2GB swap if system has <= 2GB RAM
 TOTAL_MEM=$(free -m | awk '/^Mem:/{print $2}')
@@ -48,11 +48,11 @@ if [ "$TOTAL_MEM" -le 2500 ] && [ ! -f /swapfile ]; then
 fi
 
 # ------------------------------------------------------------------------------
-# 2. Install Node.js 20 LTS & PM2
+# 2. Install Node.js 24 LTS & PM2
 # ------------------------------------------------------------------------------
-echo -e "\n${CYAN}[2/8] Installing Node.js 20 LTS and PM2 process manager...${NC}"
-if ! command -v node &> /dev/null || [[ $(node -v) != v20* ]]; then
-    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+echo -e "\n${CYAN}[2/8] Installing Node.js 24 LTS and PM2 process manager...${NC}"
+if ! command -v node &> /dev/null || [[ $(node -v) != v24* ]]; then
+    curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
     apt-get install -y nodejs
 fi
 npm install -g pm2

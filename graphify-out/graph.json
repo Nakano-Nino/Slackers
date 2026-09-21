@@ -10420,14 +10420,14 @@
       "source_location": "L1"
     },
     {
-      "id": "docs_deployment_native_step_1_install_node_js_20_pm2",
-      "label": "Step 1: Install Node.js 20 & PM2",
+      "id": "docs_deployment_native_step_1_install_node_js_24_pm2",
+      "label": "Step 1: Install Node.js 24 & PM2",
       "_origin": "ast",
       "community": 51,
       "community_name": "\ud83d\udee0 Manual Step-by-Step Installation (Alternative)",
       "file_type": "document",
       "node_kind": "heading",
-      "norm_label": "step 1: install node.js 20 & pm2",
+      "norm_label": "step 1: install node.js 24 & pm2",
       "source_file": "docs/DEPLOYMENT_NATIVE.md",
       "source_location": "L75"
     },
@@ -33436,7 +33436,7 @@
     },
     {
       "source": "docs_deployment_native_manual_step_by_step_installation_alternative",
-      "target": "docs_deployment_native_step_1_install_node_js_20_pm2",
+      "target": "docs_deployment_native_step_1_install_node_js_24_pm2",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -38051,5 +38051,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "36242b6b277cea4984e0d8a218250afb532e81d1"
+  "built_at_commit": "956f339693fadc56ae0fb431790f65495608c977"
 }

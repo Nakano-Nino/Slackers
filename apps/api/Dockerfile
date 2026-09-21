@@ -1,6 +1,6 @@
 # Multi-stage Dockerfile for Slackers API (Node.js + Express + Prisma)
 # Stage 1: Build & compile TypeScript
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
@@ -27,7 +27,7 @@ RUN npm run build
 # ==========================================
 # Stage 2: Production Runner
 # ==========================================
-FROM node:20-alpine AS runner
+FROM node:24-alpine AS runner
 
 WORKDIR /app/apps/api
 

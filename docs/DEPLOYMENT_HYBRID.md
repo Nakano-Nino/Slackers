@@ -2,7 +2,7 @@
 
 This guide explains how to deploy Slackers using the **Hybrid Model** on an Ubuntu 20.04/22.04/24.04 VPS:
 - **Databases in Docker**: PostgreSQL 16, MongoDB 7.0, and Redis 7 run in lightweight containers bound strictly to `127.0.0.1`.
-- **Apps & Nginx on Host**: Node.js 20, Next.js 16 frontend, Express API backend, and Nginx reverse proxy run natively using PM2.
+- **Apps & Nginx on Host**: Node.js 24, Next.js 16 frontend, Express API backend, and Nginx reverse proxy run natively using PM2.
 
 ---
 
@@ -36,7 +36,7 @@ sudo ./scripts/setup-vps-hybrid.sh
 The script will automatically:
 1. Ensure Docker & Docker Compose are installed.
 2. Launch PostgreSQL, MongoDB, and Redis with `docker-compose.db.yml`.
-3. Install Node.js 20 LTS and PM2.
+3. Install Node.js 24 and PM2.
 4. Push Prisma database schemas and seed initial demo accounts.
 5. Compile Next.js and Express apps.
 6. Configure Nginx reverse proxy on port 80.

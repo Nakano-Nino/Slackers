@@ -37,6 +37,7 @@ cd "$PROJECT_DIR"
 # 5. Build Next.js
 echo -e "\n${CYAN}[5/6] Building Next.js frontend...${NC}"
 cd apps/web
+npm install --no-save @tailwindcss/oxide
 npm run build
 cd "$PROJECT_DIR"
 

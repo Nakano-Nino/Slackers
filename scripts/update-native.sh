@@ -23,6 +23,7 @@ cd ../..
 
 echo -e "${CYAN}⚡ Compiling Next.js frontend...${NC}"
 cd apps/web
+npm install --no-save @tailwindcss/oxide
 npm run build
 cd ../..
 

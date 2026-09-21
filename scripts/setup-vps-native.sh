@@ -142,6 +142,8 @@ cd "$PROJECT_DIR"
 # Build Next.js frontend
 echo "Compiling Next.js frontend bundle..."
 cd apps/web
+# Ensure native Tailwind v4 oxide binding is installed on this Linux architecture
+npm install --no-save @tailwindcss/oxide
 npm run build
 cd "$PROJECT_DIR"
 

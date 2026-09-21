@@ -10,7 +10,9 @@ class NotificationService {
         orderBy: { createdAt: 'desc' },
         take: 200,
       });
-      this.notifications = dbNotifs.map((n) => ({
+      this.notifications = dbNotifs
+        .filter((n) => !(n.type === 'message' && (n.link as any)?.type === 'channel'))
+        .map((n) => ({
         id: n.id,
         recipientId: n.recipientId,
         senderId: n.senderId,
@@ -42,19 +44,6 @@ class NotificationService {
       link: { type: 'task', id: 'task-1' },
       isRead: false,
       createdAt: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
-    },
-    {
-      id: 'notif-2',
-      recipientId: 'u-1',
-      senderId: 'u-3',
-      senderName: 'Jordan Lee',
-      senderAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
-      type: 'message',
-      title: 'New message in #general',
-      content: 'Jordan Lee sent a new message in #general',
-      link: { type: 'channel', id: 'general' },
-      isRead: false,
-      createdAt: new Date(Date.now() - 1000 * 60 * 20).toISOString(),
     },
     {
       id: 'notif-3',
@@ -168,12 +157,14 @@ class NotificationService {
 
   getNotifications(userId: string): Notification[] {
     return this.notifications
-      .filter((n) => n.recipientId === userId)
+      .filter((n) => n.recipientId === userId && !(n.type === 'message' && n.link?.type === 'channel'))
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 
   getUnreadCount(userId: string): number {
-    return this.notifications.filter((n) => n.recipientId === userId && !n.isRead).length;
+    return this.notifications.filter(
+      (n) => n.recipientId === userId && !n.isRead && !(n.type === 'message' && n.link?.type === 'channel')
+    ).length;
   }
 
   createNotification(params: {
@@ -186,8 +177,8 @@ class NotificationService {
     content: string;
     link?: { type: 'channel' | 'dm' | 'task'; id: string };
   }): Notification | null {
-    // Check if channel is muted
-    if (params.link?.type === 'channel' && this.isTargetMuted(params.recipientId, 'channel', params.link.id)) {
+    // Channel messages do not create global notifications (Discord-style unread channel indicators used instead)
+    if (params.link?.type === 'channel') {
       return null;
     }
 

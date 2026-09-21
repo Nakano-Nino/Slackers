@@ -270,7 +270,7 @@ export class AuthService {
         recipientId: user.id,
         senderId: 'system',
         senderName: 'Slackers Security',
-        type: 'message',
+        type: 'system',
         title: 'Password Changed Successfully',
         content: 'Your account password has been updated and other active sessions have been revoked.',
       });

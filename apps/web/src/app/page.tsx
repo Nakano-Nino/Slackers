@@ -51,6 +51,7 @@ export default function Home() {
   const [selectedProjectId, setSelectedProjectId] = useState<string>('proj-core');
   const [channels, setChannels] = useState<Channel[]>([]);
   const [selectedChannelId, setSelectedChannelId] = useState<string>('general');
+  const [unreadChannels, setUnreadChannels] = useState<Record<string, boolean>>({});
   const [messages, setMessages] = useState<Message[]>([]);
   const [users, setUsers] = useState<User[]>([]);
 
@@ -139,8 +140,11 @@ export default function Home() {
     if (!currentUser) return;
     try {
       const data = await api.getNotifications();
-      setNotifications(data.notifications);
-      setUnreadNotificationCount(data.unreadCount);
+      const filtered = (data.notifications || []).filter(
+        (n) => !(n.type === 'message' && n.link?.type === 'channel')
+      );
+      setNotifications(filtered);
+      setUnreadNotificationCount(filtered.filter((n) => !n.isRead).length);
     } catch (err) {
       console.error('Failed to load notifications:', err);
     }
@@ -480,6 +484,9 @@ export default function Home() {
   }, [loadProjectTasksAndStats]);
 
   // Keep latest refs to avoid stale closures in socket event handlers
+  const channelsRef = useRef(channels);
+  channelsRef.current = channels;
+
   const selectedChannelIdRef = useRef(selectedChannelId);
   selectedChannelIdRef.current = selectedChannelId;
 
@@ -524,7 +531,12 @@ export default function Home() {
 
   // Real-time socket event handlers
   const handleIncomingMessage = useCallback(async (msg: Message) => {
-    if (msg.channelId === selectedChannelIdRef.current) {
+    const isCurrentlyViewingChannel =
+      activeViewRef.current === 'chat' &&
+      !selectedDmUserRef.current &&
+      msg.channelId === selectedChannelIdRef.current;
+
+    if (isCurrentlyViewingChannel) {
       let decryptedContent = msg.decryptedContent || msg.content;
       if (msg.ciphertext && msg.iv && !decryptedContent) {
         try {
@@ -544,6 +556,14 @@ export default function Home() {
         }
         return [...prev, { ...msg, decryptedContent: decryptedContent || msg.content }];
       });
+    } else {
+      // User is not actively viewing this channel: mark channel as unread (bold Discord style)
+      if (msg.userId !== currentUserRef.current?.id) {
+        setUnreadChannels((prev) => ({
+          ...prev,
+          [msg.channelId]: true,
+        }));
+      }
     }
   }, []);
 
@@ -627,6 +647,11 @@ export default function Home() {
   }, []);
 
   const handleIncomingNotification = useCallback((notif: Notification) => {
+    // Channel messages do not create global notifications (Discord-style unread channel indicators used instead)
+    if (notif.type === 'message' && notif.link?.type === 'channel') {
+      return;
+    }
+
     // Check if target is muted by the user
     const now = Date.now();
     const isTargetMuted = mutedTargetsRef.current.some((m) => {
@@ -797,6 +822,19 @@ export default function Home() {
             : prev
         );
       }
+
+      // If user is not currently viewing this channel, mark channel as unread
+      const isCurrentlyViewing =
+        activeViewRef.current === 'chat' &&
+        !selectedDmUserRef.current &&
+        data.channelId === selectedChannelIdRef.current;
+
+      if (!isCurrentlyViewing && data.reply.userId !== currentUserRef.current?.id) {
+        setUnreadChannels((prev) => ({
+          ...prev,
+          [data.channelId]: true,
+        }));
+      }
     },
     []
   );
@@ -902,6 +940,9 @@ export default function Home() {
     // Room subscription handler on connect/reconnect
     const handleConnect = () => {
       console.log('⚡ WebSocket connected/reconnected: Joining active channel and project rooms');
+      channelsRef.current.forEach((c) => {
+        socket.emit('channel:join', c.id);
+      });
       if (selectedChannelIdRef.current) {
         socket.emit('channel:join', selectedChannelIdRef.current);
       }
@@ -980,16 +1021,27 @@ export default function Home() {
     handleIncomingSessionRevoked,
   ]);
 
-  // Manage Channel room subscription
+  // Clear channel unread state when actively viewing that channel
+  useEffect(() => {
+    if (activeView === 'chat' && !selectedDmUser && selectedChannelId) {
+      setUnreadChannels((prev) => {
+        if (!prev[selectedChannelId]) return prev;
+        const next = { ...prev };
+        delete next[selectedChannelId];
+        return next;
+      });
+    }
+  }, [activeView, selectedDmUser, selectedChannelId]);
+
+  // Manage Channel room subscriptions - join all accessible channels for real-time unread & messages
   useEffect(() => {
     const socket = getSocket();
-    if (!socket || !selectedChannelId) return;
+    if (!socket || !channels.length) return;
 
-    socket.emit('channel:join', selectedChannelId);
-    return () => {
-      socket.emit('channel:leave', selectedChannelId);
-    };
-  }, [selectedChannelId, currentUser]);
+    channels.forEach((c) => {
+      socket.emit('channel:join', c.id);
+    });
+  }, [channels, currentUser]);
 
   // Manage Project room subscription
   useEffect(() => {
@@ -1248,6 +1300,12 @@ export default function Home() {
     setSelectedDmUser(null);
     setSelectedChannelId(channelId);
     setActiveView('chat');
+    setUnreadChannels((prev) => {
+      if (!prev[channelId]) return prev;
+      const next = { ...prev };
+      delete next[channelId];
+      return next;
+    });
   };
 
   const handleNavigateDM = (partnerId: string) => {
@@ -1547,7 +1605,14 @@ export default function Home() {
         onSelectChannel={(id) => {
           setSelectedDmUser(null);
           setSelectedChannelId(id);
+          setUnreadChannels((prev) => {
+            if (!prev[id]) return prev;
+            const next = { ...prev };
+            delete next[id];
+            return next;
+          });
         }}
+        unreadChannels={unreadChannels}
         onOpenCreateChannel={() => setIsChannelModalOpen(true)}
         projects={projects}
         selectedProjectId={selectedProjectId}

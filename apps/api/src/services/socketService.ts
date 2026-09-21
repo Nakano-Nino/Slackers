@@ -89,6 +89,19 @@ class SocketService {
       // Join user's personal room for DMs & Notifications
       socket.join(`user:${userId}`);
 
+      // Auto-join user to all accessible channel rooms for real-time unread/message tracking
+      const channels = dataStore.getChannels();
+      for (const channel of channels) {
+        if (
+          !channel.isPrivate ||
+          user.role === 'admin' ||
+          user.role === 'manager' ||
+          dataStore.getChannelKey(channel.id, user.id)
+        ) {
+          socket.join(`channel:${channel.id}`);
+        }
+      }
+
       // Track presence
       const currentCount = this.onlineUsers.get(userId) || 0;
       this.onlineUsers.set(userId, currentCount + 1);

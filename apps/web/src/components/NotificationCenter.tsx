@@ -99,9 +99,11 @@ export function NotificationCenter({
   };
 
   const filteredNotifications = notifications.filter((n) => {
+    // Channel messages do not appear in notification center (Discord-style unread sidebar indicators are used)
+    if (n.type === 'message' && n.link?.type === 'channel') return false;
     if (filter === 'unread') return !n.isRead;
     if (filter === 'tasks') return n.type === 'task_assigned' || n.type === 'task_comment';
-    if (filter === 'messages') return n.type === 'message' || n.type === 'dm';
+    if (filter === 'messages') return n.type === 'dm';
     return true;
   });
 
@@ -194,7 +196,7 @@ export function NotificationCenter({
                     : 'text-slate-500 dark:text-neutral-400 hover:text-slate-700 dark:hover:text-neutral-300'
                 }`}
               >
-                {tab}
+                {tab === 'messages' ? 'Direct Messages' : tab}
               </button>
             ))}
           </div>

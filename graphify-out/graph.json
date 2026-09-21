@@ -417,7 +417,7 @@
       "file_type": "code",
       "norm_label": "notificationservice",
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L307"
+      "source_location": "L298"
     },
     {
       "id": "apps_api_src_types_index_notification",
@@ -1522,7 +1522,7 @@
       "file_type": "code",
       "norm_label": "socketservice",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L295"
+      "source_location": "L308"
     },
     {
       "id": "apps_api_src_types_index_directmessage",
@@ -2153,7 +2153,7 @@
       "file_type": "code",
       "norm_label": ".createnotification()",
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L179"
+      "source_location": "L170"
     },
     {
       "id": "apps_api_src_services_notificationservice_notificationservice_deletenotification",
@@ -2165,7 +2165,7 @@
       "file_type": "code",
       "norm_label": ".deletenotification()",
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L292"
+      "source_location": "L283"
     },
     {
       "id": "apps_api_src_services_notificationservice_notificationservice_getmutetargets",
@@ -2177,7 +2177,7 @@
       "file_type": "code",
       "norm_label": ".getmutetargets()",
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L89"
+      "source_location": "L78"
     },
     {
       "id": "apps_api_src_services_notificationservice_notificationservice_getnotifications",
@@ -2189,7 +2189,7 @@
       "file_type": "code",
       "norm_label": ".getnotifications()",
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L169"
+      "source_location": "L158"
     },
     {
       "id": "apps_api_src_services_notificationservice_notificationservice_getunreadcount",
@@ -2201,7 +2201,7 @@
       "file_type": "code",
       "norm_label": ".getunreadcount()",
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L175"
+      "source_location": "L164"
     },
     {
       "id": "apps_api_src_services_notificationservice_notificationservice_initfromdb",
@@ -2225,7 +2225,7 @@
       "file_type": "code",
       "norm_label": ".istargetmuted()",
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L97"
+      "source_location": "L86"
     },
     {
       "id": "apps_api_src_services_notificationservice_notificationservice_markallasread",
@@ -2237,7 +2237,7 @@
       "file_type": "code",
       "norm_label": ".markallasread()",
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L273"
+      "source_location": "L264"
     },
     {
       "id": "apps_api_src_services_notificationservice_notificationservice_markasread",
@@ -2249,7 +2249,7 @@
       "file_type": "code",
       "norm_label": ".markasread()",
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L258"
+      "source_location": "L249"
     },
     {
       "id": "apps_api_src_services_notificationservice_notificationservice_mutetarget",
@@ -2261,7 +2261,7 @@
       "file_type": "code",
       "norm_label": ".mutetarget()",
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L113"
+      "source_location": "L102"
     },
     {
       "id": "apps_api_src_services_notificationservice_notificationservice_unmutetarget",
@@ -2273,7 +2273,7 @@
       "file_type": "code",
       "norm_label": ".unmutetarget()",
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L161"
+      "source_location": "L150"
     },
     {
       "id": "apps_api_src_services_socketservice_socketservice_emitnewnotification",
@@ -2285,7 +2285,7 @@
       "file_type": "code",
       "norm_label": ".emitnewnotification()",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L260"
+      "source_location": "L273"
     },
     {
       "id": "apps_api_src_services_redisservice_redisservice_checkhealth",
@@ -3701,7 +3701,7 @@
       "file_type": "code",
       "norm_label": "deletemessage()",
       "source_file": "apps/api/src/controllers/messageController.ts",
-      "source_location": "L290"
+      "source_location": "L276"
     },
     {
       "id": "apps_api_src_controllers_messagecontroller_editmessage",
@@ -3713,7 +3713,7 @@
       "file_type": "code",
       "norm_label": "editmessage()",
       "source_file": "apps/api/src/controllers/messageController.ts",
-      "source_location": "L239"
+      "source_location": "L225"
     },
     {
       "id": "apps_api_src_controllers_messagecontroller_getthreadreplies",
@@ -3737,7 +3737,7 @@
       "file_type": "code",
       "norm_label": "togglereaction()",
       "source_file": "apps/api/src/controllers/messageController.ts",
-      "source_location": "L201"
+      "source_location": "L187"
     },
     {
       "id": "apps_api_src_controllers_sessioncontroller_revokesession",
@@ -4625,7 +4625,7 @@
       "file_type": "code",
       "norm_label": "sidebar()",
       "source_file": "apps/web/src/components/Sidebar.tsx",
-      "source_location": "L52"
+      "source_location": "L53"
     },
     {
       "id": "apps_web_src_lib_roles_getuserrolebadge",
@@ -5285,7 +5285,7 @@
       "file_type": "code",
       "norm_label": ".emitdmdeleted()",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L250"
+      "source_location": "L263"
     },
     {
       "id": "apps_api_src_services_socketservice_socketservice_emitdmedited",
@@ -5297,7 +5297,7 @@
       "file_type": "code",
       "norm_label": ".emitdmedited()",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L245"
+      "source_location": "L258"
     },
     {
       "id": "apps_api_src_services_socketservice_socketservice_emitdmreaction",
@@ -5309,7 +5309,7 @@
       "file_type": "code",
       "norm_label": ".emitdmreaction()",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L235"
+      "source_location": "L248"
     },
     {
       "id": "apps_api_src_services_socketservice_socketservice_emitdmread",
@@ -5321,7 +5321,7 @@
       "file_type": "code",
       "norm_label": ".emitdmread()",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L255"
+      "source_location": "L268"
     },
     {
       "id": "apps_api_src_services_socketservice_socketservice_emitmessagedeleted",
@@ -5333,7 +5333,7 @@
       "file_type": "code",
       "norm_label": ".emitmessagedeleted()",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L210"
+      "source_location": "L223"
     },
     {
       "id": "apps_api_src_services_socketservice_socketservice_emitmessagereaction",
@@ -5345,7 +5345,7 @@
       "file_type": "code",
       "norm_label": ".emitmessagereaction()",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L200"
+      "source_location": "L213"
     },
     {
       "id": "apps_api_src_services_socketservice_socketservice_emitnewdirectmessage",
@@ -5357,7 +5357,7 @@
       "file_type": "code",
       "norm_label": ".emitnewdirectmessage()",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L230"
+      "source_location": "L243"
     },
     {
       "id": "apps_api_src_services_socketservice_socketservice_emitsessionrevoked",
@@ -5369,7 +5369,7 @@
       "file_type": "code",
       "norm_label": ".emitsessionrevoked()",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L280"
+      "source_location": "L293"
     },
     {
       "id": "apps_api_src_services_socketservice_socketservice_emittaskcreated",
@@ -5381,7 +5381,7 @@
       "file_type": "code",
       "norm_label": ".emittaskcreated()",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L265"
+      "source_location": "L278"
     },
     {
       "id": "apps_api_src_services_socketservice_socketservice_emittaskdeleted",
@@ -5393,7 +5393,7 @@
       "file_type": "code",
       "norm_label": ".emittaskdeleted()",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L275"
+      "source_location": "L288"
     },
     {
       "id": "apps_api_src_services_socketservice_socketservice_emittaskupdated",
@@ -5405,7 +5405,7 @@
       "file_type": "code",
       "norm_label": ".emittaskupdated()",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L270"
+      "source_location": "L283"
     },
     {
       "id": "apps_api_src_services_socketservice_socketservice_emitusercreated",
@@ -5417,7 +5417,7 @@
       "file_type": "code",
       "norm_label": ".emitusercreated()",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L285"
+      "source_location": "L298"
     },
     {
       "id": "apps_api_src_services_socketservice_socketservice_getonlineuserids",
@@ -5429,7 +5429,7 @@
       "file_type": "code",
       "norm_label": ".getonlineuserids()",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L290"
+      "source_location": "L303"
     },
     {
       "id": "apps_api_src_services_socketservice_socketservice_init",
@@ -5681,7 +5681,7 @@
       "file_type": "code",
       "norm_label": ".emitmessageedited()",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L205"
+      "source_location": "L218"
     },
     {
       "id": "apps_api_src_services_socketservice_socketservice_emitnewmessage",
@@ -5693,7 +5693,7 @@
       "file_type": "code",
       "norm_label": ".emitnewmessage()",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L195"
+      "source_location": "L208"
     },
     {
       "id": "apps_api_src_services_socketservice_socketservice_emitthreadreply",
@@ -5705,7 +5705,7 @@
       "file_type": "code",
       "norm_label": ".emitthreadreply()",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L215"
+      "source_location": "L228"
     },
     {
       "id": "apps_api_src_services_authservice_authservice_comparepassword",
@@ -11622,7 +11622,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/api/src/controllers/messageController.ts",
-      "source_location": "L302",
+      "source_location": "L288",
       "weight": 1.0
     },
     {
@@ -11634,7 +11634,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/api/src/controllers/messageController.ts",
-      "source_location": "L260",
+      "source_location": "L246",
       "weight": 1.0
     },
     {
@@ -12486,7 +12486,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L190",
+      "source_location": "L188",
       "weight": 1.0
     },
     {
@@ -13127,6 +13127,18 @@
     },
     {
       "source": "apps_web_src_app_page_home",
+      "target": "apps_web_src_lib_socket_getsocket",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "apps/web/src/app/page.tsx",
+      "source_location": "L1038",
+      "weight": 1.0
+    },
+    {
+      "source": "apps_web_src_app_page_home",
       "target": "apps_web_src_lib_e2ee_e2eeservice_getchannelkey",
       "relation": "calls",
       "_origin": "ast",
@@ -13134,7 +13146,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/app/page.tsx",
-      "source_location": "L245",
+      "source_location": "L249",
       "weight": 1.0
     },
     {
@@ -13146,7 +13158,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/app/page.tsx",
-      "source_location": "L250",
+      "source_location": "L254",
       "weight": 1.0
     },
     {
@@ -13158,7 +13170,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/app/page.tsx",
-      "source_location": "L314",
+      "source_location": "L318",
       "weight": 1.0
     },
     {
@@ -13170,7 +13182,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/app/page.tsx",
-      "source_location": "L350",
+      "source_location": "L354",
       "weight": 1.0
     },
     {
@@ -13182,7 +13194,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/app/page.tsx",
-      "source_location": "L351",
+      "source_location": "L355",
       "weight": 1.0
     },
     {
@@ -13194,7 +13206,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/app/page.tsx",
-      "source_location": "L352",
+      "source_location": "L356",
       "weight": 1.0
     },
     {
@@ -13206,7 +13218,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/app/page.tsx",
-      "source_location": "L430",
+      "source_location": "L434",
       "weight": 1.0
     },
     {
@@ -13218,7 +13230,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/app/page.tsx",
-      "source_location": "L859",
+      "source_location": "L897",
       "weight": 1.0
     },
     {
@@ -13230,19 +13242,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/app/page.tsx",
-      "source_location": "L899",
-      "weight": 1.0
-    },
-    {
-      "source": "apps_web_src_app_page_home",
-      "target": "apps_web_src_lib_socket_getsocket",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "apps/web/src/app/page.tsx",
-      "source_location": "L985",
+      "source_location": "L937",
       "weight": 1.0
     },
     {
@@ -13590,7 +13590,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/components/Sidebar.tsx",
-      "source_location": "L77",
+      "source_location": "L79",
       "weight": 1.0
     },
     {
@@ -14562,7 +14562,7 @@
       "confidence_score": 1.0,
       "context": "field",
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L32",
+      "source_location": "L34",
       "weight": 1.0
     },
     {
@@ -15138,7 +15138,7 @@
       "confidence_score": 1.0,
       "context": "field",
       "source_file": "apps/web/src/components/Sidebar.tsx",
-      "source_location": "L45",
+      "source_location": "L46",
       "weight": 1.0
     },
     {
@@ -15632,7 +15632,7 @@
       "context": "import",
       "deferred": true,
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L147",
+      "source_location": "L136",
       "weight": 1.0
     },
     {
@@ -20576,7 +20576,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "apps/web/src/components/Sidebar.tsx",
-      "source_location": "L50",
+      "source_location": "L51",
       "weight": 1.0
     },
     {
@@ -26002,7 +26002,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "apps/web/src/components/Sidebar.tsx",
-      "source_location": "L50",
+      "source_location": "L51",
       "weight": 1.0
     },
     {
@@ -26998,7 +26998,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L179",
+      "source_location": "L170",
       "weight": 1.0
     },
     {
@@ -27094,7 +27094,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L245",
+      "source_location": "L258",
       "weight": 1.0
     },
     {
@@ -27106,7 +27106,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L205",
+      "source_location": "L218",
       "weight": 1.0
     },
     {
@@ -27118,7 +27118,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L230",
+      "source_location": "L243",
       "weight": 1.0
     },
     {
@@ -27130,7 +27130,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L195",
+      "source_location": "L208",
       "weight": 1.0
     },
     {
@@ -27142,7 +27142,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L260",
+      "source_location": "L273",
       "weight": 1.0
     },
     {
@@ -27154,7 +27154,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L265",
+      "source_location": "L278",
       "weight": 1.0
     },
     {
@@ -27166,7 +27166,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L270",
+      "source_location": "L283",
       "weight": 1.0
     },
     {
@@ -27178,7 +27178,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L215",
+      "source_location": "L228",
       "weight": 1.0
     },
     {
@@ -27190,7 +27190,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L285",
+      "source_location": "L298",
       "weight": 1.0
     },
     {
@@ -28066,7 +28066,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L179",
+      "source_location": "L170",
       "weight": 1.0
     },
     {
@@ -28078,7 +28078,7 @@
       "confidence_score": 1.0,
       "context": "return_type",
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L169",
+      "source_location": "L158",
       "weight": 1.0
     },
     {
@@ -29339,7 +29339,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/controllers/messageController.ts",
-      "source_location": "L201",
+      "source_location": "L187",
+      "weight": 1.0
+    },
+    {
+      "source": "apps_api_src_controllers_messagecontroller",
+      "target": "apps_api_src_controllers_messagecontroller_editmessage",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/api/src/controllers/messageController.ts",
+      "source_location": "L225",
       "weight": 1.0
     },
     {
@@ -29355,24 +29366,13 @@
     },
     {
       "source": "apps_api_src_controllers_messagecontroller",
-      "target": "apps_api_src_controllers_messagecontroller_editmessage",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/api/src/controllers/messageController.ts",
-      "source_location": "L239",
-      "weight": 1.0
-    },
-    {
-      "source": "apps_api_src_controllers_messagecontroller",
       "target": "apps_api_src_controllers_messagecontroller_deletemessage",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/controllers/messageController.ts",
-      "source_location": "L290",
+      "source_location": "L276",
       "weight": 1.0
     },
     {
@@ -30395,7 +30395,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L307",
+      "source_location": "L298",
       "weight": 1.0
     },
     {
@@ -30505,7 +30505,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L295",
+      "source_location": "L308",
       "weight": 1.0
     },
     {
@@ -32155,7 +32155,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/web/src/components/Sidebar.tsx",
-      "source_location": "L52",
+      "source_location": "L53",
       "weight": 1.0
     },
     {
@@ -35719,7 +35719,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L113",
+      "source_location": "L102",
       "weight": 1.0
     },
     {
@@ -35730,7 +35730,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L161",
+      "source_location": "L150",
       "weight": 1.0
     },
     {
@@ -35741,7 +35741,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L169",
+      "source_location": "L158",
       "weight": 1.0
     },
     {
@@ -35752,7 +35752,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L175",
+      "source_location": "L164",
       "weight": 1.0
     },
     {
@@ -35763,7 +35763,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L179",
+      "source_location": "L170",
       "weight": 1.0
     },
     {
@@ -35774,7 +35774,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L258",
+      "source_location": "L249",
       "weight": 1.0
     },
     {
@@ -35785,7 +35785,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L273",
+      "source_location": "L264",
       "weight": 1.0
     },
     {
@@ -35796,7 +35796,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L292",
+      "source_location": "L283",
       "weight": 1.0
     },
     {
@@ -35818,7 +35818,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L89",
+      "source_location": "L78",
       "weight": 1.0
     },
     {
@@ -35829,7 +35829,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/notificationService.ts",
-      "source_location": "L97",
+      "source_location": "L86",
       "weight": 1.0
     },
     {
@@ -36269,7 +36269,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L195",
+      "source_location": "L208",
       "weight": 1.0
     },
     {
@@ -36280,7 +36280,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L200",
+      "source_location": "L213",
       "weight": 1.0
     },
     {
@@ -36291,7 +36291,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L205",
+      "source_location": "L218",
       "weight": 1.0
     },
     {
@@ -36302,7 +36302,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L210",
+      "source_location": "L223",
       "weight": 1.0
     },
     {
@@ -36313,7 +36313,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L215",
+      "source_location": "L228",
       "weight": 1.0
     },
     {
@@ -36324,7 +36324,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L230",
+      "source_location": "L243",
       "weight": 1.0
     },
     {
@@ -36335,7 +36335,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L235",
+      "source_location": "L248",
       "weight": 1.0
     },
     {
@@ -36346,7 +36346,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L245",
+      "source_location": "L258",
       "weight": 1.0
     },
     {
@@ -36357,7 +36357,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L250",
+      "source_location": "L263",
       "weight": 1.0
     },
     {
@@ -36368,7 +36368,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L255",
+      "source_location": "L268",
       "weight": 1.0
     },
     {
@@ -36379,7 +36379,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L260",
+      "source_location": "L273",
       "weight": 1.0
     },
     {
@@ -36390,7 +36390,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L265",
+      "source_location": "L278",
       "weight": 1.0
     },
     {
@@ -36401,7 +36401,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L270",
+      "source_location": "L283",
       "weight": 1.0
     },
     {
@@ -36412,7 +36412,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L275",
+      "source_location": "L288",
       "weight": 1.0
     },
     {
@@ -36423,7 +36423,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L280",
+      "source_location": "L293",
       "weight": 1.0
     },
     {
@@ -36434,7 +36434,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L285",
+      "source_location": "L298",
       "weight": 1.0
     },
     {
@@ -36445,7 +36445,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/api/src/services/socketService.ts",
-      "source_location": "L290",
+      "source_location": "L303",
       "weight": 1.0
     },
     {
@@ -38183,5 +38183,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "5257a8ef9f21fc0b5cf42d9761bf7defe877da2b"
+  "built_at_commit": "a05d2398e3adf9a6ad9f36e9d141d6b99cb94221"
 }

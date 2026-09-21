@@ -42,6 +42,7 @@ interface Props {
   selectedDmUserId?: string | null;
   onSelectDmUser?: (user: User) => void;
   unreadDms?: Record<string, number>;
+  unreadChannels?: Record<string, boolean>;
   mutedTargets?: MuteTarget[];
   onOpenCommandPalette?: () => void;
   onOpenInviteMember?: () => void;
@@ -68,7 +69,8 @@ export function Sidebar({
   onOpenSettings,
   selectedDmUserId,
   onSelectDmUser,
-  unreadDms,
+  unreadDms = {},
+  unreadChannels = {},
   mutedTargets = [],
   onOpenCommandPalette,
   onOpenInviteMember,
@@ -279,6 +281,7 @@ export function Sidebar({
           <div className="space-y-0.5">
             {filteredChannels.map((channel) => {
               const isActive = activeView === 'chat' && !selectedDmUserId && channel.id === selectedChannelId;
+              const isUnread = !isActive && !!unreadChannels?.[channel.id];
               const isChannelMuted = mutedTargets.some(
                 (m) =>
                   m.targetType === 'channel' &&
@@ -293,25 +296,54 @@ export function Sidebar({
                     onSelectChannel(channel.id);
                     onSelectView('chat');
                   }}
-                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-sm transition group ${
+                  className={`relative w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-sm transition group ${
                     isActive
                       ? 'bg-indigo-600/20 text-indigo-300 font-medium border border-indigo-500/30'
+                      : isUnread
+                      ? 'text-white font-bold bg-neutral-900/60 hover:bg-neutral-900'
                       : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900'
                   }`}
                 >
+                  {/* Discord-style unread left indicator pill */}
+                  {isUnread && (
+                    <span
+                      className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-1 h-2 rounded-r-full bg-white shadow-xs"
+                      title="Unread messages"
+                    />
+                  )}
                   <div className="flex items-center gap-2 truncate">
                     {channel.isPrivate ? (
-                      <Lock className="w-4 h-4 text-neutral-500 group-hover:text-neutral-400 shrink-0" />
+                      <Lock
+                        className={`w-4 h-4 shrink-0 transition-colors ${
+                          isUnread ? 'text-white' : 'text-neutral-500 group-hover:text-neutral-400'
+                        }`}
+                      />
                     ) : (
-                      <Hash className="w-4 h-4 text-neutral-500 group-hover:text-neutral-400 shrink-0" />
+                      <Hash
+                        className={`w-4 h-4 shrink-0 transition-colors ${
+                          isUnread ? 'text-white' : 'text-neutral-500 group-hover:text-neutral-400'
+                        }`}
+                      />
                     )}
-                    <span className="truncate">{channel.name}</span>
+                    <span
+                      className={`truncate transition-colors ${
+                        isUnread ? 'font-bold text-white tracking-tight' : ''
+                      }`}
+                    >
+                      {channel.name}
+                    </span>
                     {isChannelMuted && (
                       <BellOff className="w-3 h-3 text-amber-400/80 shrink-0" title="Notifications muted" />
                     )}
                   </div>
                   {channel.memberCount > 0 && (
-                    <span className="text-[11px] text-neutral-600 group-hover:text-neutral-500 px-1.5 py-0.5 rounded bg-neutral-900">
+                    <span
+                      className={`text-[11px] px-1.5 py-0.5 rounded transition-colors ${
+                        isUnread
+                          ? 'text-neutral-200 font-semibold bg-neutral-800'
+                          : 'text-neutral-600 group-hover:text-neutral-500 bg-neutral-900'
+                      }`}
+                    >
                       {channel.memberCount}
                     </span>
                   )}

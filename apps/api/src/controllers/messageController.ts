@@ -161,22 +161,8 @@ export const createMessage = async (req: AuthenticatedRequest, res: Response<Api
     );
   }
 
-  // Trigger notification for all team members except the sender
-  const users = dataStore.getUsers();
-  for (const u of users) {
-    if (u.id !== message.userId) {
-      notificationService.createNotification({
-        recipientId: u.id,
-        senderId: sender?.id || message.userId,
-        senderName: sender?.name || message.userName,
-        senderAvatar: sender?.avatar || message.userAvatar,
-        type: 'message',
-        title: message.parentId ? `New reply in #${channel.name}` : `New message in #${channel.name}`,
-        content: `${sender?.name || message.userName} posted in #${channel.name}`,
-        link: { type: 'channel', id: channel.id },
-      });
-    }
-  }
+
+  // Note: Channel messages do not create global notifications; instead unread state is indicated Discord-style in the sidebar
 
   // Emit real-time WebSocket events
   if (message.parentId) {

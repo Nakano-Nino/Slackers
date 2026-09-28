@@ -180,9 +180,9 @@
     "semantic_hash": ""
   },
   "apps/api/src/types/index.ts": {
-    "mtime": 1790581707.9301665,
-    "seen": 1790582382.697439,
-    "ast_hash": "7f402bf95983c4f07afaaae136bacf50",
+    "mtime": 1789818311.084971,
+    "seen": 1789818725.6587331,
+    "ast_hash": "18087066e1f284d48f546f184a042a98",
     "semantic_hash": ""
   },
   "apps/api/tsconfig.json": {
@@ -222,9 +222,9 @@
     "semantic_hash": "b42e03028136cae78674a96be000cce8"
   },
   "apps/web/src/app/page.tsx": {
-    "mtime": 1790582269.325574,
-    "seen": 1790582382.6974452,
-    "ast_hash": "8ad6ff17fe99f9ab9f659312714f1aaf",
+    "mtime": 1789993376.097781,
+    "seen": 1789993435.098645,
+    "ast_hash": "4069b680e8320031aa8e37c1032ba920",
     "semantic_hash": ""
   },
   "apps/web/src/components/AuthModal.tsx": {
@@ -246,9 +246,9 @@
     "semantic_hash": "1ee74d79f67fff518d909655a035bc2e"
   },
   "apps/web/src/components/ChatArea.tsx": {
-    "mtime": 1790582044.7148898,
-    "seen": 1790582382.69745,
-    "ast_hash": "6a0d45b2e5a7a1b0bfbdfd8b91224151",
+    "mtime": 1789993400.0750427,
+    "seen": 1789993435.098648,
+    "ast_hash": "65769b6d0a77fedbbfc56999263955d0",
     "semantic_hash": ""
   },
   "apps/web/src/components/CreateChannelModal.tsx": {
@@ -288,9 +288,9 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/Sidebar.tsx": {
-    "mtime": 1790582117.8471868,
-    "seen": 1790582382.697461,
-    "ast_hash": "e2815345e90fb7f2c15a2d0faf4e720d",
+    "mtime": 1789992726.5383892,
+    "seen": 1789992869.017573,
+    "ast_hash": "7d2bd97ddde303e8ddd0ac471d5b200a",
     "semantic_hash": ""
   },
   "apps/web/src/components/TaskDetailModal.tsx": {
@@ -324,9 +324,9 @@
     "semantic_hash": ""
   },
   "apps/web/src/types/index.ts": {
-    "mtime": 1790581712.5221171,
-    "seen": 1790582382.697474,
-    "ast_hash": "97bfe3e5fdbc9a8f7193ba54f1a09ca0",
+    "mtime": 1789818155.1214797,
+    "seen": 1789818725.658763,
+    "ast_hash": "7984c1f2c90ecbdcfe4089bbe931ddfc",
     "semantic_hash": ""
   },
   "apps/web/tsconfig.json": {
@@ -450,9 +450,9 @@
     "semantic_hash": ""
   },
   "apps/api/src/services/socketService.ts": {
-    "mtime": 1790581834.1330476,
-    "seen": 1790582382.6974342,
-    "ast_hash": "fd4016c1977fe97ac1c0220abb1cb26d",
+    "mtime": 1789993211.1828392,
+    "seen": 1789993435.098634,
+    "ast_hash": "d32bba69a6172375e5e57ea97eeab131",
     "semantic_hash": ""
   },
   "apps/web/src/lib/socket.ts": {
@@ -735,42 +735,6 @@
     "mtime": 1789979771.2726617,
     "seen": 1789980061.283668,
     "ast_hash": "b2ff1fc261f52bbdb7757048ca98714b",
-    "semantic_hash": ""
-  },
-  "apps/web/src/components/ActiveDmCallModal.tsx": {
-    "mtime": 1790581953.799574,
-    "seen": 1790582382.6974459,
-    "ast_hash": "984593d1ab9f2180411a89eecb24e150",
-    "semantic_hash": ""
-  },
-  "apps/web/src/components/GroupVoiceStageModal.tsx": {
-    "mtime": 1790581976.1405106,
-    "seen": 1790582382.697454,
-    "ast_hash": "f4fc0319a8bf202c2201ad77dd080267",
-    "semantic_hash": ""
-  },
-  "apps/web/src/components/IncomingCallModal.tsx": {
-    "mtime": 1790581947.517778,
-    "seen": 1790582382.6974552,
-    "ast_hash": "44a53c6e8c9540131ab1783131b6d47c",
-    "semantic_hash": ""
-  },
-  "apps/web/src/components/VoiceControlsBar.tsx": {
-    "mtime": 1790581967.731003,
-    "seen": 1790582382.6974652,
-    "ast_hash": "2a37fc7f852fdb54dfcb874b47b8e72d",
-    "semantic_hash": ""
-  },
-  "apps/web/src/hooks/useVoiceChat.ts": {
-    "mtime": 1790582295.386236,
-    "seen": 1790582382.6974669,
-    "ast_hash": "4806ef9bbd14993dea61ea1a64b21194",
-    "semantic_hash": ""
-  },
-  "apps/web/src/lib/webrtcSound.ts": {
-    "mtime": 1790581912.3182225,
-    "seen": 1790582382.697473,
-    "ast_hash": "48cf073ae7d7cd92037325f6f5637ac5",
     "semantic_hash": ""
   }
 }

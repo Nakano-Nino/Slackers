@@ -4,7 +4,7 @@ import { authService } from './authService.js';
 import { dataStore } from './dataStore.js';
 import { sessionService } from './sessionService.js';
 import { projectService } from './projectService.js';
-import { DirectMessage, Message, Notification, Task, User } from '../types/index.js';
+import { DirectMessage, Message, Notification, Task, User, VoiceParticipant } from '../types/index.js';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { Redis } from 'ioredis';
 
@@ -15,6 +15,8 @@ export interface AuthenticatedSocket extends Socket {
 class SocketService {
   private io: Server | null = null;
   private onlineUsers: Map<string, number> = new Map(); // userId -> active connection count
+  private voiceRooms: Map<string, Map<string, VoiceParticipant>> = new Map(); // channelId -> Map<userId, VoiceParticipant>
+  private activeDmCalls: Map<string, { caller: User; calleeId: string; callerSocketId: string; startedAt: number }> = new Map();
 
   async init(httpServer: HttpServer, clientUrl: string = 'http://localhost:3000') {
     this.io = new Server(httpServer, {
@@ -188,8 +190,195 @@ class SocketService {
         }
       });
 
+      // WebRTC: 1-on-1 Direct Message Voice Calls
+      socket.on('webrtc:call-user', (data: { targetUserId: string }) => {
+        if (!data?.targetUserId || data.targetUserId === userId) return;
+        const targetUser = dataStore.getUserById(data.targetUserId);
+        if (!targetUser) return;
+
+        const callId = `call_${userId}_${data.targetUserId}_${Date.now()}`;
+        this.activeDmCalls.set(callId, {
+          caller: user,
+          calleeId: data.targetUserId,
+          callerSocketId: socket.id,
+          startedAt: Date.now(),
+        });
+
+        this.io?.to(`user:${data.targetUserId}`).emit('webrtc:incoming-call', {
+          callId,
+          caller: user,
+          targetUserId: data.targetUserId,
+        });
+      });
+
+      socket.on('webrtc:accept-call', (data: { callId?: string; callerId: string }) => {
+        if (!data?.callerId) return;
+        this.io?.to(`user:${data.callerId}`).emit('webrtc:call-accepted', {
+          callId: data.callId,
+          callee: user,
+        });
+      });
+
+      socket.on('webrtc:decline-call', (data: { callId?: string; callerId: string; reason?: string }) => {
+        if (!data?.callerId) return;
+        this.io?.to(`user:${data.callerId}`).emit('webrtc:call-declined', {
+          callId: data.callId,
+          calleeId: userId,
+          reason: data.reason || 'declined',
+        });
+      });
+
+      socket.on('webrtc:end-call', (data: { targetUserId: string }) => {
+        if (data?.targetUserId) {
+          this.io?.to(`user:${data.targetUserId}`).emit('webrtc:call-ended', {
+            byUserId: userId,
+          });
+        }
+      });
+
+      socket.on('webrtc:signal-dm', (data: { targetUserId: string; signal: any }) => {
+        if (data?.targetUserId && data.signal) {
+          this.io?.to(`user:${data.targetUserId}`).emit('webrtc:signal-dm', {
+            fromUserId: userId,
+            signal: data.signal,
+          });
+        }
+      });
+
+      // WebRTC: Group Channel Voice Chat
+      socket.on('webrtc:channel-voice-join', (data: { channelId: string }) => {
+        const { channelId } = data || {};
+        if (!channelId || typeof channelId !== 'string') return;
+
+        const channel = dataStore.getChannelById(channelId);
+        if (!channel) return;
+
+        // Access control check for private channels
+        if (channel.isPrivate && user.role !== 'admin' && user.role !== 'manager') {
+          const key = dataStore.getChannelKey(channelId, user.id);
+          if (!key) {
+            socket.emit('error', { message: 'Access denied to voice in private channel' });
+            return;
+          }
+        }
+
+        // Leave any previous voice channel room first
+        this.leaveAllVoiceRooms(socket, user);
+
+        let room = this.voiceRooms.get(channelId);
+        if (!room) {
+          room = new Map();
+          this.voiceRooms.set(channelId, room);
+        }
+
+        const participant: VoiceParticipant = {
+          socketId: socket.id,
+          userId: user.id,
+          user,
+          muted: false,
+          deafened: false,
+          isSpeaking: false,
+          joinedAt: new Date().toISOString(),
+        };
+
+        room.set(user.id, participant);
+        socket.join(`voice:channel:${channelId}`);
+
+        const allParticipants = Array.from(room.values());
+
+        // Send existing participants to the joining user
+        socket.emit('webrtc:channel-voice-users', {
+          channelId,
+          participants: allParticipants,
+        });
+
+        // Notify other participants in the voice room
+        socket.to(`voice:channel:${channelId}`).emit('webrtc:channel-voice-user-joined', {
+          channelId,
+          participant,
+        });
+
+        // Broadcast voice state update to text channel subscribers so they see live voice activity
+        this.io?.to(`channel:${channelId}`).emit('webrtc:channel-voice-state', {
+          channelId,
+          participants: allParticipants,
+        });
+      });
+
+      socket.on('webrtc:channel-voice-signal', (data: { targetSocketId?: string; targetUserId?: string; channelId: string; signal: any }) => {
+        if (!data?.signal) return;
+        if (data.targetSocketId) {
+          this.io?.to(data.targetSocketId).emit('webrtc:channel-voice-signal', {
+            fromSocketId: socket.id,
+            fromUserId: user.id,
+            channelId: data.channelId,
+            signal: data.signal,
+          });
+        } else if (data.targetUserId) {
+          this.io?.to(`user:${data.targetUserId}`).emit('webrtc:channel-voice-signal', {
+            fromSocketId: socket.id,
+            fromUserId: user.id,
+            channelId: data.channelId,
+            signal: data.signal,
+          });
+        }
+      });
+
+      socket.on('webrtc:channel-voice-leave', (data: { channelId: string }) => {
+        if (data?.channelId) {
+          this.leaveVoiceRoom(socket, user, data.channelId);
+        }
+      });
+
+      socket.on('webrtc:channel-voice-mute', (data: { channelId: string; muted: boolean; deafened: boolean }) => {
+        if (!data?.channelId) return;
+        const room = this.voiceRooms.get(data.channelId);
+        if (room && room.has(user.id)) {
+          const p = room.get(user.id)!;
+          p.muted = Boolean(data.muted);
+          p.deafened = Boolean(data.deafened);
+          this.io?.to(`voice:channel:${data.channelId}`).emit('webrtc:channel-voice-user-updated', {
+            channelId: data.channelId,
+            userId: user.id,
+            muted: p.muted,
+            deafened: p.deafened,
+          });
+        }
+      });
+
+      socket.on('webrtc:channel-voice-speaking', (data: { channelId: string; isSpeaking: boolean }) => {
+        if (!data?.channelId) return;
+        const room = this.voiceRooms.get(data.channelId);
+        if (room && room.has(user.id)) {
+          const p = room.get(user.id)!;
+          p.isSpeaking = Boolean(data.isSpeaking);
+          socket.to(`voice:channel:${data.channelId}`).emit('webrtc:channel-voice-speaking', {
+            channelId: data.channelId,
+            userId: user.id,
+            isSpeaking: p.isSpeaking,
+          });
+        }
+      });
+
+      socket.on('webrtc:get-all-voice-states', () => {
+        socket.emit('webrtc:all-voice-states', this.getAllVoiceStates());
+      });
+
       // Disconnect
       socket.on('disconnect', () => {
+        this.leaveAllVoiceRooms(socket, user);
+
+        // Notify DM call partner if in call
+        this.activeDmCalls.forEach((call, callId) => {
+          if (call.caller.id === userId) {
+            this.io?.to(`user:${call.calleeId}`).emit('webrtc:call-ended', { byUserId: userId });
+            this.activeDmCalls.delete(callId);
+          } else if (call.calleeId === userId) {
+            this.io?.to(`user:${call.caller.id}`).emit('webrtc:call-ended', { byUserId: userId });
+            this.activeDmCalls.delete(callId);
+          }
+        });
+
         const count = this.onlineUsers.get(userId) || 1;
         if (count <= 1) {
           this.onlineUsers.delete(userId);
@@ -307,6 +496,55 @@ class SocketService {
 
   getOnlineUserIds(): string[] {
     return Array.from(this.onlineUsers.keys());
+  }
+
+  private leaveVoiceRoom(socket: Socket, user: User, channelId: string) {
+    const room = this.voiceRooms.get(channelId);
+    if (!room) return;
+
+    if (room.has(user.id)) {
+      room.delete(user.id);
+      socket.leave(`voice:channel:${channelId}`);
+
+      // Notify others in voice room
+      socket.to(`voice:channel:${channelId}`).emit('webrtc:channel-voice-user-left', {
+        channelId,
+        userId: user.id,
+      });
+
+      // Update room state
+      const remaining = Array.from(room.values());
+      if (remaining.length === 0) {
+        this.voiceRooms.delete(channelId);
+      }
+
+      // Broadcast updated voice state to text channel subscribers
+      this.io?.to(`channel:${channelId}`).emit('webrtc:channel-voice-state', {
+        channelId,
+        participants: remaining,
+      });
+    }
+  }
+
+  private leaveAllVoiceRooms(socket: Socket, user: User) {
+    this.voiceRooms.forEach((room, channelId) => {
+      if (room.has(user.id)) {
+        this.leaveVoiceRoom(socket, user, channelId);
+      }
+    });
+  }
+
+  getAllVoiceStates(): Record<string, VoiceParticipant[]> {
+    const states: Record<string, VoiceParticipant[]> = {};
+    this.voiceRooms.forEach((room, channelId) => {
+      states[channelId] = Array.from(room.values());
+    });
+    return states;
+  }
+
+  getVoiceParticipants(channelId: string): VoiceParticipant[] {
+    const room = this.voiceRooms.get(channelId);
+    return room ? Array.from(room.values()) : [];
   }
 }
 

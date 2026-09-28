@@ -268,6 +268,18 @@ export interface MuteTarget {
   createdAt: string;
 }
 
+export interface VoiceParticipant {
+  socketId: string;
+  userId: string;
+  user: User;
+  muted: boolean;
+  deafened: boolean;
+  isSpeaking: boolean;
+  joinedAt: string;
+}
+
+export type DmCallStatus = 'idle' | 'calling' | 'incoming' | 'connected';
+
 export interface Invitation {
   id: string;
   token: string;

@@ -39,6 +39,9 @@ import {
   QrCode,
   AlertTriangle,
   KeyRound,
+  Phone,
+  PhoneCall,
+  Radio,
 } from 'lucide-react';
 import { Channel, DirectMessage, Message, MuteDuration, MuteTarget, User } from '../types';
 import { getUserRoleBadge } from '../lib/roles';
@@ -81,6 +84,12 @@ interface Props {
   hasMoreMessages?: boolean;
   loadingOlderMessages?: boolean;
   onLoadOlderMessages?: () => Promise<void>;
+  onStartDmCall?: (user: User) => void;
+  isDmCallActive?: boolean;
+  isCurrentChannelInVoice?: boolean;
+  channelVoiceParticipantsCount?: number;
+  onJoinChannelVoice?: (channelId: string) => void;
+  onOpenVoiceStage?: () => void;
 }
 
 function EncryptedAttachmentCard({ attachment }: { attachment: FileAttachmentMetadata }) {
@@ -353,6 +362,12 @@ export function ChatArea({
   hasMoreMessages = false,
   loadingOlderMessages = false,
   onLoadOlderMessages,
+  onStartDmCall,
+  isDmCallActive = false,
+  isCurrentChannelInVoice = false,
+  channelVoiceParticipantsCount = 0,
+  onJoinChannelVoice,
+  onOpenVoiceStage,
 }: Props) {
   const usersMap = useMemo(() => {
     const map = new Map<string, User>();
@@ -1092,36 +1107,92 @@ export function ChatArea({
 
         <div className="flex items-center gap-3">
           {isDmMode ? (
-            <button
-              onClick={handleOpenSafetyModal}
-              className={`hidden sm:flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border transition cursor-pointer ${
-                peerKeyStatus === 'verified'
-                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20'
-                  : peerKeyStatus === 'key_changed'
-                  ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/30 hover:bg-rose-500/25 animate-pulse'
-                  : 'bg-slate-100 dark:bg-neutral-900 border-slate-200 dark:border-neutral-800 text-slate-600 dark:text-neutral-300 hover:bg-slate-200 dark:hover:bg-neutral-800'
-              }`}
-              title="Click to view and verify cryptographic safety numbers"
-            >
-              {peerKeyStatus === 'verified' ? (
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-              ) : peerKeyStatus === 'key_changed' ? (
-                <ShieldAlert className="w-3.5 h-3.5 text-rose-500" />
-              ) : (
-                <Shield className="w-3.5 h-3.5 text-slate-500 dark:text-neutral-400" />
+            <div className="flex items-center gap-2">
+              {selectedDmUser && onStartDmCall && (
+                <button
+                  type="button"
+                  onClick={() => onStartDmCall(selectedDmUser)}
+                  disabled={isDmCallActive}
+                  className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border font-medium transition cursor-pointer bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                  title={`Start voice call with ${selectedDmUser.name}`}
+                >
+                  <Phone className="w-3.5 h-3.5" />
+                  <span>Voice Call</span>
+                </button>
               )}
-              <span>
-                {peerKeyStatus === 'verified'
-                  ? 'Safety Numbers Verified'
-                  : peerKeyStatus === 'key_changed'
-                  ? 'Key Changed (Review)'
-                  : 'Verify Numbers'}
-              </span>
-            </button>
+              <button
+                onClick={handleOpenSafetyModal}
+                className={`hidden sm:flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border transition cursor-pointer ${
+                  peerKeyStatus === 'verified'
+                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20'
+                    : peerKeyStatus === 'key_changed'
+                    ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/30 hover:bg-rose-500/25 animate-pulse'
+                    : 'bg-slate-100 dark:bg-neutral-900 border-slate-200 dark:border-neutral-800 text-slate-600 dark:text-neutral-300 hover:bg-slate-200 dark:hover:bg-neutral-800'
+                }`}
+                title="Click to view and verify cryptographic safety numbers"
+              >
+                {peerKeyStatus === 'verified' ? (
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                ) : peerKeyStatus === 'key_changed' ? (
+                  <ShieldAlert className="w-3.5 h-3.5 text-rose-500" />
+                ) : (
+                  <Shield className="w-3.5 h-3.5 text-slate-500 dark:text-neutral-400" />
+                )}
+                <span>
+                  {peerKeyStatus === 'verified'
+                    ? 'Safety Numbers Verified'
+                    : peerKeyStatus === 'key_changed'
+                    ? 'Key Changed (Review)'
+                    : 'Verify Numbers'}
+                </span>
+              </button>
+            </div>
           ) : (
             channel && (
-              <div className="hidden sm:flex items-center gap-3">
-                <div className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-neutral-400 bg-slate-100 dark:bg-neutral-900 px-2.5 py-1 rounded-md border border-slate-200 dark:border-neutral-800">
+              <div className="flex items-center gap-2">
+                {onJoinChannelVoice && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (isCurrentChannelInVoice && onOpenVoiceStage) {
+                        onOpenVoiceStage();
+                      } else {
+                        onJoinChannelVoice(channel.id);
+                      }
+                    }}
+                    className={`flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border font-medium transition cursor-pointer ${
+                      isCurrentChannelInVoice
+                        ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/25'
+                        : channelVoiceParticipantsCount > 0
+                        ? 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border-indigo-500/30 hover:bg-indigo-500/25'
+                        : 'bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300 border-slate-200 dark:border-neutral-700 hover:bg-slate-200 dark:hover:bg-neutral-700'
+                    }`}
+                    title={
+                      isCurrentChannelInVoice
+                        ? 'Connected to channel voice. Click to view stage.'
+                        : channelVoiceParticipantsCount > 0
+                        ? `Join group voice (${channelVoiceParticipantsCount} active)`
+                        : 'Start or join group voice in this channel'
+                    }
+                  >
+                    {isCurrentChannelInVoice ? (
+                      <>
+                        <Radio className="w-3.5 h-3.5 text-emerald-500 animate-pulse" />
+                        <span>In Voice (Stage)</span>
+                      </>
+                    ) : (
+                      <>
+                        <PhoneCall className="w-3.5 h-3.5" />
+                        <span>
+                          {channelVoiceParticipantsCount > 0
+                            ? `Join Voice (${channelVoiceParticipantsCount})`
+                            : 'Join Voice'}
+                        </span>
+                      </>
+                    )}
+                  </button>
+                )}
+                <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-600 dark:text-neutral-400 bg-slate-100 dark:bg-neutral-900 px-2.5 py-1 rounded-md border border-slate-200 dark:border-neutral-800">
                   <Users className="w-3.5 h-3.5 text-slate-400 dark:text-neutral-500" />
                   <span>{channel.memberCount} members</span>
                 </div>

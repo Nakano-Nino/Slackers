@@ -40,6 +40,11 @@ import { InviteMemberModal } from '../components/InviteMemberModal';
 import { E2EEService } from '../lib/e2ee';
 import { Bell, X } from 'lucide-react';
 import { connectSocket, disconnectSocket, getSocket } from '../lib/socket';
+import { Socket } from 'socket.io-client';
+import { useVoiceChat } from '../hooks/useVoiceChat';
+import { IncomingCallModal } from '../components/IncomingCallModal';
+import { ActiveDmCallModal } from '../components/ActiveDmCallModal';
+import { GroupVoiceStageModal } from '../components/GroupVoiceStageModal';
 
 export default function Home() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -99,6 +104,10 @@ export default function Home() {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [hasMoreMessages, setHasMoreMessages] = useState(false);
   const [loadingOlderMessages, setLoadingOlderMessages] = useState(false);
+  const [socketInstance, setSocketInstance] = useState<Socket | null>(null);
+
+  // WebRTC Voice Chat Engine (DM 1-on-1 and Channel Group Voice Mesh)
+  const voiceChat = useVoiceChat(socketInstance, currentUser);
 
   // Check URL for invite token on mount
   useEffect(() => {
@@ -917,6 +926,7 @@ export default function Home() {
 
   const handleLogout = useCallback(async () => {
     disconnectSocket();
+    setSocketInstance(null);
     await api.logout();
     setCurrentUser(null);
     setMyKeyPair(null);
@@ -953,10 +963,12 @@ export default function Home() {
   useEffect(() => {
     if (!currentUser) {
       disconnectSocket();
+      setSocketInstance(null);
       return;
     }
 
     const socket = connectSocket();
+    setSocketInstance(socket);
     if (!socket) return;
 
     // Room subscription handler on connect/reconnect
@@ -1660,6 +1672,17 @@ export default function Home() {
         mutedTargets={mutedTargets}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
         onOpenInviteMember={() => setIsInviteMemberModalOpen(true)}
+        channelVoiceStates={voiceChat.allChannelVoiceStates}
+        currentVoiceChannelId={voiceChat.currentVoiceChannelId}
+        voiceControlsProps={{
+          isMuted: voiceChat.isMuted,
+          isDeafened: voiceChat.isDeafened,
+          isSpeaking: voiceChat.isSpeaking,
+          onToggleMute: voiceChat.toggleMute,
+          onToggleDeafen: voiceChat.toggleDeafen,
+          onDisconnect: voiceChat.leaveVoiceChannel,
+          onOpenStage: () => voiceChat.setIsStageOpen(true),
+        }}
       />
 
       {/* Main Content Workspace */}
@@ -1688,6 +1711,16 @@ export default function Home() {
             hasMoreMessages={hasMoreMessages}
             loadingOlderMessages={loadingOlderMessages}
             onLoadOlderMessages={selectedDmUser ? loadOlderDirectMessages : loadOlderMessages}
+            onStartDmCall={(user) => voiceChat.startDmCall(user)}
+            isDmCallActive={voiceChat.dmCallStatus !== 'idle'}
+            isCurrentChannelInVoice={voiceChat.currentVoiceChannelId === selectedChannelId}
+            channelVoiceParticipantsCount={
+              selectedChannelId
+                ? voiceChat.allChannelVoiceStates[selectedChannelId]?.length || 0
+                : 0
+            }
+            onJoinChannelVoice={(channelId) => voiceChat.joinVoiceChannel(channelId)}
+            onOpenVoiceStage={() => voiceChat.setIsStageOpen(true)}
           />
         ) : activeView === 'kanban' ? (
           <div className="flex-1 flex flex-col h-full p-6 overflow-hidden">
@@ -1977,6 +2010,46 @@ export default function Home() {
             )}
           </div>
         </div>
+      )}
+
+      {/* WebRTC: Incoming 1-on-1 Call Alert */}
+      {voiceChat.dmCallStatus === 'incoming' && voiceChat.dmCallPartner && (
+        <IncomingCallModal
+          caller={voiceChat.dmCallPartner}
+          onAccept={voiceChat.acceptDmCall}
+          onDecline={voiceChat.declineDmCall}
+        />
+      )}
+
+      {/* WebRTC: Active 1-on-1 Call Floating Bar */}
+      {(voiceChat.dmCallStatus === 'calling' || voiceChat.dmCallStatus === 'connected') &&
+        voiceChat.dmCallPartner && (
+          <ActiveDmCallModal
+            status={voiceChat.dmCallStatus}
+            partner={voiceChat.dmCallPartner}
+            duration={voiceChat.dmDuration}
+            isMuted={voiceChat.isMuted}
+            isDeafened={voiceChat.isDeafened}
+            onToggleMute={voiceChat.toggleMute}
+            onToggleDeafen={voiceChat.toggleDeafen}
+            onEndCall={voiceChat.endDmCall}
+          />
+        )}
+
+      {/* WebRTC: Channel Group Voice Stage View */}
+      {voiceChat.isStageOpen && voiceChat.currentVoiceChannelId && (
+        <GroupVoiceStageModal
+          channel={channels.find((c) => c.id === voiceChat.currentVoiceChannelId)}
+          participants={voiceChat.voiceParticipants}
+          currentUser={currentUser}
+          isMuted={voiceChat.isMuted}
+          isDeafened={voiceChat.isDeafened}
+          isSpeaking={voiceChat.isSpeaking}
+          onToggleMute={voiceChat.toggleMute}
+          onToggleDeafen={voiceChat.toggleDeafen}
+          onDisconnect={voiceChat.leaveVoiceChannel}
+          onClose={() => voiceChat.setIsStageOpen(false)}
+        />
       )}
     </main>
   );

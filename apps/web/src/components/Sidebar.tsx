@@ -18,9 +18,11 @@ import {
   Settings,
   BellOff,
   UserPlus,
+  Volume2,
 } from 'lucide-react';
-import { Channel, MuteTarget, Project, User } from '../types';
+import { Channel, MuteTarget, Project, User, VoiceParticipant } from '../types';
 import { ThemeToggle } from './ThemeToggle';
+import { VoiceControlsBar } from './VoiceControlsBar';
 
 interface Props {
   channels: Channel[];
@@ -46,6 +48,17 @@ interface Props {
   mutedTargets?: MuteTarget[];
   onOpenCommandPalette?: () => void;
   onOpenInviteMember?: () => void;
+  channelVoiceStates?: Record<string, VoiceParticipant[]>;
+  currentVoiceChannelId?: string | null;
+  voiceControlsProps?: {
+    isMuted: boolean;
+    isDeafened: boolean;
+    isSpeaking: boolean;
+    onToggleMute: () => void;
+    onToggleDeafen: () => void;
+    onDisconnect: () => void;
+    onOpenStage: () => void;
+  };
 }
 
 import { getUserRoleBadge } from '../lib/roles';
@@ -74,6 +87,9 @@ export function Sidebar({
   mutedTargets = [],
   onOpenCommandPalette,
   onOpenInviteMember,
+  channelVoiceStates = {},
+  currentVoiceChannelId,
+  voiceControlsProps,
 }: Props) {
   const [searchQuery, setSearchQuery] = useState('');
   const roleInfo = getUserRoleBadge(currentUser);
@@ -336,17 +352,28 @@ export function Sidebar({
                       <BellOff className="w-3 h-3 text-amber-400/80 shrink-0" title="Notifications muted" />
                     )}
                   </div>
-                  {channel.memberCount > 0 && (
-                    <span
-                      className={`text-[11px] px-1.5 py-0.5 rounded transition-colors ${
-                        isUnread
-                          ? 'text-neutral-200 font-semibold bg-neutral-800'
-                          : 'text-neutral-600 group-hover:text-neutral-500 bg-neutral-900'
-                      }`}
-                    >
-                      {channel.memberCount}
-                    </span>
-                  )}
+                  <div className="flex items-center gap-1 shrink-0">
+                    {(channelVoiceStates[channel.id]?.length || 0) > 0 && (
+                      <span
+                        className="flex items-center gap-1 text-[10px] font-semibold text-emerald-400 bg-emerald-500/15 px-1.5 py-0.5 rounded border border-emerald-500/30 shrink-0"
+                        title={`${channelVoiceStates[channel.id].length} in voice`}
+                      >
+                        <Volume2 className="w-3 h-3 text-emerald-400 animate-pulse" />
+                        <span>{channelVoiceStates[channel.id].length}</span>
+                      </span>
+                    )}
+                    {channel.memberCount > 0 && (
+                      <span
+                        className={`text-[11px] px-1.5 py-0.5 rounded transition-colors ${
+                          isUnread
+                            ? 'text-neutral-200 font-semibold bg-neutral-800'
+                            : 'text-neutral-600 group-hover:text-neutral-500 bg-neutral-900'
+                        }`}
+                      >
+                        {channel.memberCount}
+                      </span>
+                    )}
+                  </div>
                 </button>
               );
             })}
@@ -456,6 +483,21 @@ export function Sidebar({
           </div>
         </div>
       </div>
+
+      {/* Voice Controls Bar (Docked when in voice) */}
+      {currentVoiceChannelId && voiceControlsProps && (
+        <VoiceControlsBar
+          channel={channels.find((c) => c.id === currentVoiceChannelId)}
+          participantCount={channelVoiceStates[currentVoiceChannelId]?.length || 1}
+          isMuted={voiceControlsProps.isMuted}
+          isDeafened={voiceControlsProps.isDeafened}
+          isSpeaking={voiceControlsProps.isSpeaking}
+          onToggleMute={voiceControlsProps.onToggleMute}
+          onToggleDeafen={voiceControlsProps.onToggleDeafen}
+          onDisconnect={voiceControlsProps.onDisconnect}
+          onOpenStage={voiceControlsProps.onOpenStage}
+        />
+      )}
 
       {/* User Profile Footer */}
       {currentUser && (

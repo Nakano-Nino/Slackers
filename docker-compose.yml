@@ -1,12 +1,17 @@
 services:
+  # ==============================================================================
+  # Local Development Dependencies (Cloud Supabase PostgreSQL handles DB)
+  # ==============================================================================
+
+  # 1. Audit & Security Log Store: MongoDB
   mongodb:
     image: mongo:latest
-    container_name: slackers_mongodb
-    restart: always
+    container_name: slackers_mongodb_dev
+    restart: unless-stopped
     environment:
-      MONGO_INITDB_DATABASE: slackers_logs
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE:-slackers_logs}
     ports:
-      - "27017:27017"
+      - "127.0.0.1:27017:27017"
     volumes:
       - mongo_data:/data/db
     healthcheck:
@@ -15,5 +20,24 @@ services:
       timeout: 5s
       retries: 5
 
+  # 2. Real-time Cache, Pub/Sub & Presence: Redis
+  redis:
+    image: redis:alpine
+    container_name: slackers_redis_dev
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
 volumes:
   mongo_data:
+    name: slackers_mongo_data
+  redis_data:
+    name: slackers_redis_data

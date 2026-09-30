@@ -37,39 +37,35 @@ fi
 echo -e "${GREEN}✓ Docker and Docker Compose detected.${NC}"
 
 # 2. Setup production environment file
-if [ ! -f ".env.production" ]; then
-    echo -e "${YELLOW}⚙️  .env.production not found. Initializing from template...${NC}"
-    cp .env.production.example .env.production
+if [ ! -f ".env" ]; then
+    echo -e "${YELLOW}⚙️  .env not found. Initializing from .env.example...${NC}"
+    cp .env.example .env
 
     # Generate secure random secrets
-    PG_PASS=$(openssl rand -hex 16 2>/dev/null || tr -dc A-Za-z0-9 </dev/urandom | head -c 32)
     MINIO_PASS=$(openssl rand -hex 16 2>/dev/null || tr -dc A-Za-z0-9 </dev/urandom | head -c 32)
     JWT_SECRET_VAL=$(openssl rand -hex 32 2>/dev/null || tr -dc A-Za-z0-9 </dev/urandom | head -c 64)
 
     # Detect public IP
     DETECTED_IP=$(curl -s --max-time 3 https://ifconfig.me || curl -s --max-time 3 https://api.ipify.org || echo "localhost")
 
-    # Replace placeholders in .env.production
-    sed -i.bak "s/replace_with_a_secure_postgres_password/${PG_PASS}/g" .env.production
-    sed -i.bak "s/replace_with_a_secure_minio_password/${MINIO_PASS}/g" .env.production
-    sed -i.bak "s/replace_with_a_secure_random_64_character_hex_key/${JWT_SECRET_VAL}/g" .env.production
-    sed -i.bak "s|http://localhost|http://${DETECTED_IP}|g" .env.production
-    rm -f .env.production.bak
+    # Replace placeholders in .env
+    sed -i.bak "s/replace_with_a_secure_minio_password/${MINIO_PASS}/g" .env
+    sed -i.bak "s/replace_with_a_secure_random_64_character_hex_key/${JWT_SECRET_VAL}/g" .env
+    sed -i.bak "s|http://localhost|http://${DETECTED_IP}|g" .env
+    rm -f .env.bak
 
-    echo -e "${GREEN}✓ Generated secure random credentials in .env.production.${NC}"
+    echo -e "${GREEN}✓ Generated secure random credentials in .env.${NC}"
     echo -e "  Detected public address: ${CYAN}http://${DETECTED_IP}${NC}"
 else
-    echo -e "${GREEN}✓ Existing .env.production found.${NC}"
+    echo -e "${GREEN}✓ Existing .env found.${NC}"
 fi
 
 # 3. Clean up any stale stopped containers and start services
 echo -e "\n${CYAN}📦 Building Docker images and starting containers...${NC}"
 docker compose -f docker-compose.prod.yml down --remove-orphans 2>/dev/null || true
-if ! docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build; then
+if ! docker compose -f docker-compose.prod.yml up -d --build; then
     echo -e "\n${RED}❌ Docker Compose failed to start services. Container diagnostic logs:${NC}"
-    echo -e "${YELLOW}--- PostgreSQL Container Logs ---${NC}"
-    docker logs --tail 30 slackers_postgres_prod 2>/dev/null || true
-    echo -e "\n${YELLOW}--- API Container Logs ---${NC}"
+    echo -e "\n${YELLOW}--- Go API Container Logs ---${NC}"
     docker logs --tail 30 slackers_api_prod 2>/dev/null || true
     exit 1
 fi
@@ -95,7 +91,7 @@ echo -e "\n${GREEN}=============================================================
 echo -e "${GREEN}🎉 Slackers is successfully deployed and running!${NC}"
 echo -e "${GREEN}================================================================${NC}"
 
-APP_URL_VAL=$(grep -E '^APP_URL=' .env.production | cut -d '=' -f2-)
+APP_URL_VAL=$(grep -E '^APP_URL=' .env 2>/dev/null | cut -d '=' -f2- || echo "http://localhost")
 echo -e "\n🌐 Web Application: ${CYAN}${APP_URL_VAL}${NC}"
 echo -e "📡 REST API Health: ${CYAN}${APP_URL_VAL}/api/health${NC}"
 

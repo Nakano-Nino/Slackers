@@ -1,8 +1,8 @@
 {
   "apps/api/package.json": {
-    "mtime": 1789652729.8625803,
-    "seen": 1789652903.6062028,
-    "ast_hash": "b1917cdc6f29141cf13a1f2c4033c1b1",
+    "mtime": 1790740122.798605,
+    "seen": 1790740173.446839,
+    "ast_hash": "14012699d9ab9291c8349df8f5b7af83",
     "semantic_hash": ""
   },
   "apps/api/src/controllers/authController.ts": {
@@ -777,6 +777,12 @@
     "mtime": 1790736707.3432035,
     "seen": 1790737122.414329,
     "ast_hash": "ca4e589e44651b0d225acaf1a58f19cb",
+    "semantic_hash": ""
+  },
+  "apps/api/src/scripts/resetDatabase.ts": {
+    "mtime": 1790740039.4592433,
+    "seen": 1790740173.44687,
+    "ast_hash": "28c96f5188fc135aa0b520e08ea5ae1d",
     "semantic_hash": ""
   }
 }

@@ -13,6 +13,7 @@ apps/web/build
 
 # Production builds
 apps/api/dist/
+apps/api-go/bin/
 
 # Misc
 .DS_Store

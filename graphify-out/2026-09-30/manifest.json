@@ -288,9 +288,9 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/Sidebar.tsx": {
-    "mtime": 1790736778.1077168,
-    "seen": 1790737122.414332,
-    "ast_hash": "90d3d853f7856a7c3ee18885718027a5",
+    "mtime": 1790737468.4457796,
+    "seen": 1790737515.308526,
+    "ast_hash": "7aaf21a07e2bcfd84a79e85a7c115dfc",
     "semantic_hash": ""
   },
   "apps/web/src/components/TaskDetailModal.tsx": {

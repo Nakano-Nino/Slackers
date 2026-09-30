@@ -14336,7 +14336,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/hooks/useVoiceChat.ts",
-      "source_location": "L211",
+      "source_location": "L230",
       "weight": 1.0
     },
     {
@@ -14348,7 +14348,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/hooks/useVoiceChat.ts",
-      "source_location": "L239",
+      "source_location": "L267",
       "weight": 1.0
     },
     {
@@ -14360,7 +14360,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/hooks/useVoiceChat.ts",
-      "source_location": "L442",
+      "source_location": "L485",
       "weight": 1.0
     },
     {
@@ -14372,7 +14372,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/hooks/useVoiceChat.ts",
-      "source_location": "L456",
+      "source_location": "L500",
       "weight": 1.0
     },
     {
@@ -14384,7 +14384,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/hooks/useVoiceChat.ts",
-      "source_location": "L468",
+      "source_location": "L512",
       "weight": 1.0
     },
     {
@@ -40052,5 +40052,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "9c953938d83d453912f8decd8a9d2d63f55681e8"
+  "built_at_commit": "4a1fe91d921374137b7872a38ffc241ff13c3d73"
 }

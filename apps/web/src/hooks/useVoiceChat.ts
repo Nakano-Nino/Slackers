@@ -184,24 +184,43 @@ export function useVoiceChat(
     }
   }, [socket]);
 
+  // Stop local microphone stream, tracks, audio context, and speaking interval
+  const stopLocalStream = useCallback(() => {
+    if (speakingIntervalRef.current) {
+      clearInterval(speakingIntervalRef.current);
+      speakingIntervalRef.current = null;
+    }
+    if (analyserRef.current) {
+      try {
+        analyserRef.current.disconnect();
+      } catch {}
+      analyserRef.current = null;
+    }
+    if (audioContextRef.current) {
+      if (audioContextRef.current.state !== 'closed') {
+        audioContextRef.current.close().catch(() => {});
+      }
+      audioContextRef.current = null;
+    }
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach((track) => {
+        try {
+          track.stop();
+        } catch (e) {
+          console.warn('Error stopping audio track:', e);
+        }
+      });
+      localStreamRef.current = null;
+    }
+    setIsSpeaking(false);
+  }, []);
+
   // Stop local microphone stream if neither DM nor Channel voice is active
   const stopLocalStreamIfIdle = useCallback(() => {
     if (!currentVoiceChannelIdRef.current && dmCallStatusRef.current === 'idle') {
-      if (speakingIntervalRef.current) {
-        clearInterval(speakingIntervalRef.current);
-        speakingIntervalRef.current = null;
-      }
-      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
-        audioContextRef.current.close().catch(() => {});
-        audioContextRef.current = null;
-      }
-      if (localStreamRef.current) {
-        localStreamRef.current.getTracks().forEach((t) => t.stop());
-        localStreamRef.current = null;
-      }
-      setIsSpeaking(false);
+      stopLocalStream();
     }
-  }, []);
+  }, [stopLocalStream]);
 
   // -------------------------------------------------------------
   // 1-on-1 DM CALL IMPLEMENTATION
@@ -214,20 +233,29 @@ export function useVoiceChat(
       dmTimerRef.current = null;
     }
     if (dmPeerRef.current) {
-      dmPeerRef.current.close();
+      try {
+        dmPeerRef.current.close();
+      } catch {}
       dmPeerRef.current = null;
     }
     if (dmAudioElementRef.current) {
-      dmAudioElementRef.current.srcObject = null;
-      dmAudioElementRef.current.remove();
+      try {
+        dmAudioElementRef.current.srcObject = null;
+        dmAudioElementRef.current.pause();
+        dmAudioElementRef.current.remove();
+      } catch {}
       dmAudioElementRef.current = null;
     }
+    dmCallStatusRef.current = 'idle';
     setDmCallStatus('idle');
     setDmCallPartner(null);
     setDmCallId(null);
     setDmDuration(0);
-    stopLocalStreamIfIdle();
-  }, [stopLocalStreamIfIdle]);
+    // If not in channel voice, immediately stop mic tracks
+    if (!currentVoiceChannelIdRef.current) {
+      stopLocalStream();
+    }
+  }, [stopLocalStream]);
 
   const startDmCall = useCallback(
     async (targetUser: User) => {
@@ -348,22 +376,36 @@ export function useVoiceChat(
   // -------------------------------------------------------------
 
   const cleanupChannelVoice = useCallback(() => {
+    // Immediately clear ref so any synchronous checks know channel voice is inactive
+    currentVoiceChannelIdRef.current = null;
+
     // Close and remove all peer connections
-    channelPeersRef.current.forEach((pc) => pc.close());
+    channelPeersRef.current.forEach((pc) => {
+      try {
+        pc.close();
+      } catch {}
+    });
     channelPeersRef.current.clear();
 
     // Remove remote audio elements
     channelAudiosRef.current.forEach((audio) => {
-      audio.srcObject = null;
-      audio.remove();
+      try {
+        audio.srcObject = null;
+        audio.pause();
+        audio.remove();
+      } catch {}
     });
     channelAudiosRef.current.clear();
 
     setCurrentVoiceChannelId(null);
     setVoiceParticipants([]);
     setIsStageOpen(false);
-    stopLocalStreamIfIdle();
-  }, [stopLocalStreamIfIdle]);
+
+    // If not currently in a DM call, immediately stop local mic stream and audio context
+    if (dmCallStatusRef.current === 'idle') {
+      stopLocalStream();
+    }
+  }, [stopLocalStream]);
 
   // Create peer connection to another participant in the channel
   const createChannelPeerConnection = useCallback(
@@ -438,6 +480,7 @@ export function useVoiceChat(
         }
 
         await getOrCreateLocalStream();
+        currentVoiceChannelIdRef.current = channelId;
         setCurrentVoiceChannelId(channelId);
         playJoinSound();
 
@@ -451,8 +494,9 @@ export function useVoiceChat(
   );
 
   const leaveVoiceChannel = useCallback(() => {
-    if (socket && currentVoiceChannelId) {
-      socket.emit('webrtc:channel-voice-leave', { channelId: currentVoiceChannelId });
+    const channelId = currentVoiceChannelIdRef.current || currentVoiceChannelId;
+    if (socket && channelId) {
+      socket.emit('webrtc:channel-voice-leave', { channelId });
       playLeaveSound();
     }
     cleanupChannelVoice();
@@ -790,6 +834,41 @@ export function useVoiceChat(
       socket.off('webrtc:signal-dm', handleSignalDm);
     };
   }, [socket, createChannelPeerConnection, cleanupDmCall]);
+
+  // Clean up all audio tracks and WebRTC connections on unmount
+  useEffect(() => {
+    return () => {
+      stopLocalStream();
+      channelPeersRef.current.forEach((pc) => {
+        try {
+          pc.close();
+        } catch {}
+      });
+      channelPeersRef.current.clear();
+      channelAudiosRef.current.forEach((audio) => {
+        try {
+          audio.srcObject = null;
+          audio.pause();
+          audio.remove();
+        } catch {}
+      });
+      channelAudiosRef.current.clear();
+      if (dmPeerRef.current) {
+        try {
+          dmPeerRef.current.close();
+        } catch {}
+        dmPeerRef.current = null;
+      }
+      if (dmAudioElementRef.current) {
+        try {
+          dmAudioElementRef.current.srcObject = null;
+          dmAudioElementRef.current.pause();
+          dmAudioElementRef.current.remove();
+        } catch {}
+        dmAudioElementRef.current = null;
+      }
+    };
+  }, [stopLocalStream]);
 
   return {
     dmCallStatus,

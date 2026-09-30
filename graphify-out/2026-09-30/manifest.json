@@ -384,9 +384,9 @@
     "semantic_hash": ""
   },
   "docker-compose.yml": {
-    "mtime": 1789970179.8589482,
-    "seen": 1789970303.980172,
-    "ast_hash": "5d2656c8548f45bda33cabe7550d951e",
+    "mtime": 1790739331.7218018,
+    "seen": 1790739490.8515022,
+    "ast_hash": "25463942e6323e6bc450d2d427e7e672",
     "semantic_hash": ""
   },
   "apps/web/public/file.svg": {
@@ -672,9 +672,9 @@
     "semantic_hash": ""
   },
   "docker-compose.prod.yml": {
-    "mtime": 1789970622.281313,
-    "seen": 1789970851.0169432,
-    "ast_hash": "5ba39cadba7514a7bab4f03ad4fb0db7",
+    "mtime": 1790739375.5662875,
+    "seen": 1790739490.851501,
+    "ast_hash": "31835eec0cf0dfa614470c7ccc91e41c",
     "semantic_hash": ""
   },
   "docs/DEPLOYMENT_UBUNTU.md": {
@@ -720,9 +720,9 @@
     "semantic_hash": ""
   },
   "docker-compose.db.yml": {
-    "mtime": 1789972428.2537735,
-    "seen": 1789972470.129837,
-    "ast_hash": "1ef79fe01d21be02c0b564ce62500dc4",
+    "mtime": 1790739350.9012797,
+    "seen": 1790739490.851499,
+    "ast_hash": "b59d8b822653ae779933044e0d5914f7",
     "semantic_hash": ""
   },
   "docs/DEPLOYMENT_HYBRID.md": {
@@ -762,9 +762,9 @@
     "semantic_hash": ""
   },
   "apps/web/src/hooks/useVoiceChat.ts": {
-    "mtime": 1790582295.386236,
-    "seen": 1790582382.6974669,
-    "ast_hash": "4806ef9bbd14993dea61ea1a64b21194",
+    "mtime": 1790737724.9897254,
+    "seen": 1790737772.148479,
+    "ast_hash": "2cd71cc92ad71819a01f10be6463799d",
     "semantic_hash": ""
   },
   "apps/web/src/lib/webrtcSound.ts": {

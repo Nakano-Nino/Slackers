@@ -10,7 +10,8 @@
     "start": "node dist/index.js",
     "prisma:generate": "prisma generate --schema prisma/schema.prisma",
     "prisma:push": "prisma db push --schema prisma/schema.prisma",
-    "db:seed": "tsx src/services/dbSeed.ts"
+    "db:seed": "tsx src/services/dbSeed.ts",
+    "db:reset": "tsx src/scripts/resetDatabase.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1133.0",

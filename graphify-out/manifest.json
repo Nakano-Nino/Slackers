@@ -672,9 +672,9 @@
     "semantic_hash": ""
   },
   "docker-compose.prod.yml": {
-    "mtime": 1790751635.5779943,
-    "seen": 1790751664.298545,
-    "ast_hash": "539635d31a6da02fc9d504904d5c4012",
+    "mtime": 1790754093.6118186,
+    "seen": 1790754291.4556942,
+    "ast_hash": "4635f4790f1442a87a308b981f3f0d38",
     "semantic_hash": ""
   },
   "docs/DEPLOYMENT_UBUNTU.md": {

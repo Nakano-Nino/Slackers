@@ -102,6 +102,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    ports:
+      - "127.0.0.1:5001:5001"
     networks:
       - slackers_network
 
@@ -121,13 +123,17 @@ services:
       PORT: 3000
     depends_on:
       - api
+    ports:
+      - "127.0.0.1:3000:3000"
     networks:
       - slackers_network
 
   # ==============================================================================
-  # 7. Reverse Proxy & SSL Engine: Nginx
+  # 7. Reverse Proxy & SSL Engine: Nginx (Optional: use only if host has no Nginx)
   # ==============================================================================
   nginx:
+    profiles:
+      - with-nginx
     image: nginx:latest
     container_name: slackers_nginx_prod
     restart: unless-stopped

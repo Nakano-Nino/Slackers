@@ -1,28 +1,6 @@
 services:
   # ==============================================================================
-  # 1. Relational Database: PostgreSQL 16
-  # ==============================================================================
-  postgres:
-    image: postgres:16-alpine
-    container_name: slackers_postgres_prod
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-axial}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-slackers_secret_2026}
-      POSTGRES_DB: ${POSTGRES_DB:-slackers}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-axial} || exit 1"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-      start_period: 20s
-    networks:
-      - slackers_network
-
-  # ==============================================================================
-  # 2. Audit & Security Log Store: MongoDB
+  # 1. Audit & Security Log Store: MongoDB
   # ==============================================================================
   mongodb:
     image: mongo:latest
@@ -123,8 +101,6 @@ services:
       CLIENT_URL: ${APP_URL}
       SEED_DB: ${SEED_DB:-false}
     depends_on:
-      postgres:
-        condition: service_healthy
       mongodb:
         condition: service_healthy
       redis:
@@ -175,7 +151,6 @@ services:
       - slackers_network
 
 volumes:
-  postgres_data:
   mongo_data:
   redis_data:
   minio_data:

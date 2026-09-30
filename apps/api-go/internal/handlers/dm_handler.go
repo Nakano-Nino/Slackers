@@ -13,12 +13,17 @@ import (
 )
 
 type DmHandler struct {
-	DB     *db.Database
-	Config *config.Config
+	DB          *db.Database
+	Config      *config.Config
+	Broadcaster Broadcaster
 }
 
 func NewDmHandler(db *db.Database, cfg *config.Config) *DmHandler {
 	return &DmHandler{DB: db, Config: cfg}
+}
+
+func (h *DmHandler) SetBroadcaster(b Broadcaster) {
+	h.Broadcaster = b
 }
 
 func (h *DmHandler) ListDms(w http.ResponseWriter, r *http.Request) {
@@ -164,6 +169,10 @@ func (h *DmHandler) SendDm(w http.ResponseWriter, r *http.Request) {
 		SenderCopy: req.SenderCopy,
 		IsRead:     false,
 		CreatedAt:  now,
+	}
+
+	if h.Broadcaster != nil {
+		h.Broadcaster.BroadcastNewDM(claims.ID, req.ReceiverID, dm)
 	}
 
 	writeJSON(w, http.StatusCreated, APIResponse{

@@ -16,12 +16,17 @@ import (
 )
 
 type TaskHandler struct {
-	DB     *db.Database
-	Config *config.Config
+	DB          *db.Database
+	Config      *config.Config
+	Broadcaster Broadcaster
 }
 
 func NewTaskHandler(db *db.Database, cfg *config.Config) *TaskHandler {
 	return &TaskHandler{DB: db, Config: cfg}
+}
+
+func (h *TaskHandler) SetBroadcaster(b Broadcaster) {
+	h.Broadcaster = b
 }
 
 func (h *TaskHandler) ListTasks(w http.ResponseWriter, r *http.Request) {
@@ -178,6 +183,10 @@ func (h *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 		UpdatedAt:   now,
 	}
 
+	if h.Broadcaster != nil {
+		h.Broadcaster.BroadcastTaskCreated(task.ProjectID, task)
+	}
+
 	writeJSON(w, http.StatusCreated, APIResponse{
 		Success:   true,
 		Data:      task,
@@ -249,8 +258,9 @@ func (h *TaskHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 		argIdx++
 	}
 
-	query := fmt.Sprintf(`UPDATE public.tasks SET %s WHERE id = $1`, strings.Join(updates, ", "))
-	_, err := h.DB.Pool.Exec(ctx, query, args...)
+	query := fmt.Sprintf(`UPDATE public.tasks SET %s WHERE id = $1 RETURNING "projectId"`, strings.Join(updates, ", "))
+	var projectID string
+	err := h.DB.Pool.QueryRow(ctx, query, args...).Scan(&projectID)
 	if err != nil {
 		writeJSON(w, http.StatusInternalServerError, APIResponse{
 			Success:   false,
@@ -258,6 +268,14 @@ func (h *TaskHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 			Timestamp: time.Now().UTC().Format(time.RFC3339),
 		})
 		return
+	}
+
+	if h.Broadcaster != nil && projectID != "" {
+		h.Broadcaster.BroadcastTaskUpdated(projectID, map[string]interface{}{
+			"id":        taskID,
+			"projectId": projectID,
+			"updatedAt": now,
+		})
 	}
 
 	writeJSON(w, http.StatusOK, APIResponse{
@@ -271,6 +289,9 @@ func (h *TaskHandler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 	taskID := chi.URLParam(r, "id")
 	ctx := r.Context()
 
+	var projectID string
+	_ = h.DB.Pool.QueryRow(ctx, `SELECT "projectId" FROM public.tasks WHERE id = $1`, taskID).Scan(&projectID)
+
 	_, err := h.DB.Pool.Exec(ctx, `DELETE FROM public.tasks WHERE id = $1`, taskID)
 	if err != nil {
 		writeJSON(w, http.StatusInternalServerError, APIResponse{
@@ -279,6 +300,10 @@ func (h *TaskHandler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 			Timestamp: time.Now().UTC().Format(time.RFC3339),
 		})
 		return
+	}
+
+	if h.Broadcaster != nil && projectID != "" {
+		h.Broadcaster.BroadcastTaskDeleted(projectID, taskID)
 	}
 
 	writeJSON(w, http.StatusOK, APIResponse{

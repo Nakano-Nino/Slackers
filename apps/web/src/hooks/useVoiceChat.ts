@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Socket } from 'socket.io-client';
+import { Socket } from '../lib/socket';
 import { User, VoiceParticipant, DmCallStatus } from '../types';
 import {
   startRingSound,

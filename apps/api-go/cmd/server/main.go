@@ -16,6 +16,7 @@ import (
 	"github.com/Nakano-Nino/slackers-api-go/internal/db"
 	"github.com/Nakano-Nino/slackers-api-go/internal/handlers"
 	"github.com/Nakano-Nino/slackers-api-go/internal/middleware"
+	"github.com/Nakano-Nino/slackers-api-go/internal/ws"
 )
 
 func main() {
@@ -30,14 +31,22 @@ func main() {
 	}
 	defer database.Close()
 
+	// Initialize Real-time WebSocket Hub
+	hub := ws.NewHub(database, cfg.RedisURL)
+	go hub.Run()
+	wsHandler := ws.NewWSHandler(hub, database, cfg)
+
 	// Initialize Handlers
 	authHandler := handlers.NewAuthHandler(database, cfg)
 	channelHandler := handlers.NewChannelHandler(database, cfg)
 	projectHandler := handlers.NewProjectHandler(database, cfg)
 	taskHandler := handlers.NewTaskHandler(database, cfg)
+	taskHandler.SetBroadcaster(hub)
 	bugHandler := handlers.NewBugHandler(database, cfg)
 	messageHandler := handlers.NewMessageHandler(database, cfg)
+	messageHandler.SetBroadcaster(hub)
 	dmHandler := handlers.NewDmHandler(database, cfg)
+	dmHandler.SetBroadcaster(hub)
 	memberHandler := handlers.NewMemberHandler(database, cfg)
 	notificationHandler := handlers.NewNotificationHandler(database, cfg)
 
@@ -71,6 +80,9 @@ func main() {
 			"timestamp": time.Now().UTC().Format(time.RFC3339),
 		})
 	})
+
+	// Pure WebSocket Endpoint (WebRTC Signaling, Real-time Chat, Presence)
+	r.Get("/ws", wsHandler.ServeWS)
 
 	// Public Auth Routes
 	r.Route("/api/auth", func(r chi.Router) {

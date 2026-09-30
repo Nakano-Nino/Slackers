@@ -16,12 +16,17 @@ import (
 )
 
 type MessageHandler struct {
-	DB     *db.Database
-	Config *config.Config
+	DB          *db.Database
+	Config      *config.Config
+	Broadcaster Broadcaster
 }
 
 func NewMessageHandler(db *db.Database, cfg *config.Config) *MessageHandler {
 	return &MessageHandler{DB: db, Config: cfg}
+}
+
+func (h *MessageHandler) SetBroadcaster(b Broadcaster) {
+	h.Broadcaster = b
 }
 
 func (h *MessageHandler) ListMessages(w http.ResponseWriter, r *http.Request) {
@@ -184,6 +189,17 @@ func (h *MessageHandler) CreateMessage(w http.ResponseWriter, r *http.Request) {
 		CreatedAt:  now,
 	}
 
+	if h.Broadcaster != nil {
+		if req.ParentID != nil && *req.ParentID != "" {
+			h.Broadcaster.BroadcastThreadReply(req.ChannelID, *req.ParentID, msg, map[string]interface{}{
+				"replyCount":  1,
+				"lastReplyAt": now.Format(time.RFC3339),
+			})
+		} else {
+			h.Broadcaster.BroadcastNewMessage(req.ChannelID, msg)
+		}
+	}
+
 	writeJSON(w, http.StatusCreated, APIResponse{
 		Success:   true,
 		Data:      msg,
@@ -207,7 +223,8 @@ func (h *MessageHandler) DeleteMessage(w http.ResponseWriter, r *http.Request) {
 
 	// Admins can delete any message; members can delete their own
 	var ownerID string
-	err := h.DB.Pool.QueryRow(ctx, `SELECT "userId" FROM public.messages WHERE id = $1`, msgID).Scan(&ownerID)
+	var channelID string
+	err := h.DB.Pool.QueryRow(ctx, `SELECT "userId", "channelId" FROM public.messages WHERE id = $1`, msgID).Scan(&ownerID, &channelID)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			writeJSON(w, http.StatusNotFound, APIResponse{
@@ -242,6 +259,10 @@ func (h *MessageHandler) DeleteMessage(w http.ResponseWriter, r *http.Request) {
 			Timestamp: time.Now().UTC().Format(time.RFC3339),
 		})
 		return
+	}
+
+	if h.Broadcaster != nil && channelID != "" {
+		h.Broadcaster.BroadcastMessageDeleted(channelID, msgID)
 	}
 
 	writeJSON(w, http.StatusOK, APIResponse{

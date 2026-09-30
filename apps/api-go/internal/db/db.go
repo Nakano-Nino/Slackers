@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -31,6 +32,8 @@ func Connect(connStr string) (*Database, error) {
 		config.ConnConfig.RuntimeParams = make(map[string]string)
 	}
 	config.ConnConfig.RuntimeParams["search_path"] = "public"
+	// Use simple protocol to avoid prepared statement name collisions
+	config.ConnConfig.DefaultQueryExecMode = pgx.QueryExecModeSimpleProtocol
 
 	pool, err := pgxpool.NewWithConfig(ctx, config)
 	if err != nil {

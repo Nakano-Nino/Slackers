@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type UserRole string
 
@@ -58,20 +61,105 @@ type Project struct {
 	UpdatedAt   time.Time `json:"updatedAt"`
 }
 
+type Task struct {
+	ID          string          `json:"id"`
+	ProjectID   string          `json:"projectId"`
+	Title       string          `json:"title"`
+	Description string          `json:"description"`
+	Status      string          `json:"status"`
+	Priority    string          `json:"priority"`
+	StoryPoints int             `json:"storyPoints"`
+	Tags        []string        `json:"tags"`
+	DueDate     *time.Time      `json:"dueDate,omitempty"`
+	AssigneeID  *string         `json:"assigneeId,omitempty"`
+	CreatorID   string          `json:"creatorId"`
+	QASteps     json.RawMessage `json:"qaSteps,omitempty"`
+	QAVerdict   *string         `json:"qaVerdict,omitempty"`
+	Subtasks    json.RawMessage `json:"subtasks,omitempty"`
+	Attachments json.RawMessage `json:"attachments,omitempty"`
+	CreatedAt   time.Time       `json:"createdAt"`
+	UpdatedAt   time.Time       `json:"updatedAt"`
+}
+
+type Bug struct {
+	ID                 string     `json:"id"`
+	ProjectID          string     `json:"projectId"`
+	Title              string     `json:"title"`
+	Description        string     `json:"description"`
+	Severity           string     `json:"severity"`
+	Status             string     `json:"status"`
+	Environment        string     `json:"environment"`
+	ReproductionSteps  string     `json:"reproductionSteps"`
+	ExpectedBehavior   string     `json:"expectedBehavior"`
+	ActualBehavior     string     `json:"actualBehavior"`
+	ReportedByID       string     `json:"reportedById"`
+	AssignedToID       *string    `json:"assignedToId,omitempty"`
+	TaskID             *string    `json:"taskId,omitempty"`
+	CreatedAt          time.Time  `json:"createdAt"`
+	UpdatedAt          time.Time  `json:"updatedAt"`
+}
+
 type Message struct {
-	ID         string     `json:"id"`
-	ChannelID  string     `json:"channelId"`
-	UserID     string     `json:"userId"`
-	UserName   string     `json:"userName"`
-	UserAvatar string     `json:"userAvatar"`
-	Content    string     `json:"content"`
-	Encrypted  bool       `json:"encrypted"`
-	IV         *string    `json:"iv,omitempty"`
-	KeyVersion *int       `json:"keyVersion,omitempty"`
-	ParentID   *string    `json:"parentId,omitempty"`
-	ReplyCount int        `json:"replyCount"`
-	CreatedAt  time.Time  `json:"createdAt"`
-	UpdatedAt  time.Time  `json:"updatedAt"`
+	ID          string          `json:"id"`
+	ChannelID   string          `json:"channelId"`
+	UserID      string          `json:"userId"`
+	UserName    string          `json:"userName,omitempty"`
+	UserAvatar  string          `json:"userAvatar,omitempty"`
+	Content     string          `json:"content"`
+	Ciphertext  *string         `json:"ciphertext,omitempty"`
+	IV          *string         `json:"iv,omitempty"`
+	TaskID      *string         `json:"taskId,omitempty"`
+	BugID       *string         `json:"bugId,omitempty"`
+	ParentID    *string         `json:"parentId,omitempty"`
+	ReplyCount  int             `json:"replyCount"`
+	LastReplyAt *time.Time      `json:"lastReplyAt,omitempty"`
+	IsEdited    bool            `json:"isEdited"`
+	IsDeleted   bool            `json:"isDeleted"`
+	EditedAt    *time.Time      `json:"editedAt,omitempty"`
+	Reactions   json.RawMessage `json:"reactions,omitempty"`
+	CreatedAt   time.Time       `json:"createdAt"`
+	ExpiresAt   *time.Time      `json:"expiresAt,omitempty"`
+}
+
+type DirectMessage struct {
+	ID         string          `json:"id"`
+	SenderID   string          `json:"senderId"`
+	ReceiverID string          `json:"receiverId"`
+	Ciphertext *string         `json:"ciphertext,omitempty"`
+	IV         *string         `json:"iv,omitempty"`
+	SenderCopy *string         `json:"senderCopy,omitempty"`
+	IsRead     bool            `json:"isRead"`
+	ReadAt     *time.Time      `json:"readAt,omitempty"`
+	IsEdited   bool            `json:"isEdited"`
+	IsDeleted  bool            `json:"isDeleted"`
+	EditedAt   *time.Time      `json:"editedAt,omitempty"`
+	Reactions  json.RawMessage `json:"reactions,omitempty"`
+	CreatedAt  time.Time       `json:"createdAt"`
+	ExpiresAt  *time.Time      `json:"expiresAt,omitempty"`
+}
+
+type Notification struct {
+	ID           string          `json:"id"`
+	RecipientID  string          `json:"recipientId"`
+	SenderID     *string         `json:"senderId,omitempty"`
+	SenderName   *string         `json:"senderName,omitempty"`
+	SenderAvatar *string         `json:"senderAvatar,omitempty"`
+	Type         string          `json:"type"`
+	Title        string          `json:"title"`
+	Content      string          `json:"content"`
+	Link         json.RawMessage `json:"link,omitempty"`
+	IsRead       bool            `json:"isRead"`
+	CreatedAt    time.Time       `json:"createdAt"`
+}
+
+type TaskComment struct {
+	ID        string    `json:"id"`
+	TaskID    string    `json:"taskId"`
+	UserID    string    `json:"userId"`
+	UserName  string    `json:"userName,omitempty"`
+	Content   string    `json:"content"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 type LoginRequest struct {

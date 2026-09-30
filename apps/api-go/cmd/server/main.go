@@ -32,6 +32,14 @@ func main() {
 
 	// Initialize Handlers
 	authHandler := handlers.NewAuthHandler(database, cfg)
+	channelHandler := handlers.NewChannelHandler(database, cfg)
+	projectHandler := handlers.NewProjectHandler(database, cfg)
+	taskHandler := handlers.NewTaskHandler(database, cfg)
+	bugHandler := handlers.NewBugHandler(database, cfg)
+	messageHandler := handlers.NewMessageHandler(database, cfg)
+	dmHandler := handlers.NewDmHandler(database, cfg)
+	memberHandler := handlers.NewMemberHandler(database, cfg)
+	notificationHandler := handlers.NewNotificationHandler(database, cfg)
 
 	// Setup Chi Router
 	r := chi.NewRouter()
@@ -74,6 +82,71 @@ func main() {
 			r.Use(middleware.AuthMiddleware(cfg.JWTSecret))
 			r.Get("/me", authHandler.GetMe)
 			r.Post("/logout", authHandler.Logout)
+		})
+	})
+
+	// Protected Workspace API Routes
+	r.Group(func(r chi.Router) {
+		r.Use(middleware.AuthMiddleware(cfg.JWTSecret))
+
+		// Channels
+		r.Route("/api/channels", func(r chi.Router) {
+			r.Get("/", channelHandler.ListChannels)
+			r.Post("/", channelHandler.CreateChannel)
+			r.Get("/{id}", channelHandler.GetChannel)
+			r.Delete("/{id}", channelHandler.DeleteChannel)
+		})
+
+		// Projects
+		r.Route("/api/projects", func(r chi.Router) {
+			r.Get("/", projectHandler.ListProjects)
+			r.Post("/", projectHandler.CreateProject)
+			r.Get("/{id}", projectHandler.GetProject)
+			r.Get("/{id}/stats", projectHandler.GetProjectStats)
+		})
+
+		// Tasks
+		r.Route("/api/tasks", func(r chi.Router) {
+			r.Get("/", taskHandler.ListTasks)
+			r.Post("/", taskHandler.CreateTask)
+			r.Put("/{id}", taskHandler.UpdateTask)
+			r.Delete("/{id}", taskHandler.DeleteTask)
+		})
+
+		// Bugs
+		r.Route("/api/bugs", func(r chi.Router) {
+			r.Get("/", bugHandler.ListBugs)
+			r.Post("/", bugHandler.CreateBug)
+			r.Put("/{id}", bugHandler.UpdateBug)
+			r.Delete("/{id}", bugHandler.DeleteBug)
+		})
+
+		// Channel Messages
+		r.Route("/api/messages", func(r chi.Router) {
+			r.Get("/", messageHandler.ListMessages)
+			r.Post("/", messageHandler.CreateMessage)
+			r.Delete("/{id}", messageHandler.DeleteMessage)
+		})
+
+		// Direct Messages
+		r.Route("/api/direct-messages", func(r chi.Router) {
+			r.Get("/", dmHandler.ListDms)
+			r.Post("/", dmHandler.SendDm)
+		})
+		r.Route("/api/dm", func(r chi.Router) {
+			r.Get("/", dmHandler.ListDms)
+			r.Post("/", dmHandler.SendDm)
+		})
+
+		// Workspace Members
+		r.Get("/api/members", memberHandler.ListMembers)
+		r.Get("/api/users", memberHandler.ListMembers)
+
+		// Notifications
+		r.Route("/api/notifications", func(r chi.Router) {
+			r.Get("/", notificationHandler.ListNotifications)
+			r.Put("/{id}/read", notificationHandler.MarkRead)
+			r.Put("/read-all", notificationHandler.MarkAllRead)
 		})
 	})
 

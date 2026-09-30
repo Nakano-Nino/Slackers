@@ -784,5 +784,65 @@
     "seen": 1790740173.44687,
     "ast_hash": "28c96f5188fc135aa0b520e08ea5ae1d",
     "semantic_hash": ""
+  },
+  "apps/api-go/cmd/server/main.go": {
+    "mtime": 1790741029.042428,
+    "seen": 1790741851.606431,
+    "ast_hash": "a36ad6509e07ba8939eecebb93ad4d6a",
+    "semantic_hash": ""
+  },
+  "apps/api-go/go.mod": {
+    "mtime": 1790741005.498106,
+    "seen": 1790741851.606435,
+    "ast_hash": "5bf0ae1afe0ec0810f2f5b682eed1cd8",
+    "semantic_hash": ""
+  },
+  "apps/api-go/internal/auth/jwt.go": {
+    "mtime": 1790740838.052726,
+    "seen": 1790741851.606436,
+    "ast_hash": "7eca0419731bfe8b6204a93f0362d6b1",
+    "semantic_hash": ""
+  },
+  "apps/api-go/internal/auth/password.go": {
+    "mtime": 1790740845.224649,
+    "seen": 1790741851.6064372,
+    "ast_hash": "e41eddc90318e005f16b11aa6bacf7be",
+    "semantic_hash": ""
+  },
+  "apps/api-go/internal/config/config.go": {
+    "mtime": 1790740800.9285,
+    "seen": 1790741851.606438,
+    "ast_hash": "120db3edba156f1d59477f0c437900d4",
+    "semantic_hash": ""
+  },
+  "apps/api-go/internal/db/db.go": {
+    "mtime": 1790741197.3939245,
+    "seen": 1790741851.6064389,
+    "ast_hash": "75f28463b147f40d1de1767ff1d714eb",
+    "semantic_hash": ""
+  },
+  "apps/api-go/internal/handlers/auth_handler.go": {
+    "mtime": 1790741536.0355368,
+    "seen": 1790741851.6064398,
+    "ast_hash": "d9a4ca9cb126c0127cfff6ecadc52486",
+    "semantic_hash": ""
+  },
+  "apps/api-go/internal/middleware/auth.go": {
+    "mtime": 1790740851.5830097,
+    "seen": 1790741851.606441,
+    "ast_hash": "045a55759a66d2d5c68520dc78c18a67",
+    "semantic_hash": ""
+  },
+  "apps/api-go/internal/middleware/cors.go": {
+    "mtime": 1790740855.1796587,
+    "seen": 1790741851.606441,
+    "ast_hash": "53efb4eb844e9d2052cc0eca8436dd48",
+    "semantic_hash": ""
+  },
+  "apps/api-go/internal/models/models.go": {
+    "mtime": 1790740814.6480942,
+    "seen": 1790741851.606442,
+    "ast_hash": "4caffaf9fe7ebb2ceb24b14f9755c7fb",
+    "semantic_hash": ""
   }
 }

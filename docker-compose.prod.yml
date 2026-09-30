@@ -42,7 +42,7 @@ services:
   # 4. S3 Object Storage: MinIO
   # ==============================================================================
   minio:
-    image: quay.io/minio/minio:latest
+    image: cgr.dev/chainguard/minio:latest
     container_name: slackers_minio_prod
     restart: unless-stopped
     command: server /data --console-address ":9001"
@@ -51,23 +51,20 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     volumes:
       - minio_data:/data
-    healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     networks:
       - slackers_network
 
   # Helper container: Ensure default encrypted storage bucket exists
   minio-init:
-    image: quay.io/minio/mc:latest
+    build:
+      context: .
+      dockerfile: docker/minio-init/Dockerfile
     container_name: slackers_minio_init
     depends_on:
       - minio
     entrypoint: >
       /bin/sh -c "
-      sleep 3;
+      sleep 4;
       /usr/bin/mc alias set myminio http://minio:9000 $${MINIO_ROOT_USER:-minioadmin} $${MINIO_ROOT_PASSWORD};
       /usr/bin/mc mb --ignore-existing myminio/$${S3_BUCKET_NAME:-slackers-encrypted-files};
       /usr/bin/mc anonymous set download myminio/$${S3_BUCKET_NAME:-slackers-encrypted-files};

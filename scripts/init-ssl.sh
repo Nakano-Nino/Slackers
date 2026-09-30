@@ -28,7 +28,7 @@ fi
 echo -e "${CYAN}🔐 Requesting Let's Encrypt SSL certificate for: ${DOMAIN}...${NC}"
 
 # Ensure containers are running
-docker compose -f docker-compose.prod.yml up -d nginx
+docker-compose -f docker-compose.prod.yml up -d nginx 2>/dev/null || docker compose -f docker-compose.prod.yml up -d nginx
 
 # Run certbot standalone webroot client
 docker run --rm \
@@ -55,13 +55,13 @@ fi
 # Reload Nginx configuration
 docker exec slackers_nginx_prod nginx -s reload
 
-# Update APP_URL in .env.production
-if [ -f ".env.production" ]; then
-    sed -i.bak "s|APP_URL=.*|APP_URL=https://${DOMAIN}|g" .env.production
-    rm -f .env.production.bak
-    echo -e "${GREEN}✓ Updated APP_URL=https://${DOMAIN} in .env.production.${NC}"
+# Update APP_URL in .env
+if [ -f ".env" ]; then
+    sed -i.bak "s|APP_URL=.*|APP_URL=https://${DOMAIN}|g" .env
+    rm -f .env.bak
+    echo -e "${GREEN}✓ Updated APP_URL=https://${DOMAIN} in .env.${NC}"
     echo -e "${YELLOW}Restarting API and Web to update CORS origin...${NC}"
-    docker compose -f docker-compose.prod.yml up -d api web
+    docker-compose -f docker-compose.prod.yml up -d api web 2>/dev/null || docker compose -f docker-compose.prod.yml up -d api web
 fi
 
 echo -e "\n${GREEN}🎉 HTTPS is now active at: ${CYAN}https://${DOMAIN}${NC}!\n"

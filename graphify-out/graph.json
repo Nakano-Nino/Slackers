@@ -14144,7 +14144,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/web/src/components/Sidebar.tsx",
-      "source_location": "L98",
+      "source_location": "L457",
       "weight": 1.0
     },
     {
@@ -40052,5 +40052,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "26bafcc235e07d9ab241be47680e9c4943063e3f"
+  "built_at_commit": "9c953938d83d453912f8decd8a9d2d63f55681e8"
 }

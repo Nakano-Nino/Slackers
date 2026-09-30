@@ -95,7 +95,6 @@ export function Sidebar({
   const [searchQuery, setSearchQuery] = useState('');
   const [projectSearchQuery, setProjectSearchQuery] = useState('');
   const [isProjectSearchOpen, setIsProjectSearchOpen] = useState(false);
-  const roleInfo = getUserRoleBadge(currentUser);
   const canCreateChannel = currentUser?.role === 'admin' || currentUser?.role === 'manager';
   const canManageMembers = currentUser?.role === 'admin' || currentUser?.role === 'manager';
   const totalDmUnread = Object.values(unreadDms || {}).reduce((sum, count) => sum + count, 0);
@@ -558,15 +557,12 @@ export function Sidebar({
               <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-neutral-950" />
             </div>
             <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
-                <p className="text-xs font-semibold text-neutral-200 truncate">
-                  {currentUser.name.split(' ')[0]}
-                </p>
-                <span className={`text-[9px] font-bold uppercase px-1.5 py-0.2 rounded border ${roleInfo.class}`}>
-                  {roleInfo.label}
-                </span>
-              </div>
-              <p className="text-[10px] text-neutral-500 truncate">{currentUser.email}</p>
+              <p className="text-xs font-semibold text-neutral-200 truncate" title={currentUser.name}>
+                {currentUser.name}
+              </p>
+              <p className="text-[10px] text-neutral-500 truncate" title={currentUser.email}>
+                {currentUser.email}
+              </p>
             </div>
           </div>
 

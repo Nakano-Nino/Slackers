@@ -169,7 +169,7 @@ export function BugTracker({
           <select
             value={selectedProjectId}
             onChange={(e) => onSelectProject(e.target.value)}
-            className="bg-neutral-950 border border-neutral-800 rounded-lg px-2.5 py-1 text-xs text-neutral-300 focus:outline-none"
+            className="bg-neutral-950 border border-neutral-800 rounded-lg px-2.5 py-1 text-xs text-neutral-300 focus:outline-none cursor-pointer transition"
           >
             {projects.map((p) => (
               <option key={p.id} value={p.id}>
@@ -182,20 +182,20 @@ export function BugTracker({
           <select
             value={severityFilter}
             onChange={(e) => setSeverityFilter(e.target.value)}
-            className="bg-neutral-950 border border-neutral-800 rounded-lg px-2.5 py-1 text-xs text-neutral-300 focus:outline-none"
+            className="bg-neutral-950 border border-neutral-800 rounded-lg px-2.5 py-1 text-xs text-neutral-300 focus:outline-none cursor-pointer transition"
           >
             <option value="all">All Severities</option>
-            <option value="critical">🔴 Critical</option>
-            <option value="major">🟠 Major</option>
-            <option value="minor">🟡 Minor</option>
-            <option value="cosmetic">🔵 Cosmetic</option>
+            <option value="critical">Critical</option>
+            <option value="major">Major</option>
+            <option value="minor">Minor</option>
+            <option value="cosmetic">Cosmetic</option>
           </select>
 
           {/* Status filter */}
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-neutral-950 border border-neutral-800 rounded-lg px-2.5 py-1 text-xs text-neutral-300 focus:outline-none"
+            className="bg-neutral-950 border border-neutral-800 rounded-lg px-2.5 py-1 text-xs text-neutral-300 focus:outline-none cursor-pointer transition"
           >
             <option value="all">All Statuses</option>
             <option value="open">Open</option>
@@ -207,7 +207,7 @@ export function BugTracker({
 
           <button
             onClick={onOpenReportBug}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold rounded-lg shadow-sm transition ml-1"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold rounded-lg shadow-sm transition-all duration-150 cursor-pointer active:scale-95 ml-1"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Report Bug</span>

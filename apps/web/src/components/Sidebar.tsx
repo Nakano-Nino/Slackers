@@ -136,7 +136,7 @@ export function Sidebar({
         {/* Chat Button */}
         <button
           onClick={() => onSelectView('chat')}
-          className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition ${
+          className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold cursor-pointer transition-all duration-150 active:scale-[0.98] ${
             activeView === 'chat'
               ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
               : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900'
@@ -158,7 +158,7 @@ export function Sidebar({
         {/* Kanban Button */}
         <button
           onClick={() => onSelectView('kanban')}
-          className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition ${
+          className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold cursor-pointer transition-all duration-150 active:scale-[0.98] ${
             activeView === 'kanban'
               ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
               : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900'
@@ -180,7 +180,7 @@ export function Sidebar({
         {/* Bug Tracker Button */}
         <button
           onClick={() => onSelectView('bugs')}
-          className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition ${
+          className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold cursor-pointer transition-all duration-150 active:scale-[0.98] ${
             activeView === 'bugs'
               ? 'bg-rose-600 text-white shadow-md shadow-rose-600/20'
               : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900'

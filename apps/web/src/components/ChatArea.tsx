@@ -1616,21 +1616,23 @@ export function ChatArea({
                   >
                   {/* Floating Action Bar */}
                   {!dm.isDeleted && (
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute right-3 -top-2.5 z-10 flex items-center gap-0.5 bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 rounded-lg shadow-md px-1 py-0.5">
+                    <div className="opacity-0 group-hover:opacity-100 transition-all duration-150 absolute right-3 -top-3 z-10 flex items-center gap-0.5 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md border border-slate-200 dark:border-neutral-700/80 rounded-xl shadow-lg shadow-black/5 dark:shadow-black/20 px-1.5 py-0.5 scale-95 group-hover:scale-100">
                       {['👍', '❤️', '🚀', '🎉', '👀'].map((emoji) => (
                         <button
                           key={emoji}
                           onClick={() => onToggleReaction?.(dm.id, emoji, true)}
-                          className="text-xs hover:scale-125 transition-transform p-1 rounded hover:bg-slate-100 dark:hover:bg-neutral-800"
+                          className="text-xs hover:scale-125 transition-transform p-1 rounded-md hover:bg-slate-100 dark:hover:bg-neutral-800 cursor-pointer"
                           title={`React with ${emoji}`}
                         >
                           {emoji}
                         </button>
                       ))}
 
+                      <div className="w-px h-3.5 bg-slate-200 dark:bg-neutral-700 mx-0.5" />
+
                       <button
                         onClick={() => onOpenThread?.(dm, decryptedText)}
-                        className="p-1 text-slate-500 hover:text-indigo-500 dark:hover:text-indigo-400 rounded hover:bg-slate-100 dark:hover:bg-neutral-800 transition"
+                        className="p-1 text-slate-500 hover:text-indigo-500 dark:hover:text-indigo-400 rounded-md hover:bg-slate-100 dark:hover:bg-neutral-800 transition cursor-pointer"
                         title="Reply in thread"
                       >
                         <MessageSquare className="w-3.5 h-3.5" />
@@ -1639,7 +1641,7 @@ export function ChatArea({
                       {isMe && (
                         <button
                           onClick={() => handleStartEdit(dm.id, decryptedText, true)}
-                          className="p-1 text-slate-500 hover:text-amber-500 rounded hover:bg-slate-100 dark:hover:bg-neutral-800 transition"
+                          className="p-1 text-slate-500 hover:text-amber-500 rounded-md hover:bg-slate-100 dark:hover:bg-neutral-800 transition cursor-pointer"
                           title="Edit message"
                         >
                           <Pencil className="w-3.5 h-3.5" />
@@ -1648,7 +1650,7 @@ export function ChatArea({
                       {(isMe || currentUser?.role === 'admin') && (
                         <button
                           onClick={() => handleDelete(dm.id, true)}
-                          className="p-1 text-slate-500 hover:text-rose-500 rounded hover:bg-slate-100 dark:hover:bg-neutral-800 transition"
+                          className="p-1 text-slate-500 hover:text-rose-500 rounded-md hover:bg-slate-100 dark:hover:bg-neutral-800 transition cursor-pointer"
                           title="Delete message"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -1848,21 +1850,23 @@ export function ChatArea({
                   >
                   {/* Floating Action Bar */}
                   {!msg.isDeleted && (
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute right-3 -top-2.5 z-10 flex items-center gap-0.5 bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 rounded-lg shadow-md px-1 py-0.5">
+                    <div className="opacity-0 group-hover:opacity-100 transition-all duration-150 absolute right-3 -top-3 z-10 flex items-center gap-0.5 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md border border-slate-200 dark:border-neutral-700/80 rounded-xl shadow-lg shadow-black/5 dark:shadow-black/20 px-1.5 py-0.5 scale-95 group-hover:scale-100">
                       {['👍', '❤️', '🚀', '🎉', '👀'].map((emoji) => (
                         <button
                           key={emoji}
                           onClick={() => onToggleReaction?.(msg.id, emoji, false)}
-                          className="text-xs hover:scale-125 transition-transform p-1 rounded hover:bg-slate-100 dark:hover:bg-neutral-800"
+                          className="text-xs hover:scale-125 transition-transform p-1 rounded-md hover:bg-slate-100 dark:hover:bg-neutral-800 cursor-pointer"
                           title={`React with ${emoji}`}
                         >
                           {emoji}
                         </button>
                       ))}
 
+                      <div className="w-px h-3.5 bg-slate-200 dark:bg-neutral-700 mx-0.5" />
+
                       <button
                         onClick={() => onOpenThread?.(msg, displayContent)}
-                        className="p-1 text-slate-500 hover:text-indigo-500 dark:hover:text-indigo-400 rounded hover:bg-slate-100 dark:hover:bg-neutral-800 transition"
+                        className="p-1 text-slate-500 hover:text-indigo-500 dark:hover:text-indigo-400 rounded-md hover:bg-slate-100 dark:hover:bg-neutral-800 transition cursor-pointer"
                         title="Reply in thread"
                       >
                         <MessageSquare className="w-3.5 h-3.5" />
@@ -1871,7 +1875,7 @@ export function ChatArea({
                       {isMe && (
                         <button
                           onClick={() => handleStartEdit(msg.id, displayContent, false)}
-                          className="p-1 text-slate-500 hover:text-amber-500 rounded hover:bg-slate-100 dark:hover:bg-neutral-800 transition"
+                          className="p-1 text-slate-500 hover:text-amber-500 rounded-md hover:bg-slate-100 dark:hover:bg-neutral-800 transition cursor-pointer"
                           title="Edit message"
                         >
                           <Pencil className="w-3.5 h-3.5" />
@@ -1880,7 +1884,7 @@ export function ChatArea({
                       {(isMe || currentUser?.role === 'admin') && (
                         <button
                           onClick={() => handleDelete(msg.id, false)}
-                          className="p-1 text-slate-500 hover:text-rose-500 rounded hover:bg-slate-100 dark:hover:bg-neutral-800 transition"
+                          className="p-1 text-slate-500 hover:text-rose-500 rounded-md hover:bg-slate-100 dark:hover:bg-neutral-800 transition cursor-pointer"
                           title="Delete message"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -2040,23 +2044,23 @@ export function ChatArea({
       )}
 
       {/* Message Input Bar */}
-      <div className="p-4 border-t border-slate-200 dark:border-neutral-800 bg-white/90 dark:bg-neutral-950/80">
+      <div className="p-4 border-t border-slate-200 dark:border-neutral-800/80 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-md">
         <form
           onSubmit={handleSubmit}
-          className="bg-slate-50 dark:bg-neutral-900 border border-slate-300 dark:border-neutral-800 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 rounded-xl p-2 transition shadow-sm dark:shadow-lg"
+          className="bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 focus-within:border-indigo-500/80 focus-within:ring-2 focus-within:ring-indigo-500/10 rounded-2xl p-2.5 transition-all shadow-xs dark:shadow-md"
         >
           {/* File Attachment Staging Preview */}
           {attachmentStaging && (
-            <div className="mb-2 p-2.5 bg-indigo-500/10 border border-indigo-500/20 rounded-lg flex items-center justify-between text-xs animate-in fade-in duration-150">
+            <div className="mb-2 p-2.5 bg-indigo-500/10 border border-indigo-500/20 rounded-xl flex items-center justify-between text-xs animate-in fade-in duration-150">
               <div className="flex items-center gap-2.5 min-w-0">
                 {attachmentStaging.previewUrl ? (
                   <img
                     src={attachmentStaging.previewUrl}
                     alt="Preview"
-                    className="w-10 h-10 rounded object-cover border border-indigo-500/30"
+                    className="w-10 h-10 rounded-lg object-cover border border-indigo-500/30"
                   />
                 ) : (
-                  <div className="w-9 h-9 rounded bg-indigo-500/20 text-indigo-500 flex items-center justify-center shrink-0">
+                  <div className="w-9 h-9 rounded-lg bg-indigo-500/20 text-indigo-500 flex items-center justify-center shrink-0">
                     <FileText className="w-5 h-5" />
                   </div>
                 )}
@@ -2072,7 +2076,7 @@ export function ChatArea({
               <button
                 type="button"
                 onClick={handleRemoveAttachment}
-                className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-neutral-200 rounded-md hover:bg-slate-200 dark:hover:bg-neutral-800 transition"
+                className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-neutral-200 rounded-lg hover:bg-slate-200 dark:hover:bg-neutral-800 transition cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -2089,7 +2093,7 @@ export function ChatArea({
                 : `Message #${channel?.name || 'channel'}`
             }
             rows={2}
-            className="w-full bg-transparent text-sm text-slate-900 dark:text-neutral-100 placeholder-slate-400 dark:placeholder-neutral-500 focus:outline-none resize-none px-2 py-1"
+            className="w-full bg-transparent text-sm text-slate-900 dark:text-neutral-100 placeholder-slate-400 dark:placeholder-neutral-500 focus:outline-none resize-none px-2 py-1 leading-relaxed"
           />
 
           <input
@@ -2100,23 +2104,23 @@ export function ChatArea({
             accept="image/*,.pdf,.txt,.doc,.docx,.zip,.tar,.gz,.json,.csv"
           />
 
-          <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-neutral-800/60 px-2">
+          <div className="flex items-center justify-between pt-2 border-t border-slate-200/80 dark:border-neutral-800/60 px-2">
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="p-1.5 text-slate-500 dark:text-neutral-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-200/60 dark:hover:bg-neutral-800 rounded-lg transition flex items-center gap-1 text-xs"
+                className="p-1.5 text-slate-500 dark:text-neutral-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-200/60 dark:hover:bg-neutral-800 rounded-lg transition flex items-center gap-1.5 text-xs font-medium cursor-pointer active:scale-95"
                 title="Attach file"
               >
                 <Paperclip className="w-4 h-4" />
-                <span className="text-[11px] font-medium hidden sm:inline">Attach</span>
+                <span className="text-[11px] hidden sm:inline">Attach</span>
               </button>
             </div>
 
             <button
               type="submit"
               disabled={sending || isEncrypting || (!content.trim() && !selectedFile)}
-              className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:hover:bg-indigo-600 disabled:opacity-40 text-white rounded-lg text-xs font-medium flex items-center gap-1.5 transition shadow-sm"
+              className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:hover:bg-indigo-600 disabled:opacity-40 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition shadow-sm cursor-pointer active:scale-95 disabled:cursor-not-allowed"
             >
               {isEncrypting || sending ? (
                 <>

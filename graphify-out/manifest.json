@@ -672,9 +672,9 @@
     "semantic_hash": ""
   },
   "docker-compose.prod.yml": {
-    "mtime": 1790739375.5662875,
-    "seen": 1790739490.851501,
-    "ast_hash": "31835eec0cf0dfa614470c7ccc91e41c",
+    "mtime": 1790748776.2440298,
+    "seen": 1790750013.6175349,
+    "ast_hash": "a5946656bf4ce48d0f88f7ff9022ea41",
     "semantic_hash": ""
   },
   "docs/DEPLOYMENT_UBUNTU.md": {
@@ -792,9 +792,9 @@
     "semantic_hash": ""
   },
   "apps/api-go/go.mod": {
-    "mtime": 1790743620.624869,
-    "seen": 1790744168.540242,
-    "ast_hash": "26792196c3ed64bf5f69d5c3403a92b0",
+    "mtime": 1790749251.5712361,
+    "seen": 1790750013.61741,
+    "ast_hash": "9b63afd869887dc4522e7f61ecdf5884",
     "semantic_hash": ""
   },
   "apps/api-go/internal/auth/jwt.go": {

@@ -15,6 +15,7 @@ apps/web/out
 # TypeScript & build artifacts
 dist
 apps/api/dist
+apps/api-go/bin
 build
 *.tsbuildinfo
 

@@ -9,6 +9,7 @@ import {
   User as UserType,
   UserRole,
 } from '../types';
+import { ProjectSearchDropdown } from './ProjectSearchDropdown';
 import {
   AlertOctagon,
   AlertTriangle,
@@ -166,17 +167,12 @@ export function BugTracker({
 
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Project selector */}
-          <select
-            value={selectedProjectId}
-            onChange={(e) => onSelectProject(e.target.value)}
-            className="bg-neutral-950 border border-neutral-800 rounded-lg px-2.5 py-1 text-xs text-neutral-300 focus:outline-none cursor-pointer transition"
-          >
-            {projects.map((p) => (
-              <option key={p.id} value={p.id}>
-                [{p.key}] {p.name}
-              </option>
-            ))}
-          </select>
+          <ProjectSearchDropdown
+            projects={projects}
+            selectedProjectId={selectedProjectId}
+            onSelectProject={onSelectProject}
+            size="sm"
+          />
 
           {/* Severity filter */}
           <select

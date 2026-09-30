@@ -19,6 +19,7 @@ import {
   BellOff,
   UserPlus,
   Volume2,
+  X,
 } from 'lucide-react';
 import { Channel, MuteTarget, Project, User, VoiceParticipant } from '../types';
 import { ThemeToggle } from './ThemeToggle';
@@ -92,14 +93,17 @@ export function Sidebar({
   voiceControlsProps,
 }: Props) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [projectSearchQuery, setProjectSearchQuery] = useState('');
+  const [isProjectSearchOpen, setIsProjectSearchOpen] = useState(false);
   const roleInfo = getUserRoleBadge(currentUser);
   const canCreateChannel = currentUser?.role === 'admin' || currentUser?.role === 'manager';
   const canManageMembers = currentUser?.role === 'admin' || currentUser?.role === 'manager';
   const totalDmUnread = Object.values(unreadDms || {}).reduce((sum, count) => sum + count, 0);
 
   const query = searchQuery.toLowerCase().trim();
+  const pQuery = projectSearchQuery.toLowerCase().trim() || query;
   const filteredProjects = projects.filter(
-    (p) => !query || p.name.toLowerCase().includes(query) || p.key.toLowerCase().includes(query)
+    (p) => !pQuery || p.name.toLowerCase().includes(pQuery) || p.key.toLowerCase().includes(pQuery)
   );
   const filteredChannels = channels.filter(
     (c) => !query || c.name.toLowerCase().includes(query)
@@ -239,41 +243,83 @@ export function Sidebar({
               <FolderKanban className="w-3.5 h-3.5 text-neutral-500" />
               Projects
             </span>
-            <span className="text-[10px] text-neutral-500 font-mono">
-              {filteredProjects.length}
-            </span>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setIsProjectSearchOpen((prev) => !prev)}
+                className={`p-1 rounded hover:bg-neutral-800 text-neutral-400 hover:text-white transition cursor-pointer ${
+                  isProjectSearchOpen || projectSearchQuery ? 'text-indigo-400 bg-neutral-800' : ''
+                }`}
+                title="Search / filter projects"
+              >
+                <Search className="w-3 h-3" />
+              </button>
+              <span className="text-[10px] text-neutral-500 font-mono">
+                {filteredProjects.length}
+              </span>
+            </div>
           </div>
 
-          <div className="space-y-0.5">
-            {filteredProjects.map((project) => {
-              const isActive = project.id === selectedProjectId;
-              return (
+          {/* Quick Inline Project Search */}
+          {(isProjectSearchOpen || projectSearchQuery) && (
+            <div className="relative mb-2 px-0.5 animate-in fade-in duration-150">
+              <Search className="w-3 h-3 text-neutral-500 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={projectSearchQuery}
+                onChange={(e) => setProjectSearchQuery(e.target.value)}
+                placeholder="Filter projects..."
+                className="w-full bg-neutral-900 border border-neutral-800 focus:border-indigo-500/80 rounded-lg pl-7 pr-6 py-1 text-[11px] text-neutral-200 placeholder-neutral-500 focus:outline-none transition"
+                autoFocus
+              />
+              {projectSearchQuery && (
                 <button
-                  key={project.id}
-                  onClick={() => {
-                    onSelectProject(project.id);
-                    if (activeView === 'chat') {
-                      onSelectView('kanban');
-                    }
-                  }}
-                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition group ${
-                    isActive
-                      ? 'bg-neutral-800/90 text-indigo-300 font-medium border border-neutral-700'
-                      : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900'
-                  }`}
+                  type="button"
+                  onClick={() => setProjectSearchQuery('')}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-200 cursor-pointer"
                 >
-                  <div className="flex items-center gap-2 truncate">
-                    <span className="font-mono text-[10px] px-1 py-0.2 bg-neutral-950 rounded text-neutral-400 border border-neutral-800">
-                      {project.key}
-                    </span>
-                    <span className="truncate">{project.name}</span>
-                  </div>
-                  {project.isPrivate && (
-                    <Lock className="w-3 h-3 text-amber-500/80 shrink-0" />
-                  )}
+                  <X className="w-3 h-3" />
                 </button>
-              );
-            })}
+              )}
+            </div>
+          )}
+
+          <div className="max-h-48 overflow-y-auto space-y-0.5 pr-0.5">
+            {filteredProjects.length === 0 ? (
+              <div className="py-2.5 text-center text-[11px] text-neutral-500">
+                No matching projects
+              </div>
+            ) : (
+              filteredProjects.map((project) => {
+                const isActive = project.id === selectedProjectId;
+                return (
+                  <button
+                    key={project.id}
+                    onClick={() => {
+                      onSelectProject(project.id);
+                      if (activeView === 'chat') {
+                        onSelectView('kanban');
+                      }
+                    }}
+                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition cursor-pointer group ${
+                      isActive
+                        ? 'bg-neutral-800/90 text-indigo-300 font-medium border border-neutral-700'
+                        : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 truncate">
+                      <span className="font-mono text-[10px] px-1 py-0.2 bg-neutral-950 rounded text-neutral-400 border border-neutral-800">
+                        {project.key}
+                      </span>
+                      <span className="truncate">{project.name}</span>
+                    </div>
+                    {project.isPrivate && (
+                      <Lock className="w-3 h-3 text-amber-500/80 shrink-0" />
+                    )}
+                  </button>
+                );
+              })
+            )}
           </div>
         </div>
 

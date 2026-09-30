@@ -1223,7 +1223,7 @@
       "file_type": "code",
       "norm_label": "safetymodalprops",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L2199"
+      "source_location": "L2203"
     },
     {
       "id": "apps_web_src_components_commandpalette_paletteitem",
@@ -4118,7 +4118,7 @@
       "file_type": "code",
       "norm_label": "safetynumbermatrix()",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L2154"
+      "source_location": "L2158"
     },
     {
       "id": "apps_web_src_components_chatarea_safetynumbermodal",
@@ -4130,7 +4130,7 @@
       "file_type": "code",
       "norm_label": "safetynumbermodal()",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L2215"
+      "source_location": "L2219"
     },
     {
       "id": "apps_web_src_components_taskdetailmodal_taskattachmentcard",
@@ -15428,7 +15428,7 @@
       "confidence_score": 1.0,
       "context": "field",
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L2202",
+      "source_location": "L2206",
       "weight": 1.0
     },
     {
@@ -33176,7 +33176,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L2154",
+      "source_location": "L2158",
       "weight": 1.0
     },
     {
@@ -33187,7 +33187,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L2199",
+      "source_location": "L2203",
       "weight": 1.0
     },
     {
@@ -33198,7 +33198,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/web/src/components/ChatArea.tsx",
-      "source_location": "L2215",
+      "source_location": "L2219",
       "weight": 1.0
     },
     {
@@ -39886,5 +39886,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "5a93f90e5628b951529ea0a7adf2313eaed7aa5c"
+  "built_at_commit": "f420af30979fd8b0f31bc088cb2ec2bd3d06d017"
 }

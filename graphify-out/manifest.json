@@ -240,9 +240,9 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/BugTracker.tsx": {
-    "mtime": 1790736121.7390857,
-    "seen": 1790736149.503065,
-    "ast_hash": "8a751f0bedae8bbfc723563b3776ecbf",
+    "mtime": 1790736824.2715874,
+    "seen": 1790737122.4143171,
+    "ast_hash": "d64f762ca3a8bfc1abd3bec8df0e42e0",
     "semantic_hash": ""
   },
   "apps/web/src/components/ChatArea.tsx": {
@@ -276,9 +276,9 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/ProjectProgressBar.tsx": {
-    "mtime": 1789622358.276088,
-    "seen": 1789622541.2877069,
-    "ast_hash": "b19ed239ab7a2009c8925963c86d6628",
+    "mtime": 1790736725.7081838,
+    "seen": 1790737122.4143271,
+    "ast_hash": "3ca2ddfa6ec7133059f022fd836fc52f",
     "semantic_hash": ""
   },
   "apps/web/src/components/ReportBugModal.tsx": {
@@ -288,9 +288,9 @@
     "semantic_hash": ""
   },
   "apps/web/src/components/Sidebar.tsx": {
-    "mtime": 1790735869.2552357,
-    "seen": 1790736149.503079,
-    "ast_hash": "0f4aa4f76fa01e5159d637308f0211dc",
+    "mtime": 1790736778.1077168,
+    "seen": 1790737122.414332,
+    "ast_hash": "90d3d853f7856a7c3ee18885718027a5",
     "semantic_hash": ""
   },
   "apps/web/src/components/TaskDetailModal.tsx": {
@@ -771,6 +771,12 @@
     "mtime": 1790581912.3182225,
     "seen": 1790582382.697473,
     "ast_hash": "48cf073ae7d7cd92037325f6f5637ac5",
+    "semantic_hash": ""
+  },
+  "apps/web/src/components/ProjectSearchDropdown.tsx": {
+    "mtime": 1790736707.3432035,
+    "seen": 1790737122.414329,
+    "ast_hash": "ca4e589e44651b0d225acaf1a58f19cb",
     "semantic_hash": ""
   }
 }

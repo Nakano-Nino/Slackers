@@ -11,6 +11,7 @@ import {
   ChevronDown,
   Users,
 } from 'lucide-react';
+import { ProjectSearchDropdown } from './ProjectSearchDropdown';
 
 interface Props {
   projects: Project[];
@@ -53,21 +54,12 @@ export function ProjectProgressBar({
         {/* Project Selector & Overview */}
         <div className="space-y-1.5">
           <div className="flex flex-wrap items-center gap-2">
-            {/* Project Switcher Dropdown */}
-            <div className="relative inline-block">
-              <select
-                value={activeProject?.id || ''}
-                onChange={(e) => onSelectProject(e.target.value)}
-                className="appearance-none bg-slate-50 dark:bg-neutral-950 border border-slate-300 dark:border-neutral-700 hover:border-indigo-500 rounded-lg pl-3 pr-8 py-1.5 text-sm font-bold text-slate-800 dark:text-neutral-100 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer shadow-sm"
-              >
-                {projects.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    [{p.key}] {p.name} {p.isPrivate ? '🔒' : ''}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="w-4 h-4 text-slate-400 dark:text-neutral-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-            </div>
+            {/* Searchable Project Switcher Dropdown */}
+            <ProjectSearchDropdown
+              projects={projects}
+              selectedProjectId={activeProject?.id || ''}
+              onSelectProject={onSelectProject}
+            />
 
             {/* Privacy Badge */}
             {activeProject?.isPrivate ? (

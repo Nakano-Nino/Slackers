@@ -184,12 +184,30 @@ export default function Home() {
 
     try {
       const [fetchedProjects, fetchedChannels, fetchedUsers, fetchedBugs, unreadCounts, fetchedMutes] = await Promise.all([
-        api.getProjects(),
-        api.getChannels(),
-        api.getUsers(),
-        api.getBugs(),
-        api.getDmUnreadCounts(),
-        api.getMutedTargets(),
+        api.getProjects().catch((err) => {
+          console.warn('Failed to load projects:', err);
+          return [];
+        }),
+        api.getChannels().catch((err) => {
+          console.warn('Failed to load channels:', err);
+          return [];
+        }),
+        api.getUsers().catch((err) => {
+          console.warn('Failed to load users:', err);
+          return [];
+        }),
+        api.getBugs().catch((err) => {
+          console.warn('Failed to load bugs:', err);
+          return [];
+        }),
+        api.getDmUnreadCounts().catch((err) => {
+          console.warn('Failed to load DM unread counts:', err);
+          return {};
+        }),
+        api.getMutedTargets().catch((err) => {
+          console.warn('Failed to load muted targets:', err);
+          return [];
+        }),
       ]);
 
       setProjects(fetchedProjects);

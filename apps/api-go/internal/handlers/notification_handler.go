@@ -120,3 +120,31 @@ func (h *NotificationHandler) MarkAllRead(w http.ResponseWriter, r *http.Request
 		Timestamp: time.Now().UTC().Format(time.RFC3339),
 	})
 }
+
+// GetMutedTargets handles GET /api/notifications/mutes
+func (h *NotificationHandler) GetMutedTargets(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, http.StatusOK, APIResponse{
+		Success:   true,
+		Data:      []interface{}{},
+		Timestamp: time.Now().UTC().Format(time.RFC3339),
+	})
+}
+
+// MuteTarget handles POST /api/notifications/mute
+func (h *NotificationHandler) MuteTarget(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, http.StatusOK, APIResponse{
+		Success:   true,
+		Data:      nil,
+		Timestamp: time.Now().UTC().Format(time.RFC3339),
+	})
+}
+
+// UnmuteTarget handles DELETE /api/notifications/mute/{targetType}/{targetId}
+func (h *NotificationHandler) UnmuteTarget(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, http.StatusOK, APIResponse{
+		Success:   true,
+		Data:      map[string]bool{"unmuted": true},
+		Timestamp: time.Now().UTC().Format(time.RFC3339),
+	})
+}
+

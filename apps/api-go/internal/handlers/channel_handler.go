@@ -57,6 +57,23 @@ func (h *ChannelHandler) ListChannels(w http.ResponseWriter, r *http.Request) {
 		channels = append(channels, c)
 	}
 
+	if len(channels) == 0 {
+		_, _ = h.DB.Pool.Exec(ctx, `
+			INSERT INTO public.channels (id, name, description, "isPrivate", "createdAt", "updatedAt")
+			VALUES ('general', 'general', 'Company-wide announcements and general discussion', false, NOW(), NOW())
+			ON CONFLICT (id) DO NOTHING;
+		`)
+		channels = append(channels, models.Channel{
+			ID:          "general",
+			Name:        "general",
+			Description: "Company-wide announcements and general discussion",
+			IsPrivate:   false,
+			MemberCount: 1,
+			CreatedAt:   time.Now().UTC(),
+			UpdatedAt:   time.Now().UTC(),
+		})
+	}
+
 	writeJSON(w, http.StatusOK, APIResponse{
 		Success:   true,
 		Data:      channels,

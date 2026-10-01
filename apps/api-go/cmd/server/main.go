@@ -144,14 +144,23 @@ func main() {
 			r.Delete("/{id}", messageHandler.DeleteMessage)
 		})
 
-		// Direct Messages
+		// Direct Messages & Key Vault
 		r.Route("/api/direct-messages", func(r chi.Router) {
 			r.Get("/", dmHandler.ListDms)
 			r.Post("/", dmHandler.SendDm)
+			r.Get("/unread-counts", dmHandler.GetUnreadCounts)
+			r.Get("/key-vault", dmHandler.GetKeyVault)
+			r.Post("/key-vault", dmHandler.SaveKeyVault)
+			r.Post("/public-key", dmHandler.RegisterPublicKey)
+			r.Get("/public-key/{userId}", dmHandler.GetUserPublicKey)
+			r.Get("/{partnerId}", dmHandler.ListDms)
+			r.Patch("/{partnerId}/read", dmHandler.MarkAsRead)
+			r.Delete("/{id}", dmHandler.DeleteDm)
 		})
 		r.Route("/api/dm", func(r chi.Router) {
 			r.Get("/", dmHandler.ListDms)
 			r.Post("/", dmHandler.SendDm)
+			r.Get("/{partnerId}", dmHandler.ListDms)
 		})
 
 		// Workspace Members & Invitations
@@ -166,11 +175,16 @@ func main() {
 		})
 		r.Get("/api/users", memberHandler.ListMembers)
 
-		// Notifications
+		// Notifications & Mutes
 		r.Route("/api/notifications", func(r chi.Router) {
 			r.Get("/", notificationHandler.ListNotifications)
 			r.Put("/{id}/read", notificationHandler.MarkRead)
+			r.Patch("/{id}/read", notificationHandler.MarkRead)
 			r.Put("/read-all", notificationHandler.MarkAllRead)
+			r.Patch("/read-all", notificationHandler.MarkAllRead)
+			r.Get("/mutes", notificationHandler.GetMutedTargets)
+			r.Post("/mute", notificationHandler.MuteTarget)
+			r.Delete("/mute/{targetType}/{targetId}", notificationHandler.UnmuteTarget)
 		})
 	})
 

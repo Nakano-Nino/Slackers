@@ -57,6 +57,25 @@ func (h *ProjectHandler) ListProjects(w http.ResponseWriter, r *http.Request) {
 		projects = append(projects, p)
 	}
 
+	if len(projects) == 0 {
+		_, _ = h.DB.Pool.Exec(ctx, `
+			INSERT INTO public.projects (id, name, key, description, "isPrivate", "ownerId", "memberIds", "createdAt", "updatedAt")
+			VALUES ('proj-core', 'Core Platform', 'CORE', 'Primary workspace engineering project', false, 'u-admin', '{}', NOW(), NOW())
+			ON CONFLICT (id) DO NOTHING;
+		`)
+		projects = append(projects, models.Project{
+			ID:          "proj-core",
+			Name:        "Core Platform",
+			Key:         "CORE",
+			Description: "Primary workspace engineering project",
+			IsPrivate:   false,
+			OwnerID:     "u-admin",
+			MemberIDs:   []string{},
+			CreatedAt:   time.Now().UTC(),
+			UpdatedAt:   time.Now().UTC(),
+		})
+	}
+
 	writeJSON(w, http.StatusOK, APIResponse{
 		Success:   true,
 		Data:      projects,

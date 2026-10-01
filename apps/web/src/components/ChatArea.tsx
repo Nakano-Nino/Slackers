@@ -90,6 +90,7 @@ interface Props {
   channelVoiceParticipantsCount?: number;
   onJoinChannelVoice?: (channelId: string) => void;
   onOpenVoiceStage?: () => void;
+  onDeleteChannel?: (channel: Channel) => void;
 }
 
 function EncryptedAttachmentCard({ attachment }: { attachment: FileAttachmentMetadata }) {
@@ -368,6 +369,7 @@ export function ChatArea({
   channelVoiceParticipantsCount = 0,
   onJoinChannelVoice,
   onOpenVoiceStage,
+  onDeleteChannel,
 }: Props) {
   const usersMap = useMemo(() => {
     const map = new Map<string, User>();
@@ -1196,6 +1198,20 @@ export function ChatArea({
                   <Users className="w-3.5 h-3.5 text-slate-400 dark:text-neutral-500" />
                   <span>{channel.memberCount} members</span>
                 </div>
+                {currentUser?.role === 'admin' &&
+                  channel.id.toLowerCase() !== 'general' &&
+                  channel.name.toLowerCase() !== 'general' &&
+                  onDeleteChannel && (
+                    <button
+                      type="button"
+                      onClick={() => onDeleteChannel(channel)}
+                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 transition cursor-pointer"
+                      title={`Delete #${channel.name} (Admin only)`}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span className="hidden md:inline">Delete Channel</span>
+                    </button>
+                )}
               </div>
             )
           )}

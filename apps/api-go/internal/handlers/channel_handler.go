@@ -228,7 +228,7 @@ func (h *ChannelHandler) GetChannel(w http.ResponseWriter, r *http.Request) {
 
 func (h *ChannelHandler) DeleteChannel(w http.ResponseWriter, r *http.Request) {
 	claims := middleware.GetUserFromContext(r.Context())
-	if claims == nil || claims.Role != "admin" {
+	if claims == nil || strings.ToLower(claims.Role) != "admin" {
 		writeJSON(w, http.StatusForbidden, APIResponse{
 			Success:   false,
 			Error:     "Only admins can delete channels",
@@ -238,9 +238,42 @@ func (h *ChannelHandler) DeleteChannel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	channelID := chi.URLParam(r, "id")
-	ctx := r.Context()
+	if channelID == "" {
+		writeJSON(w, http.StatusBadRequest, APIResponse{
+			Success:   false,
+			Error:     "Channel ID is required",
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+		})
+		return
+	}
 
-	_, err := h.DB.Pool.Exec(ctx, `DELETE FROM public.channels WHERE id = $1`, channelID)
+	if strings.ToLower(channelID) == "general" {
+		writeJSON(w, http.StatusBadRequest, APIResponse{
+			Success:   false,
+			Error:     "The default #general channel cannot be deleted",
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+		})
+		return
+	}
+
+	ctx := r.Context()
+	tx, err := h.DB.Pool.Begin(ctx)
+	if err != nil {
+		writeJSON(w, http.StatusInternalServerError, APIResponse{
+			Success:   false,
+			Error:     "Failed to start transaction: " + err.Error(),
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+		})
+		return
+	}
+	defer tx.Rollback(ctx)
+
+	_, _ = tx.Exec(ctx, `DELETE FROM public.messages WHERE "channelId" = $1`, channelID)
+	_, _ = tx.Exec(ctx, `DELETE FROM public.channel_members WHERE "channelId" = $1`, channelID)
+	_, _ = tx.Exec(ctx, `DELETE FROM public.channel_keys WHERE "channelId" = $1`, channelID)
+	_, _ = tx.Exec(ctx, `DELETE FROM public.webhooks WHERE "channelId" = $1`, channelID)
+
+	res, err := tx.Exec(ctx, `DELETE FROM public.channels WHERE id = $1`, channelID)
 	if err != nil {
 		writeJSON(w, http.StatusInternalServerError, APIResponse{
 			Success:   false,
@@ -250,9 +283,27 @@ func (h *ChannelHandler) DeleteChannel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if res.RowsAffected() == 0 {
+		writeJSON(w, http.StatusNotFound, APIResponse{
+			Success:   false,
+			Error:     "Channel not found",
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+		})
+		return
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		writeJSON(w, http.StatusInternalServerError, APIResponse{
+			Success:   false,
+			Error:     "Failed to commit deletion: " + err.Error(),
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+		})
+		return
+	}
+
 	writeJSON(w, http.StatusOK, APIResponse{
 		Success:   true,
-		Data:      map[string]string{"message": "Channel deleted successfully"},
+		Data:      map[string]string{"id": channelID, "message": "Channel deleted successfully"},
 		Timestamp: time.Now().UTC().Format(time.RFC3339),
 	})
 }

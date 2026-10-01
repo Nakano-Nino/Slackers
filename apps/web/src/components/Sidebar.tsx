@@ -19,6 +19,7 @@ import {
   BellOff,
   UserPlus,
   Volume2,
+  Trash2,
   X,
 } from 'lucide-react';
 import { Channel, MuteTarget, Project, User, VoiceParticipant } from '../types';
@@ -30,6 +31,7 @@ interface Props {
   selectedChannelId: string;
   onSelectChannel: (id: string) => void;
   onOpenCreateChannel: () => void;
+  onDeleteChannel?: (channel: Channel) => void;
   projects: Project[];
   selectedProjectId: string;
   onSelectProject: (id: string) => void;
@@ -69,6 +71,7 @@ export function Sidebar({
   selectedChannelId,
   onSelectChannel,
   onOpenCreateChannel,
+  onDeleteChannel,
   projects,
   selectedProjectId,
   onSelectProject,
@@ -398,6 +401,29 @@ export function Sidebar({
                     )}
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
+                    {currentUser?.role === 'admin' &&
+                      channel.id.toLowerCase() !== 'general' &&
+                      channel.name.toLowerCase() !== 'general' &&
+                      onDeleteChannel && (
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onDeleteChannel(channel);
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.stopPropagation();
+                              onDeleteChannel(channel);
+                            }
+                          }}
+                          title={`Delete #${channel.name}`}
+                          className="opacity-0 group-hover:opacity-100 p-1 hover:bg-rose-500/20 text-neutral-400 hover:text-rose-400 rounded transition cursor-pointer"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </span>
+                      )}
                     {(channelVoiceStates[channel.id]?.length || 0) > 0 && (
                       <span
                         className="flex items-center gap-1 text-[10px] font-semibold text-emerald-400 bg-emerald-500/15 px-1.5 py-0.5 rounded border border-emerald-500/30 shrink-0"

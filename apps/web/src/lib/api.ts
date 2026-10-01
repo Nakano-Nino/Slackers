@@ -257,6 +257,12 @@ export const api = {
     return res.data;
   },
 
+  deleteChannel: async (id: string): Promise<void> => {
+    await fetchJson<ApiResponse<{ message: string }>>(`/api/channels/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
   saveChannelKey: async (channelId: string, data: { encryptedKey: string; iv: string }): Promise<ChannelKey> => {
     const res = await fetchJson<ApiResponse<ChannelKey>>(`/api/channels/${channelId}/keys`, {
       method: 'POST',

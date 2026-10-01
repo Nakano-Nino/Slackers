@@ -26,6 +26,7 @@ import { KanbanBoard } from '../components/KanbanBoard';
 import { BugTracker } from '../components/BugTracker';
 import { ProjectProgressBar } from '../components/ProjectProgressBar';
 import { CreateChannelModal } from '../components/CreateChannelModal';
+import { DeleteChannelModal } from '../components/DeleteChannelModal';
 import { CreateProjectModal } from '../components/CreateProjectModal';
 import { ProjectMembersModal } from '../components/ProjectMembersModal';
 import { CreateTaskModal } from '../components/CreateTaskModal';
@@ -86,6 +87,7 @@ export default function Home() {
 
   // Modals
   const [isChannelModalOpen, setIsChannelModalOpen] = useState(false);
+  const [channelToDelete, setChannelToDelete] = useState<Channel | null>(null);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [isProjectMembersModalOpen, setIsProjectMembersModalOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
@@ -1160,6 +1162,25 @@ export default function Home() {
     setSelectedChannelId(newChannel.id);
   };
 
+  const handleDeleteChannel = async (channelId: string) => {
+    await api.deleteChannel(channelId);
+    setChannels((prev) => prev.filter((c) => c.id !== channelId));
+    if (selectedChannelId === channelId) {
+      setSelectedChannelId('general');
+    }
+    setToastNotification({
+      id: `chan-del-${Date.now()}`,
+      recipientId: currentUser?.id || '',
+      senderId: 'system',
+      senderName: 'Slackers System',
+      type: 'message',
+      title: 'Channel Deleted',
+      content: 'The channel has been permanently deleted.',
+      isRead: false,
+      createdAt: new Date().toISOString(),
+    });
+  };
+
   const handleCreateProject = async (projectData: {
     name: string;
     key: string;
@@ -1668,6 +1689,7 @@ export default function Home() {
         }}
         unreadChannels={unreadChannels}
         onOpenCreateChannel={() => setIsChannelModalOpen(true)}
+        onDeleteChannel={(channel) => setChannelToDelete(channel)}
         projects={projects}
         selectedProjectId={selectedProjectId}
         onSelectProject={setSelectedProjectId}
@@ -1738,6 +1760,7 @@ export default function Home() {
             }
             onJoinChannelVoice={(channelId) => voiceChat.joinVoiceChannel(channelId)}
             onOpenVoiceStage={() => voiceChat.setIsStageOpen(true)}
+            onDeleteChannel={(channel) => setChannelToDelete(channel)}
           />
         ) : activeView === 'kanban' ? (
           <div className="flex-1 flex flex-col h-full p-6 overflow-hidden">
@@ -1833,6 +1856,13 @@ export default function Home() {
         isOpen={isChannelModalOpen}
         onClose={() => setIsChannelModalOpen(false)}
         onCreate={handleCreateChannel}
+      />
+
+      <DeleteChannelModal
+        isOpen={!!channelToDelete}
+        onClose={() => setChannelToDelete(null)}
+        channel={channelToDelete}
+        onConfirmDelete={handleDeleteChannel}
       />
 
       <CreateProjectModal

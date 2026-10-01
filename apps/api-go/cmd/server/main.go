@@ -97,6 +97,10 @@ func main() {
 		})
 	})
 
+	// Public Invitation Routes
+	r.Get("/api/members/invitations/verify/{token}", memberHandler.VerifyInvitation)
+	r.Post("/api/members/invitations/accept", memberHandler.AcceptInvitation)
+
 	// Protected Workspace API Routes
 	r.Group(func(r chi.Router) {
 		r.Use(middleware.AuthMiddleware(cfg.JWTSecret))
@@ -150,8 +154,16 @@ func main() {
 			r.Post("/", dmHandler.SendDm)
 		})
 
-		// Workspace Members
-		r.Get("/api/members", memberHandler.ListMembers)
+		// Workspace Members & Invitations
+		r.Route("/api/members", func(r chi.Router) {
+			r.Get("/", memberHandler.ListMembers)
+			r.Post("/", memberHandler.AddMember)
+			r.Post("/invite", memberHandler.CreateInvitation)
+			r.Get("/invitations", memberHandler.ListInvitations)
+			r.Delete("/invitations/{id}", memberHandler.RevokeInvitation)
+			r.Patch("/{id}/role", memberHandler.UpdateMemberRole)
+			r.Put("/{id}/role", memberHandler.UpdateMemberRole)
+		})
 		r.Get("/api/users", memberHandler.ListMembers)
 
 		// Notifications

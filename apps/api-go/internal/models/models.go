@@ -171,3 +171,52 @@ type LoginResponse struct {
 	Token string `json:"token"`
 	User  *User  `json:"user"`
 }
+
+type Invitation struct {
+	ID            string     `json:"id"`
+	Token         string     `json:"token"`
+	Email         *string    `json:"email,omitempty"`
+	Role          string     `json:"role"`
+	DeveloperRole *string    `json:"developerRole,omitempty"`
+	InvitedByID   string     `json:"invitedById"`
+	InvitedByName *string    `json:"invitedByName,omitempty"`
+	ExpiresAt     time.Time  `json:"expiresAt"`
+	IsUsed        bool       `json:"isUsed"`
+	UsedByID      *string    `json:"usedById,omitempty"`
+	UsedAt        *time.Time `json:"usedAt,omitempty"`
+	CreatedAt     time.Time  `json:"createdAt"`
+}
+
+type AddMemberRequest struct {
+	Name          string  `json:"name"`
+	Email         string  `json:"email"`
+	Password      *string `json:"password,omitempty"`
+	Role          *string `json:"role,omitempty"`
+	DeveloperRole *string `json:"developerRole,omitempty"`
+}
+
+type AddMemberResponse struct {
+	User         *User   `json:"user"`
+	TempPassword *string `json:"tempPassword,omitempty"`
+}
+
+type CreateInvitationRequest struct {
+	Email         *string `json:"email,omitempty"`
+	Role          *string `json:"role,omitempty"`
+	DeveloperRole *string `json:"developerRole,omitempty"`
+	ExpiresInDays *int    `json:"expiresInDays,omitempty"`
+}
+
+type AcceptInvitationRequest struct {
+	Token         string  `json:"token"`
+	Name          string  `json:"name"`
+	Email         *string `json:"email,omitempty"`
+	Password      string  `json:"password"`
+	DeveloperRole *string `json:"developerRole,omitempty"`
+}
+
+type UpdateMemberRoleRequest struct {
+	Role          *string `json:"role,omitempty"`
+	DeveloperRole *string `json:"developerRole,omitempty"`
+}
+

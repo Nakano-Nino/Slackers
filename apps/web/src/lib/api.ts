@@ -90,11 +90,22 @@ async function fetchJson<T>(endpoint: string, options?: RequestInit): Promise<T>
       cache: 'no-store',
     });
 
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.error || `HTTP error! status: ${res.status}`);
+    const text = await res.text();
+    let data: any = null;
+    if (text) {
+      try {
+        data = JSON.parse(text);
+      } catch {
+        // Response was not JSON
+      }
     }
-    return data;
+
+    if (!res.ok) {
+      const errorMsg = data?.error || (text && text.length < 200 ? text : `HTTP error! status: ${res.status}`);
+      throw new Error(errorMsg);
+    }
+
+    return (data !== null ? data : {}) as T;
   } catch (err: unknown) {
     if (err instanceof Error) {
       throw err;

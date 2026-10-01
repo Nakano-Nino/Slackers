@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -95,9 +96,10 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 			})
 			return
 		}
+		log.Printf("ERROR: Database error during user lookup: %v", err)
 		writeJSON(w, http.StatusInternalServerError, APIResponse{
 			Success:   false,
-			Error:     "Database error: " + err.Error(),
+			Error:     "Authentication service temporarily unavailable. Please try again later.",
 			Timestamp: time.Now().UTC().Format(time.RFC3339),
 		})
 		return

@@ -67,7 +67,7 @@ services:
       sleep 4;
       /usr/bin/mc alias set myminio http://minio:9000 $${MINIO_ROOT_USER:-minioadmin} $${MINIO_ROOT_PASSWORD};
       /usr/bin/mc mb --ignore-existing myminio/$${S3_BUCKET_NAME:-slackers-encrypted-files};
-      /usr/bin/mc anonymous set download myminio/$${S3_BUCKET_NAME:-slackers-encrypted-files};
+      /usr/bin/mc anonymous set none myminio/$${S3_BUCKET_NAME:-slackers-encrypted-files};
       exit 0;
       "
     networks:

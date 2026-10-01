@@ -84,10 +84,14 @@ func main() {
 	// Pure WebSocket Endpoint (WebRTC Signaling, Real-time Chat, Presence)
 	r.Get("/ws", wsHandler.ServeWS)
 
+	// Rate limiters for brute-force protection
+	authRateLimiter := middleware.NewIPRateLimiter(10, time.Minute)
+	inviteRateLimiter := middleware.NewIPRateLimiter(20, time.Minute)
+
 	// Public Auth Routes
 	r.Route("/api/auth", func(r chi.Router) {
-		r.Post("/login", authHandler.Login)
-		r.Post("/register", authHandler.Register)
+		r.With(authRateLimiter.Limit).Post("/login", authHandler.Login)
+		r.With(authRateLimiter.Limit).Post("/register", authHandler.Register)
 
 		// Protected Auth Routes
 		r.Group(func(r chi.Router) {
@@ -98,8 +102,8 @@ func main() {
 	})
 
 	// Public Invitation Routes
-	r.Get("/api/members/invitations/verify/{token}", memberHandler.VerifyInvitation)
-	r.Post("/api/members/invitations/accept", memberHandler.AcceptInvitation)
+	r.With(inviteRateLimiter.Limit).Get("/api/members/invitations/verify/{token}", memberHandler.VerifyInvitation)
+	r.With(inviteRateLimiter.Limit).Post("/api/members/invitations/accept", memberHandler.AcceptInvitation)
 
 	// Protected Workspace API Routes
 	r.Group(func(r chi.Router) {

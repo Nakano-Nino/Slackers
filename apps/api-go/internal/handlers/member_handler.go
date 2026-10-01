@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -90,17 +91,17 @@ func NewMemberHandler(database *db.Database, cfg *config.Config) *MemberHandler 
 func (h *MemberHandler) ListMembers(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	query := `
-		SELECT id, email, name, avatar, "publicKey", "encryptedPrivateKey",
-		       "keyVaultSalt", "keyVaultIv", role::text, "developerRole", status::text, "createdAt", "updatedAt"
+		SELECT id, email, name, avatar, "publicKey", role::text, "developerRole", status::text, "createdAt", "updatedAt"
 		FROM public.users
 		ORDER BY name ASC
 	`
 
 	rows, err := h.DB.Pool.Query(ctx, query)
 	if err != nil {
+		log.Printf("ERROR: Failed to query members: %v", err)
 		writeJSON(w, http.StatusInternalServerError, APIResponse{
 			Success:   false,
-			Error:     "Failed to query members: " + err.Error(),
+			Error:     "Failed to query workspace members. Please try again later.",
 			Timestamp: time.Now().UTC().Format(time.RFC3339),
 		})
 		return
@@ -112,8 +113,8 @@ func (h *MemberHandler) ListMembers(w http.ResponseWriter, r *http.Request) {
 		var u models.User
 		var roleStr, statusStr string
 		if err := rows.Scan(
-			&u.ID, &u.Email, &u.Name, &u.Avatar, &u.PublicKey, &u.EncryptedPrivateKey,
-			&u.KeyVaultSalt, &u.KeyVaultIv, &roleStr, &u.DeveloperRole, &statusStr,
+			&u.ID, &u.Email, &u.Name, &u.Avatar, &u.PublicKey,
+			&roleStr, &u.DeveloperRole, &statusStr,
 			&u.CreatedAt, &u.UpdatedAt,
 		); err != nil {
 			continue
@@ -186,9 +187,10 @@ func (h *MemberHandler) AddMember(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	} else if err != pgx.ErrNoRows {
+		log.Printf("ERROR: Database check failed in AddMember: %v", err)
 		writeJSON(w, http.StatusInternalServerError, APIResponse{
 			Success:   false,
-			Error:     "Database check failed: " + err.Error(),
+			Error:     "An unexpected error occurred while verifying the email.",
 			Timestamp: time.Now().UTC().Format(time.RFC3339),
 		})
 		return
@@ -247,9 +249,10 @@ func (h *MemberHandler) AddMember(w http.ResponseWriter, r *http.Request) {
 		&newUser.CreatedAt, &newUser.UpdatedAt,
 	)
 	if err != nil {
+		log.Printf("ERROR: Failed to create user in database: %v", err)
 		writeJSON(w, http.StatusInternalServerError, APIResponse{
 			Success:   false,
-			Error:     "Failed to create user in database: " + err.Error(),
+			Error:     "Failed to create user in database. Please verify input data and try again.",
 			Timestamp: time.Now().UTC().Format(time.RFC3339),
 		})
 		return
@@ -257,6 +260,9 @@ func (h *MemberHandler) AddMember(w http.ResponseWriter, r *http.Request) {
 
 	newUser.Role = strings.ToLower(roleStr)
 	newUser.Status = strings.ToLower(statusStr)
+	newUser.EncryptedPrivateKey = nil
+	newUser.KeyVaultSalt = nil
+	newUser.KeyVaultIv = nil
 
 	writeJSON(w, http.StatusCreated, APIResponse{
 		Success: true,
@@ -343,9 +349,10 @@ func (h *MemberHandler) UpdateMemberRole(w http.ResponseWriter, r *http.Request)
 		&u.CreatedAt, &u.UpdatedAt,
 	)
 	if err != nil {
+		log.Printf("ERROR: Failed to update member role: %v", err)
 		writeJSON(w, http.StatusInternalServerError, APIResponse{
 			Success:   false,
-			Error:     "Failed to update member role: " + err.Error(),
+			Error:     "Failed to update member role. Please try again later.",
 			Timestamp: time.Now().UTC().Format(time.RFC3339),
 		})
 		return
@@ -353,6 +360,9 @@ func (h *MemberHandler) UpdateMemberRole(w http.ResponseWriter, r *http.Request)
 
 	u.Role = strings.ToLower(roleStr)
 	u.Status = strings.ToLower(statusStr)
+	u.EncryptedPrivateKey = nil
+	u.KeyVaultSalt = nil
+	u.KeyVaultIv = nil
 
 	writeJSON(w, http.StatusOK, APIResponse{
 		Success:   true,
@@ -435,9 +445,10 @@ func (h *MemberHandler) CreateInvitation(w http.ResponseWriter, r *http.Request)
 		&statusStr, &inv.ExpiresAt, &inv.CreatedAt,
 	)
 	if err != nil {
+		log.Printf("ERROR: Failed to persist invitation: %v", err)
 		writeJSON(w, http.StatusInternalServerError, APIResponse{
 			Success:   false,
-			Error:     "Failed to persist invitation: " + err.Error(),
+			Error:     "Failed to create invitation. Please try again later.",
 			Timestamp: time.Now().UTC().Format(time.RFC3339),
 		})
 		return
@@ -487,9 +498,10 @@ func (h *MemberHandler) ListInvitations(w http.ResponseWriter, r *http.Request) 
 
 	rows, err := h.DB.Pool.Query(ctx, query)
 	if err != nil {
+		log.Printf("ERROR: Failed to query invitations: %v", err)
 		writeJSON(w, http.StatusInternalServerError, APIResponse{
 			Success:   false,
-			Error:     "Failed to query invitations: " + err.Error(),
+			Error:     "Failed to query invitations. Please try again later.",
 			Timestamp: time.Now().UTC().Format(time.RFC3339),
 		})
 		return
@@ -546,9 +558,10 @@ func (h *MemberHandler) RevokeInvitation(w http.ResponseWriter, r *http.Request)
 
 	result, err := h.DB.Pool.Exec(ctx, `DELETE FROM public.invitations WHERE id = $1 OR token = $1`, id)
 	if err != nil {
+		log.Printf("ERROR: Failed to revoke invitation: %v", err)
 		writeJSON(w, http.StatusInternalServerError, APIResponse{
 			Success:   false,
-			Error:     "Failed to revoke invitation: " + err.Error(),
+			Error:     "Failed to revoke invitation. Please try again later.",
 			Timestamp: time.Now().UTC().Format(time.RFC3339),
 		})
 		return
@@ -608,9 +621,10 @@ func (h *MemberHandler) VerifyInvitation(w http.ResponseWriter, r *http.Request)
 			})
 			return
 		}
+		log.Printf("ERROR: Database error verifying invitation: %v", err)
 		writeJSON(w, http.StatusInternalServerError, APIResponse{
 			Success:   false,
-			Error:     "Database error: " + err.Error(),
+			Error:     "An error occurred while verifying the invitation. Please try again later.",
 			Timestamp: time.Now().UTC().Format(time.RFC3339),
 		})
 		return
@@ -694,9 +708,10 @@ func (h *MemberHandler) AcceptInvitation(w http.ResponseWriter, r *http.Request)
 			})
 			return
 		}
+		log.Printf("ERROR: Database error in AcceptInvitation: %v", err)
 		writeJSON(w, http.StatusInternalServerError, APIResponse{
 			Success:   false,
-			Error:     "Database error: " + err.Error(),
+			Error:     "An error occurred while processing the invitation. Please try again later.",
 			Timestamp: time.Now().UTC().Format(time.RFC3339),
 		})
 		return
@@ -787,9 +802,10 @@ func (h *MemberHandler) AcceptInvitation(w http.ResponseWriter, r *http.Request)
 		&newUser.CreatedAt, &newUser.UpdatedAt,
 	)
 	if err != nil {
+		log.Printf("ERROR: Failed to create user in AcceptInvitation: %v", err)
 		writeJSON(w, http.StatusInternalServerError, APIResponse{
 			Success:   false,
-			Error:     "Failed to create user: " + err.Error(),
+			Error:     "Failed to create user account. Please try again later.",
 			Timestamp: time.Now().UTC().Format(time.RFC3339),
 		})
 		return
@@ -797,6 +813,9 @@ func (h *MemberHandler) AcceptInvitation(w http.ResponseWriter, r *http.Request)
 
 	newUser.Role = strings.ToLower(roleStr)
 	newUser.Status = strings.ToLower(statusStr)
+	newUser.EncryptedPrivateKey = nil
+	newUser.KeyVaultSalt = nil
+	newUser.KeyVaultIv = nil
 
 	// Mark invitation accepted
 	_, _ = h.DB.Pool.Exec(ctx, `UPDATE public.invitations SET status = 'accepted', "acceptedAt" = NOW() WHERE id = $1`, invID)

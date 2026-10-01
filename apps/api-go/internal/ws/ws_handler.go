@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -32,8 +33,21 @@ func NewWSHandler(hub *Hub, database *db.Database, cfg *config.Config) *WSHandle
 			ReadBufferSize:  1024 * 64,
 			WriteBufferSize: 1024 * 64,
 			CheckOrigin: func(r *http.Request) bool {
-				// Allow dynamic origin mirroring; JWT auth protects the endpoint
-				return true
+				origin := r.Header.Get("Origin")
+				if origin == "" {
+					return true // Non-browser clients (curl, mobile apps)
+				}
+				// Allow local development and configured client URL
+				if origin == cfg.ClientURL || origin == "http://localhost:3000" || origin == "http://127.0.0.1:3000" {
+					return true
+				}
+				// Verify if origin host matches the server host (same-origin / reverse proxy)
+				u, err := url.Parse(origin)
+				if err == nil && (strings.EqualFold(u.Host, r.Host) || strings.EqualFold(u.Hostname(), r.Host)) {
+					return true
+				}
+				log.Printf("SECURITY WARNING: Rejected WebSocket handshake from untrusted origin: %s (Host: %s)", origin, r.Host)
+				return false
 			},
 		},
 	}

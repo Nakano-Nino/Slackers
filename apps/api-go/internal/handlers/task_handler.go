@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -106,6 +107,15 @@ func (h *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if strings.ToLower(claims.Role) == "viewer" {
+		writeJSON(w, http.StatusForbidden, APIResponse{
+			Success:   false,
+			Error:     "Permission denied: Viewers cannot create tasks",
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+		})
+		return
+	}
+
 	var req struct {
 		ProjectID   string   `json:"projectId"`
 		Title       string   `json:"title"`
@@ -195,6 +205,25 @@ func (h *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *TaskHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
+	claims := middleware.GetUserFromContext(r.Context())
+	if claims == nil {
+		writeJSON(w, http.StatusUnauthorized, APIResponse{
+			Success:   false,
+			Error:     "Authentication required",
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+		})
+		return
+	}
+
+	if strings.ToLower(claims.Role) == "viewer" {
+		writeJSON(w, http.StatusForbidden, APIResponse{
+			Success:   false,
+			Error:     "Permission denied: Viewers cannot update tasks",
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+		})
+		return
+	}
+
 	taskID := chi.URLParam(r, "id")
 	ctx := r.Context()
 
@@ -262,9 +291,10 @@ func (h *TaskHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	var projectID string
 	err := h.DB.Pool.QueryRow(ctx, query, args...).Scan(&projectID)
 	if err != nil {
+		log.Printf("ERROR: Failed to update task: %v", err)
 		writeJSON(w, http.StatusInternalServerError, APIResponse{
 			Success:   false,
-			Error:     "Failed to update task: " + err.Error(),
+			Error:     "Failed to update task. Please try again later.",
 			Timestamp: time.Now().UTC().Format(time.RFC3339),
 		})
 		return
@@ -286,17 +316,46 @@ func (h *TaskHandler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *TaskHandler) DeleteTask(w http.ResponseWriter, r *http.Request) {
+	claims := middleware.GetUserFromContext(r.Context())
+	if claims == nil {
+		writeJSON(w, http.StatusUnauthorized, APIResponse{
+			Success:   false,
+			Error:     "Authentication required",
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+		})
+		return
+	}
+
 	taskID := chi.URLParam(r, "id")
 	ctx := r.Context()
 
-	var projectID string
-	_ = h.DB.Pool.QueryRow(ctx, `SELECT "projectId" FROM public.tasks WHERE id = $1`, taskID).Scan(&projectID)
-
-	_, err := h.DB.Pool.Exec(ctx, `DELETE FROM public.tasks WHERE id = $1`, taskID)
+	var projectID, creatorID string
+	err := h.DB.Pool.QueryRow(ctx, `SELECT "projectId", "creatorId" FROM public.tasks WHERE id = $1`, taskID).Scan(&projectID, &creatorID)
 	if err != nil {
+		writeJSON(w, http.StatusNotFound, APIResponse{
+			Success:   false,
+			Error:     "Task not found",
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+		})
+		return
+	}
+
+	callerRole := strings.ToLower(claims.Role)
+	if callerRole != "admin" && callerRole != "manager" && creatorID != claims.ID {
+		writeJSON(w, http.StatusForbidden, APIResponse{
+			Success:   false,
+			Error:     "Permission denied: Only task creators, managers, or admins can delete this task",
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+		})
+		return
+	}
+
+	_, err = h.DB.Pool.Exec(ctx, `DELETE FROM public.tasks WHERE id = $1`, taskID)
+	if err != nil {
+		log.Printf("ERROR: Failed to delete task: %v", err)
 		writeJSON(w, http.StatusInternalServerError, APIResponse{
 			Success:   false,
-			Error:     "Failed to delete task: " + err.Error(),
+			Error:     "Failed to delete task. Please try again later.",
 			Timestamp: time.Now().UTC().Format(time.RFC3339),
 		})
 		return

@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -92,6 +93,15 @@ func (h *BugHandler) CreateBug(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusUnauthorized, APIResponse{
 			Success:   false,
 			Error:     "Unauthorized",
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+		})
+		return
+	}
+
+	if strings.ToLower(claims.Role) == "viewer" {
+		writeJSON(w, http.StatusForbidden, APIResponse{
+			Success:   false,
+			Error:     "Permission denied: Viewers cannot report bugs",
 			Timestamp: time.Now().UTC().Format(time.RFC3339),
 		})
 		return
@@ -197,6 +207,25 @@ func (h *BugHandler) CreateBug(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *BugHandler) UpdateBug(w http.ResponseWriter, r *http.Request) {
+	claims := middleware.GetUserFromContext(r.Context())
+	if claims == nil {
+		writeJSON(w, http.StatusUnauthorized, APIResponse{
+			Success:   false,
+			Error:     "Authentication required",
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+		})
+		return
+	}
+
+	if strings.ToLower(claims.Role) == "viewer" {
+		writeJSON(w, http.StatusForbidden, APIResponse{
+			Success:   false,
+			Error:     "Permission denied: Viewers cannot update bugs",
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+		})
+		return
+	}
+
 	bugID := chi.URLParam(r, "id")
 	ctx := r.Context()
 
@@ -251,9 +280,10 @@ func (h *BugHandler) UpdateBug(w http.ResponseWriter, r *http.Request) {
 	query := fmt.Sprintf(`UPDATE public.bugs SET %s WHERE id = $1`, strings.Join(updates, ", "))
 	_, err := h.DB.Pool.Exec(ctx, query, args...)
 	if err != nil {
+		log.Printf("ERROR: Failed to update bug: %v", err)
 		writeJSON(w, http.StatusInternalServerError, APIResponse{
 			Success:   false,
-			Error:     "Failed to update bug: " + err.Error(),
+			Error:     "Failed to update bug. Please try again later.",
 			Timestamp: time.Now().UTC().Format(time.RFC3339),
 		})
 		return
@@ -267,14 +297,46 @@ func (h *BugHandler) UpdateBug(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *BugHandler) DeleteBug(w http.ResponseWriter, r *http.Request) {
+	claims := middleware.GetUserFromContext(r.Context())
+	if claims == nil {
+		writeJSON(w, http.StatusUnauthorized, APIResponse{
+			Success:   false,
+			Error:     "Authentication required",
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+		})
+		return
+	}
+
 	bugID := chi.URLParam(r, "id")
 	ctx := r.Context()
 
-	_, err := h.DB.Pool.Exec(ctx, `DELETE FROM public.bugs WHERE id = $1`, bugID)
+	var reporterID string
+	err := h.DB.Pool.QueryRow(ctx, `SELECT "reportedById" FROM public.bugs WHERE id = $1`, bugID).Scan(&reporterID)
 	if err != nil {
+		writeJSON(w, http.StatusNotFound, APIResponse{
+			Success:   false,
+			Error:     "Bug not found",
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+		})
+		return
+	}
+
+	callerRole := strings.ToLower(claims.Role)
+	if callerRole != "admin" && callerRole != "manager" && reporterID != claims.ID {
+		writeJSON(w, http.StatusForbidden, APIResponse{
+			Success:   false,
+			Error:     "Permission denied: Only bug reporters, managers, or admins can delete this bug",
+			Timestamp: time.Now().UTC().Format(time.RFC3339),
+		})
+		return
+	}
+
+	_, err = h.DB.Pool.Exec(ctx, `DELETE FROM public.bugs WHERE id = $1`, bugID)
+	if err != nil {
+		log.Printf("ERROR: Failed to delete bug: %v", err)
 		writeJSON(w, http.StatusInternalServerError, APIResponse{
 			Success:   false,
-			Error:     "Failed to delete bug: " + err.Error(),
+			Error:     "Failed to delete bug. Please try again later.",
 			Timestamp: time.Now().UTC().Format(time.RFC3339),
 		})
 		return
